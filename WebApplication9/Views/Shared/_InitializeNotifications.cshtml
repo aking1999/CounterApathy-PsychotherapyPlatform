@@ -1,0 +1,11 @@
+﻿@using Framework.Helpers.ExtensionMethods;
+@using Microsoft.AspNetCore.Identity
+@using Database.Models
+@inject UserManager<CustomClient> UserManager
+@inject SignInManager<CustomClient> SignInManager
+
+<script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
+<script>
+    var url = '@await Html.GetNotificationsUrlBasedOnRole(User, UserManager)';
+</script>
+<script src="~/notification/notifications.js"></script>

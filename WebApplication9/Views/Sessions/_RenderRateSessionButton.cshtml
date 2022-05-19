@@ -1,0 +1,175 @@
+﻿@model WebApplication9.ViewModels.BookedSessionViewModel
+
+@if (!Model.Rating.HasRating && Model.SessionHasEnded)
+{
+    <div id="rate-session-modal-@Model.BookingId" data-toggle="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true" style="padding: 0 !important;">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-primary">Rate this session</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="form-rate-session-@Model.BookingId" asp-area="" asp-controller="Sessions" asp-action="RateSession" method="post" autocomplete="off">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-primary mb-0" id="privacy-protected" role="alert">
+                                    <i class="far fa-shield-alt"></i>&nbsp;Privacy protected
+                                    <a href="#"
+                                       id="btn-show-popover-@Model.BookingId"
+                                       class="col-form-label"
+                                       data-placement="bottom"
+                                       title="Your privacy is protected at all times."
+                                       style="margin-bottom: 20px !important;"
+                                       data-content="When you rate a session, your information will be invisible to others. Only your name initials will be shown.">
+                                        <i class="fas fa-question-circle text-primary"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-8 offset-md-2">
+                                <div class="form-group">
+                                </div>
+                                <center>
+                                    <div class="form-group">
+                                        <div id="full-stars-example-two">
+                                            <div class="rating-group">
+                                                <input asp-for="Rating.StarsRating" name="rating3" disabled checked class="rating__input rating__input--none" id="rating3-none-@Model.BookingId" value="0" type="radio">
+
+                                                <label aria-label="1 star" class="rating__label" for="rating3-1-@Model.BookingId"><i class="rating__icon rating__icon--star fa fa-star"></i></label>
+                                                <input asp-for="Rating.StarsRating" name="rating3" class="rating__input" id="rating3-1-@Model.BookingId" value="1" type="radio">
+
+                                                <label aria-label="2 stars" class="rating__label" for="rating3-2-@Model.BookingId"><i class="rating__icon rating__icon--star fa fa-star"></i></label>
+                                                <input asp-for="Rating.StarsRating" name="rating3" class="rating__input" id="rating3-2-@Model.BookingId" value="2" type="radio">
+
+                                                <label aria-label="3 stars" class="rating__label" for="rating3-3-@Model.BookingId"><i class="rating__icon rating__icon--star fa fa-star"></i></label>
+                                                <input asp-for="Rating.StarsRating" name="rating3" class="rating__input" id="rating3-3-@Model.BookingId" value="3" type="radio">
+
+                                                <label aria-label="4 stars" class="rating__label" for="rating3-4-@Model.BookingId"><i class="rating__icon rating__icon--star fa fa-star"></i></label>
+                                                <input asp-for="Rating.StarsRating" name="rating3" class="rating__input" id="rating3-4-@Model.BookingId" value="4" type="radio">
+
+                                                <label aria-label="5 stars" class="rating__label" for="rating3-5-@Model.BookingId"><i class="rating__icon rating__icon--star fa fa-star"></i></label>
+                                                <input asp-for="Rating.StarsRating" name="rating3" class="rating__input" id="rating3-5-@Model.BookingId" value="5" type="radio">
+                                            </div>
+                                            <br />
+                                            <span id="validation-stars-rating-@Model.BookingId" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </center>
+                                <div class="form-group">
+                                    <textarea asp-for="Rating.Comment" id="comment-@Model.BookingId" placeholder="Comment..." rows="2" class="form-control"></textarea>
+                                    <br />
+                                    <span id="validation-comment-@Model.BookingId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Rate</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <button id="btn-rate-session-@Model.BookingId"
+            class="btn btn-warning btn-mini b-none "
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Rate this session">
+        <i class="far fa-star m-0"></i>
+    </button>
+
+    <script>
+        $(document).ready(function () {
+            $('#btn-show-popover-' + '@Model.BookingId').popover({
+                trigger: 'focus'
+            });
+
+            $('#btn-rate-session-' + '@Model.BookingId').click(function () {
+                $('#rate-session-modal-' + '@Model.BookingId').modal('show');
+            });
+
+            $('#form-rate-session-' + '@Model.BookingId').submit(function (e) {
+                e.preventDefault();
+
+                var formData = new FormData($('#form-rate-session-' + '@Model.BookingId').get(0));
+
+                let stars = $('#form-rate-session-' + '@Model.BookingId' + ' input[name="rating3"]:checked').val();
+
+                //formData = new FormData();
+                formData.append("bookedSessionVm.BookingId", '@Model.BookingId');
+                formData.append("bookedSessionVm.SessionId", '@Model.SessionId');
+                formData.append("bookedSessionVm.TherapistId", '@Model.TherapistId');
+                formData.append("bookedSessionVm.Rating.StarsRating", stars);
+                formData.append("bookedSessionVm.Rating.Comment", $('#comment-' + '@Model.BookingId').val());
+
+                $.ajax({
+                    url: '@Url.Action("RateSession", "Sessions", new { Area = "" })',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false
+                }).done(function (response) {
+                    if (response.success) {
+                        $('#rate-session-modal-' + '@Model.BookingId').modal('hide');
+
+                        Swal.fire(
+                            'Congratulations!',
+                            'You have succesfully rated the session.',
+                            'success'
+                        ).then((result) => {
+                            window.location.href = '@Url.Action("BookedSessions", "Sessions")';
+                        });
+                    }
+                    else {
+                        if (!response.errors)
+                            toastr[response.toastSeverity](response.toastBody, response.toastHeader);
+                        else {
+                            let errorArray = $.map(response.errors, function (value, index) {
+                                return [value];
+                            });
+                            $.each(errorArray, function (index, value) {
+                            @*if (value.key === 'bookedSessionVm.Rating.StarsRating') {
+                                $('#validation-stars-rating-' + '@Model.BookingId').html(value.value);
+                            }
+                            else if (value.key === 'bookedSessionVm.Rating.Comment') {
+                                $('#validation-comment-' + '@Model.BookingId').html(value.value);
+                            }*@
+                                if (String(value.key).toLowerCase().indexOf('starsrating') > -1) {
+                                    $('#validation-stars-rating-' + '@Model.BookingId').html(value.value);
+                                }
+                                else if (String(value.key).toLowerCase().indexOf('comment') > -1) {
+                                    $('#validation-comment-' + '@Model.BookingId').html(value.value);
+                                }
+                            })
+                        }
+                    }
+                })
+            })
+        });
+    </script>
+}
+else
+{
+    <button id="btn-rate-session-@Model.BookingId"
+            class="btn btn-warning btn-mini b-none "
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Rate this session">
+        <i class="far fa-star m-0"></i>
+    </button>
+
+    <script>
+        $('#btn-rate-session-' + '@Model.BookingId').click(function () {
+            Swal.fire(
+                'Session cannot be rated yet.',
+                'You can rate the session after the session has ended.',
+                'info'
+            );
+        });
+    </script>
+}

@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20210811113554_dodajem_terapeuta_i_metodeKontaktiranjaTerapeuta_i_upitnik.cs" />
+    <Compile Remove="Data\Migrations\20210811113554_dodajem_terapeuta_i_metodeKontaktiranjaTerapeuta_i_upitnik.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210811113940_dodajem_foreignKey_za_terapeute_i_metodeKontaktiranjaTerapeuta.cs" />
+    <Compile Remove="Data\Migrations\20210811113940_dodajem_foreignKey_za_terapeute_i_metodeKontaktiranjaTerapeuta.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210811114214_konacno_dodajem_foreignKeyeve_u_CustomClient.cs" />
+    <Compile Remove="Data\Migrations\20210811114214_konacno_dodajem_foreignKeyeve_u_CustomClient.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210811120058_konacno_dodajem_foreignKeyeve_u_CustomClient_i_menjam_duzine_Id_polja.cs" />
+    <Compile Remove="Data\Migrations\20210811120058_konacno_dodajem_foreignKeyeve_u_CustomClient_i_menjam_duzine_Id_polja.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210811120304_dodajem_foreignKeyeve.cs" />
+    <Compile Remove="Data\Migrations\20210811120304_dodajem_foreignKeyeve.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210811120509_promenio_sam_duzine_ruzcno.cs" />
+    <Compile Remove="Data\Migrations\20210811120509_promenio_sam_duzine_ruzcno.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210811122620_Dodajem_ContactMethods_i_Survey.cs" />
+    <Compile Remove="Data\Migrations\20210811122620_Dodajem_ContactMethods_i_Survey.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210811123726_Dodajem_therapists_i_therapistsContactMethods.cs" />
+    <Compile Remove="Data\Migrations\20210811123726_Dodajem_therapists_i_therapistsContactMethods.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210811124008_Dodajem_ForeignKey_Za_Therapists_i_TherapistsContactMethods.cs" />
+    <Compile Remove="Data\Migrations\20210811124008_Dodajem_ForeignKey_Za_Therapists_i_TherapistsContactMethods.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210811124128_Dodajem_ForeignKey_Za_Therapists_i_TherapistsContactMethods.cs" />
+    <Compile Remove="Data\Migrations\20210811124128_Dodajem_ForeignKey_Za_Therapists_i_TherapistsContactMethods.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210811124251_Dodajem_ForeignKey_Za_Therapists_i_TherapistsContactMethods.cs" />
+    <Compile Remove="Data\Migrations\20210811124251_Dodajem_ForeignKey_Za_Therapists_i_TherapistsContactMethods.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210815132843_dodajem_unique_na_therapists_prema_aspnetusers.cs" />
+    <Compile Remove="Data\Migrations\20210815132843_dodajem_unique_na_therapists_prema_aspnetusers.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210815134055_Dodajem_Index_na_Thrapists_Prema_AspNetUsers.cs" />
+    <Compile Remove="Data\Migrations\20210815134055_Dodajem_Index_na_Thrapists_Prema_AspNetUsers.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210831062928_dodajem_tableu_TherapistApplications.cs" />
+    <Compile Remove="Data\Migrations\20210831062928_dodajem_tableu_TherapistApplications.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210907135841_Dodajem_Foreign_Keyeve_u_Tabele_TherapistApplications_Prema_AspNetUsers_i_Tabelu_TherapistApplicationsSpecialities.cs" />
+    <Compile Remove="Data\Migrations\20210907135841_Dodajem_Foreign_Keyeve_u_Tabele_TherapistApplications_Prema_AspNetUsers_i_Tabelu_TherapistApplicationsSpecialities.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210908210334_Dodajem_Kolonu_Accepted_u_Tabelu_TherapistApplications.cs" />
+    <Compile Remove="Data\Migrations\20210908210334_Dodajem_Kolonu_Accepted_u_Tabelu_TherapistApplications.Designer.cs" />
+    <Compile Remove="Data\Migrations\20211217024310_Dodajem_Street_i_City_i_Country_u_Tabelu_TherapistsApplications.cs" />
+    <Compile Remove="Data\Migrations\20211217024310_Dodajem_Street_i_City_i_Country_u_Tabelu_TherapistsApplications.Designer.cs" />
+    <Compile Remove="Data\Migrations\20211217024607_Dodajem_Street_i_City_i_Country_i_Gender_u_Tabelu_TherapistsApplications.cs" />
+    <Compile Remove="Data\Migrations\20211217024607_Dodajem_Street_i_City_i_Country_i_Gender_u_Tabelu_TherapistsApplications.Designer.cs" />
+    <Compile Remove="Data\Migrations\20220220024654_Dodajem_Tabelu_BookedSession.cs" />
+    <Compile Remove="Data\Migrations\20220220024654_Dodajem_Tabelu_BookedSession.Designer.cs" />
+    <Compile Remove="Data\Migrations\20220223092435_Dodajem_Tabelu_BookedSession.cs" />
+    <Compile Remove="Data\Migrations\20220223092435_Dodajem_Tabelu_BookedSession.Designer.cs" />
+    <Compile Remove="Data\Migrations\20220223095756_Dodajem_Tabelu_BookedSession.cs" />
+    <Compile Remove="Data\Migrations\20220223095756_Dodajem_Tabelu_BookedSession.Designer.cs" />
+    <Compile Remove="Data\Migrations\20220224000511_Dodajem_Kolone_o_Adresi_Terapeuta_u_Tabelu_BookedSessions.cs" />
+    <Compile Remove="Data\Migrations\20220224000511_Dodajem_Kolone_o_Adresi_Terapeuta_u_Tabelu_BookedSessions.Designer.cs" />
+    <Compile Remove="Data\Migrations\20220224001937_Dodajem_Kolone_o_Adresi_Terapeuta_u_Tabelu_BookedSessions.cs" />
+    <Compile Remove="Data\Migrations\20220224001937_Dodajem_Kolone_o_Adresi_Terapeuta_u_Tabelu_BookedSessions.Designer.cs" />
+    <Compile Remove="Data\Migrations\20220226183641_Dodajem_Tabelu_PendingRatings.cs" />
+    <Compile Remove="Data\Migrations\20220226183641_Dodajem_Tabelu_PendingRatings.Designer.cs" />
+    <Compile Remove="Data\Migrations\20220404134439_Dodajem_Earnings_u_Tabelu_Therapists.cs" />
+    <Compile Remove="Data\Migrations\20220404134439_Dodajem_Earnings_u_Tabelu_Therapists.Designer.cs" />
+    <Compile Remove="Data\Migrations\20220418161603_Dodajem_Tabelu_Withdrawals.cs" />
+    <Compile Remove="Data\Migrations\20220418161603_Dodajem_Tabelu_Withdrawals.Designer.cs" />
+    <Compile Remove="Data\Migrations\20220428221117_Dodajem_Tabelu_Notifications.cs" />
+    <Compile Remove="Data\Migrations\20220428221117_Dodajem_Tabelu_Notifications.Designer.cs" />
+    <Compile Remove="Data\Migrations\20220514172555_Dodajem_Kolonu_NotifiedCount_u_Tabelu_Notifications.cs" />
+    <Compile Remove="Data\Migrations\20220514172555_Dodajem_Kolonu_NotifiedCount_u_Tabelu_Notifications.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.10" />
+  </ItemGroup>
+
+</Project>

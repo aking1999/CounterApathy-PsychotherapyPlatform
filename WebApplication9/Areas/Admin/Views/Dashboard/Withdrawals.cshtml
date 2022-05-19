@@ -1,0 +1,240 @@
+﻿@model List<WebApplication9.Areas.Admin.ViewModels.WithdrawalViewModel>
+
+@using Framework.Helpers.ExtensionMethods
+
+@{
+    ViewData["Title"] = "Withdrawals";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Adminty/adminty.css" />
+<link rel="stylesheet" href="~/dashboard/dashboard.css" />
+<link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+<link rel="stylesheet" href="~/css/profile-info.css" />
+
+<div class="page-header">
+    <div class="row align-items-end">
+        <div class="col-lg-8">
+            <div class="page-header-title">
+                <div class="d-inline">
+                    <h4>Withdrawals</h4>
+                    <span>You can manage withdrawal requests easily on this page.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="page-body invoice-list-page">
+    <div class="row">
+        <div class="col-md-12 filter-bar">
+            <!-- Navigation start -->
+            <nav class="navbar navbar-light bg-faded m-b-30 p-10">
+                <ul class="nav navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#!">Filter: <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#!" id="bydate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-calendar-alt"></i> By Date</a>
+                        <div class="dropdown-menu" aria-labelledby="bydate">
+                            <a class="dropdown-item" href='@Url.Action("Withdrawals", "Dashboard", new { Area = "Admin" })'>Show all</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href='@Url.Action("Withdrawals", "Dashboard", new { Area = "Admin", filter = "date", predicate = "today" })'>Today</a>
+                            <a class="dropdown-item" href='@Url.Action("Withdrawals", "Dashboard", new { Area = "Admin", filter = "date", predicate = "this week" })'>This week</a>
+                            <a class="dropdown-item" href='@Url.Action("Withdrawals", "Dashboard", new { Area = "Admin", filter = "date", predicate = "this month" })'>This month</a>
+                            <a class="dropdown-item" href='@Url.Action("Withdrawals", "Dashboard", new { Area = "Admin", filter = "date", predicate = "this year" })'>This year</a>
+                        </div>
+                    </li>
+                    <!-- end of by date dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#!" id="bystatus" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-analytics"></i> By Status</a>
+                        <div class="dropdown-menu" aria-labelledby="bystatus">
+                            <a class="dropdown-item" href='@Url.Action("Withdrawals", "Dashboard", new { Area = "Admin" })'>Show all</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-warning" href='@Url.Action("Withdrawals", "Dashboard", new { Area = "Admin", filter = "status", predicate = "requested" })'>Requested</a>
+                            <a class="dropdown-item text-success" href='@Url.Action("Withdrawals", "Dashboard", new { Area = "Admin", filter = "status", predicate = "completed" })'>Completed</a>
+                        </div>
+                    </li>
+                    <!-- end of by status dropdown -->
+                </ul>
+            </nav>
+
+            @if (Model != null && Model.Count > 0)
+            {
+                <div class="table-responsive">
+                    <table class="
+                        align-middle
+                        mb-0
+                        table table-borderless table-striped table-hover
+                      ">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Name</th>
+                                <th class="text-center">Amount (RSD)</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Request Date</th>
+                                <th class="text-center">Accept Date</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int orderNumber = 1;
+                                foreach (var withdrawal in Model)
+                                {
+                                    string badgeClass = string.Empty;
+                                    string badgeText = string.Empty;
+
+                                    if (withdrawal.Status == 1)
+                                    {
+                                        badgeClass = "badge-success";
+                                        badgeText = "Accepted";
+                                    }
+                                    else if (withdrawal.Status == 0)
+                                    {
+                                        badgeClass = "badge-warning";
+                                        badgeText = "Requested";
+                                    }
+                                    else
+                                    {
+                                        badgeClass = "badge-primary";
+                                        badgeText = "Undefined";
+                                    }
+
+                                    <tr>
+                                        <td class="text-center text-muted">#@orderNumber</td>
+                                        <td>
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left mr-3">
+                                                        <div class="widget-content-left">
+                                                            <img width="40"
+                                                                 height="40"
+                                                                 class="rounded-circle"
+                                                                 src="@Html.RenderUserProfilePhotoOrDefaultPhoto(withdrawal.ProfilePhoto)"
+                                                                 alt="" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="widget-content-left flex2">
+                                                        <div class="widget-heading">
+                                                            @withdrawal.TherapistAccountFirstName @withdrawal.TherapistAccountLastName
+                                                            &nbsp;
+                                                            <a href="#"
+                                                               id="popover-@withdrawal.Id"
+                                                               class="col-form-label"
+                                                               data-placement="bottom"
+                                                               title="Receiver"
+                                                               style="margin-bottom: 20px !important;"
+                                                               data-html="true"
+                                                               data-content="@withdrawal.FirstName @withdrawal.LastName<br /> @withdrawal.Street @withdrawal.HouseNumber, @withdrawal.City @withdrawal.PostalCode, @withdrawal.Country<br /><i class='far fa-phone'></i> @withdrawal.PhoneNumber<br /><i class='far fa-envelope'></i> @withdrawal.Email<br /><br /><strong>Bank Account Number:</strong><br />@withdrawal.BankAccountNumber">
+                                                                <i class="far fa-address-card"></i>
+                                                            </a>
+                                                        </div>
+                                                        <div class="widget-subheading opacity-7">
+                                                            @withdrawal.Email
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">@withdrawal.Amount</td>
+                                        <td class="text-center">
+                                            <span id="status-@withdrawal.Id" class="badge @badgeClass">@badgeText</span>
+                                        </td>
+                                        <td class="text-center">@withdrawal.RequestDateTime</td>
+                                        <td class="text-center" id="accept-datetime-@withdrawal.Id">@withdrawal.AcceptDateTime</td>
+                                        @if (withdrawal.Status == 0)
+                                        {
+                                            <td class="text-center">
+                                                <form id="form-accept-@withdrawal.Id" asp-area="Admin" asp-controller="Dashboard" asp-action="AcceptWithdrawal" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit"
+                                                            id="PopoverCustomT-1"
+                                                            class="btn btn-success btn-sm">
+                                                        Accept
+                                                    </button>
+                                                </form>
+                                            </td>
+
+                                            <script>
+                                                $(document).ready(function () {
+                                                    $('#form-accept-' + '@withdrawal.Id').submit(function (e) {
+                                                        e.preventDefault();
+
+                                                        const swalPopup = Swal.mixin({
+                                                            customClass: {
+                                                                confirmButton: 'btn btn-success delete-buttons-separator',
+                                                                cancelButton: 'btn btn-danger'
+                                                            },
+                                                            buttonsStyling: false
+                                                        });
+
+                                                        swalPopup.fire({
+                                                            title: 'This action cannot be undone!',
+                                                            text: "Accept the withdrawal request?",
+                                                            icon: 'warning',
+                                                            showCancelButton: true,
+                                                            confirmButtonText: 'Yes'
+                                                        }).then((result) => {
+                                                            if (result.isConfirmed) {
+                                                                var formData = new FormData($('#form-accept-' + '@withdrawal.Id').get(0));
+                                                                formData.append("id", '@withdrawal.Id');
+
+                                                                $.ajax({
+                                                                    method: 'POST',
+                                                                    url: '@Url.Action("AcceptWithdrawal", "Dashboard", new { Area = "Admin" })',
+                                                                    data: formData,
+                                                                    processData: false,
+                                                                    contentType: false,
+                                                                    success: function (response) {
+                                                                        if (response.success === true) {
+                                                                            var spanStatus = $('#status-' + '@withdrawal.Id');
+                                                                            spanStatus.removeClass('badge-warning');
+                                                                            spanStatus.addClass('badge-success');
+                                                                            spanStatus.html('Accepted');
+                                                                            $('#form-accept-' + '@withdrawal.Id').remove();
+                                                                            $('#accept-datetime-' + '@withdrawal.Id').html('@DateTime.Now.ToString("dd/MMM/yyyy HH:mm")');
+                                                                        }
+
+                                                                        Swal.fire(
+                                                                            response.title,
+                                                                            response.body,
+                                                                            response.severity
+                                                                        )
+                                                                    }
+                                                                });
+                                                            }
+                                                        })
+                                                    });
+                                                });
+                                            </script>
+                                        }
+                                    </tr>
+
+                                    orderNumber++;
+
+                                    <script>
+                                            $(document).ready(function () {
+                                                $('#popover-' + '@withdrawal.Id').popover({
+                                                    trigger: 'focus'
+                                                });
+                                            })
+                                    </script>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <h3 class="text-primary">No withdrawal requests yet.</h3>
+            }
+        </div>
+    </div>
+</div>
+

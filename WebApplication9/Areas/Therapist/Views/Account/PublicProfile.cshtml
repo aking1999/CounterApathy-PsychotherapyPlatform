@@ -1,0 +1,301 @@
+﻿@model WebApplication9.Areas.Therapist.ViewModels.TherapistPublicProfileViewModel
+
+@using Database.Models
+@using Microsoft.AspNetCore.Identity
+@using Framework.Helpers.ExtensionMethods
+@inject UserManager<CustomClient> UserManager
+@{
+    ViewData["Title"] = "PublicProfile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Adminty/adminty.css" />
+
+<!-- Main-body start -->
+<div class="main-body">
+    @*<div class="page-wrapper">*@
+    <!-- Page-header start -->
+    @*<div class="page-header">
+            <div class="row align-items-end">
+                <div class="col-lg-8">
+                    <div class="page-header-title">
+                        <div class="d-inline">
+                            <h4>User Profile</h4>
+                            <span>lorem ipsum dolor sit amet, consectetur adipisicing elit</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+    <!-- Page-header end -->
+    <!-- Page-body start -->
+    <div class="page-body">
+        <!--profile cover start-->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="cover-profile">
+                    <div class="profile-bg-img">
+                        <img class="profile-bg-img img-fluid" src="~/images/content-images/public-profile-cover-photo.jpg" alt="bg-img">
+                        <div class="card-block user-info">
+                            <div class="col-md-12">
+                                <div class="media-left">
+                                    <a href="#" class="profile-image">
+                                        <img class="user-img img-radius" style="width:118px;height:118px;" src="@await Html.RenderUserProfilePhotoOrDefaultPhoto(User, UserManager)" alt="user-img">
+                                    </a>
+                                </div>
+                                <div class="media-body row">
+                                    <div class="col-lg-12">
+                                        <div class="user-title">
+                                            <h2>@Model.Firstname @Model.Lastname</h2>
+                                            <span class="text-white">Psychotherapist</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="pull-right cover-btn">
+                                            <button type="button" class="btn btn-primary m-r-5 m-b-5"><i class="far fa-calendar-plus"></i> Book a session</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--profile cover end-->
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- tab header start -->
+                <div class="tab-header card">
+                    <ul class="nav nav-tabs md-tabs tab-timeline" role="tablist" id="mytab">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#personal" role="tab">Personal info</a>
+                            <div class="slide"></div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#binfo" role="tab">Specialties</a>
+                            <div class="slide"></div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#sessions" role="tab">Sessions</a>
+                            <div class="slide"></div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#review" role="tab">Reviews</a>
+                            <div class="slide"></div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#blog-posts" role="tab">Blog posts</a>
+                            <div class="slide"></div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- tab header end -->
+                <!-- tab content start -->
+                <div class="tab-content">
+
+                    <!-- tab panel personal start -->
+                    <div class="tab-pane active" id="personal" role="tabpanel">
+                        <!-- personal card start -->
+                        <div class="card" style="margin-bottom: 0 !important;">
+                            <div class="card-header" style="padding: 15px 20px;">
+                                <h5 class="card-header-text">Specialties</h5>
+                            </div>
+                        </div>
+                        @for (int i = 0; i < Model.SpecialitiesTherapistDescription.Count; i++)
+                        {
+                            if (i != 0 && i % 4 == 0)
+                            {
+                                <br />
+                                <br />
+                            }
+                            <span class="badge" style="background-color: @Model.SpecialitiesTherapistDescription[i].Color; padding: 6px 12px; color: white;">@Model.SpecialitiesTherapistDescription[i].Name&nbsp;&nbsp;<i class="@Model.SpecialitiesTherapistDescription[i].Icon"></i></span>
+                        }
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-header-text">About Me</h5>
+                            </div>
+                            <div class="card-block">
+                                <div class="view-info">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="general-info">
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-xl-6">
+                                                        <div class="table-responsive">
+                                                            <table class="table m-0">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th scope="row">Full Name</th>
+                                                                        <td>@Model.Firstname @Model.Lastname</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th scope="row">Gender</th>
+                                                                        <td>@Model.Gender</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end of table col-lg-6 -->
+                                                    <div class="col-lg-12 col-xl-6">
+                                                        <div class="table-responsive">
+                                                            <table class="table">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th scope="row">Year of birth</th>
+                                                                        <td>@Model.YearOfBirth</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th scope="row">Location</th>
+                                                                        <td>@Model.City, @Model.Country</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end of table col-lg-6 -->
+                                                </div>
+                                                <!-- end of row -->
+                                            </div>
+                                            <!-- end of general info -->
+                                        </div>
+                                        <!-- end of col-lg-12 -->
+                                    </div>
+                                    <!-- end of row -->
+                                </div>
+                                <!-- end of view-info -->
+                            </div>
+                            <!-- end of card-block -->
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-header-text">About me</h5>
+                                    </div>
+                                    <div class="card-block user-desc">
+                                        <div class="view-desc">
+                                            <p>&nbsp;&nbsp;&nbsp;@Model.About</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- personal card end-->
+                    </div>
+                    <!-- tab pane personal end -->
+                    <!-- tab pane info start -->
+                    <div class="tab-pane" id="binfo" role="tabpanel">
+                        <!-- info card start -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-header-text">@Model.Firstname's specialties</h5>
+                            </div>
+                            <div class="card-block">
+
+                                @if (Model.SpecialitiesTherapistDescription.Count > 0)
+                                {
+                                    <div class="row">
+                                        @foreach (var speciality in Model.SpecialitiesTherapistDescription)
+                                        {
+                                            <div class="col-md-6">
+                                                @*m-b-20*@
+                                                <div class="card b-l business-info services" style="border-color: @speciality.Color">
+                                                    <div class="card-header">
+                                                        <div class="service-header">
+                                                            <a href="#">
+                                                                <h5 class="card-header-text" style="color: @speciality.Color">@speciality.Name&nbsp;&nbsp;<i class="@speciality.Icon"></i></h5>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    @if (!string.IsNullOrEmpty(speciality.UserDescription) || !string.IsNullOrWhiteSpace(speciality.UserDescription))
+                                                    {
+                                                        <div class="card-block">
+                                                            <div class="row">
+                                                                <div class="col-sm-12">
+                                                                    <p class="task-detail">@speciality.UserDescription</p>
+                                                                </div>
+                                                                @*end of col-sm-8*@
+                                                            </div>
+                                                            @*end of row*@
+                                                        </div>
+                                                        @*end of card-block*@
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <center><h1 style="color: #DC3545; ">No specialties available for @Model.Firstname.</h1></center>
+                                }
+                            </div>
+                        </div>
+                        <!-- info card end -->
+                    </div>
+                    <!-- tab pane info end -->
+                    <!-- tab sessions starts here -->
+                    <div class="tab-pane active" id="sessions" role="tabpanel">
+                        <center><h1 style="color: #969996; ">You can review available sessions here.</h1></center>
+                    </div>
+                    <!-- tab sessions ends here -->
+                    <!-- tab review starts here -->
+                    <div class="tab-pane" id="review" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-header-text">Review</h5>
+                            </div>
+                            <div class="card-block">
+                                <ul class="media-list">
+                                    <li class="media">
+                                        <div class="media-left">
+                                            <a href="#">
+                                                <img class="media-object img-radius comment-img" src="~/images/content-images/default-user-image.png" alt="Generic placeholder image">
+                                            </a>
+                                        </div>
+                                        <div class="media-body">
+                                            <h6 class="media-heading">Sortino media<span class="f-12 text-muted m-l-5">Just now</span></h6>
+                                            <div class="stars-example-css review-star">
+                                                <i class="fal fa-star"></i>
+                                                <i class="fal fa-star"></i>
+                                                <i class="fal fa-star"></i>
+                                                <i class="fal fa-star"></i>
+                                                <i class="fal fa-star"></i>
+                                            </div>
+                                            <p class="m-b-0">Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis.</p>
+                                            <hr>
+                                            <!-- Nested media object goes here -->
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- tab review ends here -->
+                    <!-- tab pane blog-post start -->
+                    <div class="tab-pane" id="blog-posts" role="tabpanel">
+                        <center><span style="color: #969996; ">This feature is coming soon.</span></center>
+                    </div>
+                    <!-- tab pane blog-post end -->
+
+                </div>
+                <!-- tab content end -->
+            </div>
+        </div>
+    </div>
+    <!-- Page-body end -->
+</div>
+<!-- Main body end -->
+<div id="styleSelector">
+
+</div>
+<script>
+    $(document).ready(function () {
+        $('nav.mb-3').removeClass('mb-3');
+    })
+</script>
+
+
+

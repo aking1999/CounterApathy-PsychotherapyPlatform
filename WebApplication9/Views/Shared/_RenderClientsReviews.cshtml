@@ -1,0 +1,38 @@
+﻿@model List<WebApplication9.PartialViewModels.ClientReviewPartialViewModel>
+
+<div class="tab-pane" id="review" role="tabpanel">
+    @if (Model.Count > 0)
+    {
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-header-text">Reviews</h5>
+            </div>
+            @foreach (var clientReview in Model)
+            {
+                <div class="card-block">
+                    <ul class="media-list">
+                        <li class="media">
+                            <div class="media-left">
+                                <a href="#">
+                                    <img class="media-object img-radius comment-img" src="~/images/content-images/default-user-image.png" alt="user image">
+                                </a>
+                            </div>
+                            <div class="media-body">
+                                <h6 class="media-heading">@clientReview.FullName<span class="f-12 text-muted m-l-5">@clientReview.RatingDate</span></h6>
+                                @await Html.PartialAsync("_RenderStars", clientReview.StarsRating)
+                                <p class="m-b-0">@clientReview.Comment</p>
+                                <hr>
+                                <!-- Nested media object goes here -->
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <center><h1 style="color: #969996; ">Therapist currently has no reviews.</h1></center>
+    }
+
+</div>

@@ -1,0 +1,180 @@
+﻿@model List<TherapistRatingsSessionsViewModel>
+
+@using WebApplication9.ViewModels
+
+@{
+    ViewData["Title"] = "All";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/star-rating/star-rating.css" />
+<link rel="stylesheet" href="~/Adminty/adminty.css" />
+
+<div class="page-header">
+    <div class="row align-items-end">
+        <div class="col-lg-8">
+            <div class="page-header-title">
+                <div class="d-inline">
+                    <h4>Therapists</h4>
+                    <span>You can see all our therapists easily on this page.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="page-body invoice-list-page">
+    <div class="row">
+        <div class="col-md-12 filter-bar">
+            <!-- Navigation start -->
+            <nav class="navbar navbar-light bg-faded m-b-30 p-10">
+                <ul class="nav navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#!">Filter: <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#!" id="bydate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-book"></i> By Specialty</a>
+                        <div class="dropdown-menu" aria-labelledby="bydate">
+                            <a class="dropdown-item" href='@Url.Action("All", "Therapists")'>Show all</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href='@Url.Action("All", "Therapists", new { filter = "specialty", predicate = "today" })'>Today</a>
+                            <a class="dropdown-item" href='@Url.Action("All", "Therapists", new { filter = "specialty", predicate = "this week" })'>This week</a>
+                            <a class="dropdown-item" href='@Url.Action("All", "Therapists", new { filter = "specialty", predicate = "this month" })'>This month</a>
+                            <a class="dropdown-item" href='@Url.Action("All", "Therapists", new { filter = "specialty", predicate = "this year" })'>This year</a>
+                        </div>
+                    </li>
+                    <!-- end of by date dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#!" id="bypriority" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-star"></i> By Rating</a>
+                        <div class="dropdown-menu" aria-labelledby="bypriority">
+                            <a class="dropdown-item" href='@Url.Action("All", "Therapists")'>Show all</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href='@Url.Action("All", "Therapists", new { filter = "rating", predicate = "high to low" })'>High to Low</a>
+                            <a class="dropdown-item" href='@Url.Action("All", "Therapists", new { filter = "rating", predicate = "low to high" })'>Low to High</a>
+
+                        </div>
+                    </li>
+                </ul>
+                @*<div class="nav-item nav-grid">
+                        <span class="m-r-15">View Mode: </span>
+                        <button type="button" class="btn btn-sm btn-primary waves-effect waves-light m-r-10" data-toggle="tooltip" data-placement="top" title="list view">
+                            <i class="icofont icofont-listine-dots"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="grid view">
+                            <i class="icofont icofont-table"></i>
+                        </button>
+                    </div>*@
+                <!-- end of by priority dropdown -->
+            </nav>
+
+            @if (Model.Count > 0)
+            {
+                <div class="row simple-cards users-card">
+                    @foreach (var therapist in Model)
+                    {
+                        <div class="col-md-12 col-xl-4">
+                            <div class="card user-card">
+                                <div class="card-header-img">
+                                    <img class="img-fluid img-radius" src="@therapist.ProfilePhoto" alt="card-img" style="width: 230px; height: 230px;">
+                                    <h4>@therapist.FullName</h4>
+                                    <h6>Psychotherapist</h6>
+                                </div>
+
+                                @if (therapist.Rating > 0)
+                                {
+                                    <div id="full-stars-example-two">
+                                        <div class="rating-group">
+                                            @await Html.PartialAsync("_RenderStars", therapist.Rating)
+                                        </div>
+                                    </div>
+                                }
+
+                                @*<div class="row justify-content-center">
+                                        <div class="col-auto">
+                                            <div class="label-icon" title="Number of clients">
+                                                <i class="far fa-user"></i>
+                                                <label class="badge badge-primary badge-top-right">@therapist.NumberOfSessions</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                                <div class="label-icon">
+                                                    <i class="icofont icofont-heart"></i>
+                                                    <label class="badge badge-success badge-top-right">9</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="label-icon">
+                                                    <i class="icofont icofont-bag-alt"></i>
+                                                    <label class="badge badge-danger badge-top-right">9</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="label-icon">
+                                                    <i class="icofont icofont-ui-message"></i>
+                                                    <label class="badge badge-info badge-top-right">9</label>
+                                                </div>
+                                            </div>
+                                    </div>*@
+
+                                <p>@therapist.About</p>
+
+                                <div class="row justify-content-center">
+                                    <div class="col-auto">
+                                        Specialties:
+                                        @{
+                                            var specialtiesConcatenated = string.Empty;
+
+                                            foreach (var speciality in therapist.Specialties)
+                                            {
+                                                specialtiesConcatenated = specialtiesConcatenated + speciality + ", ";
+                                            }
+                                        }
+                                        <span>@specialtiesConcatenated.Remove(specialtiesConcatenated.Length - 2)</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <button type="button" id="book-session-@therapist.Id" class="btn btn-success waves-effect waves-light m-r-15"><i class="far fa-calendar-plus m-r-5"></i>Book a session</button>
+                                    <form asp-area="" asp-controller="Therapists" asp-action="Profile" method="get" style="display: inline;">
+                                        @Html.Hidden("therapist", therapist.Id)
+
+                                        <button type="submit" class="btn btn-primary waves-effect waves-light"><i class="far fa-user m-r-5"></i>Profile</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            $(document).ready(function () {
+                                $('#book-session-' + '@therapist.Id').click(function () {
+                                    window.location.href = '@Url.Action("Profile", "Therapists", new { Area = "", therapist = therapist.Id })';
+                                    sessionStorage.setItem('showCalendarTab', 'true');
+                                })
+                            });
+                        </script>
+                    }
+                </div>
+            }
+            else
+            {
+                @*<link rel="preconnect" href="https://fonts.googleapis.com">
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">*@
+                <link type="text/css" rel="stylesheet" href="~/css/404-not-found.css" />
+
+                <div id="notfound">
+                    <div class="notfound">
+                        <div class="notfound-404">
+                            <h1>Oops!</h1>
+                        </div>
+                        <h2>404 - Therapists not found</h2>
+                        <p>The page you are looking for might have been removed, had it's name changed or is temporarily unavailable.</p>
+                        <a href="@Url.Action("Index", "Home")">Go To Homepage</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

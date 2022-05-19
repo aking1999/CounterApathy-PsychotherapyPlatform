@@ -1,0 +1,38 @@
+﻿@model WebApplication9.PartialViewModels.SessionStatusPartial
+@using Framework.Helpers
+
+<script>
+    $(document).ready(function () {
+        var countDownDate = new Date("@Helper.ParseDateForJavascriptCountdown(Model.SessionDate) @Model.SessionStartTime").getTime();
+
+        var x = setInterval(function () {
+            var now = new Date().getTime();
+
+            var distance = countDownDate - now;
+
+            // If the count down is finished, write some text
+            if (distance < 0) {
+                if ($('#status-' + '@Model.SessionStatusId').hasClass('badge-warning')) {
+                    $('#status-' + '@Model.SessionStatusId').removeClass('badge-warning');
+                    $('#status-' + '@Model.SessionStatusId').addClass('badge-primary');
+                    $('#status-' + '@Model.SessionStatusId').css('color', 'white');
+                    $('#status-' + '@Model.SessionStatusId').html('Session In Progress');
+                }
+
+                var finished = new Date("@Helper.ParseDateForJavascriptCountdown(Model.SessionDate) @Model.SessionEndTime").getTime();
+                var dateTimeNow = new Date();
+
+                if (dateTimeNow >= finished) {
+                    clearInterval(x);
+
+                    if ($('#status-' + '@Model.SessionStatusId').hasClass('badge-primary')) {
+                        $('#status-' + '@Model.SessionStatusId').removeClass('badge-primary');
+                        $('#status-' + '@Model.SessionStatusId').addClass('badge-success');
+                        $('#status-' + '@Model.SessionStatusId').css('color', 'white');
+                        $('#status-' + '@Model.SessionStatusId').html('Session Completed');
+                    }
+                }
+            }
+        }, 1000);
+    })
+</script>

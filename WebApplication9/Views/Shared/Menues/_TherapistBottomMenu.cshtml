@@ -1,0 +1,40 @@
+﻿<link rel="stylesheet" href="~/bottom-menu/bottom-menu.css" />
+<script src="~/bottom-menu/bottom-menu.js"></script>
+
+<div class="mobile-bm">
+    <div class="navigation-bm">
+        <ul>
+            <li class="list active">
+                <a asp-area="Therapist" asp-controller="Account" asp-action="Profile">
+                    <span class="icon"><i class="far fa-user"></i></span>
+                    <span class="text">Profile</span>
+                </a>
+            </li>
+            <li class="list">
+                <a asp-area="Therapist" asp-controller="Account" asp-action="Dashboard">
+                    <span class="icon"><i class="far fa-chart-bar"></i></span>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li class="list">
+                <a asp-area="Therapist" asp-controller="Sessions" asp-action="All">
+                    <span class="icon"><i class="far fa-calendar-plus"></i></span>
+                    <span class="text">Session Manager</span>
+                </a>
+            </li>
+            <li class="list">
+                <a>
+                    <span class="icon"><i class="far fa-clipboard-user"></i></span>
+                    <span class="text">Booked Sessions</span>
+                </a>
+            </li>
+            <li class="list">
+                <a>
+                    <span class="icon"><i class="far fa-cog"></i></span>
+                    <span class="text">Settings</span>
+                </a>
+            </li>
+            <div class="indicator-bm"></div>
+        </ul>
+    </div>
+</div>

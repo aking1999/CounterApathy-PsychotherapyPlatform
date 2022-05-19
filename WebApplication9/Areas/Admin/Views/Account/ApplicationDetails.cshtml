@@ -1,0 +1,164 @@
+﻿@model WebApplication9.Areas.Admin.ViewModels.ApplicationDetailsViewModel
+@{
+    ViewData["Title"] = "ApplicationDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/profile-info.css" />
+<link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<script src="~/sweet-alert2/sweetalert2.min.js"></script>
+<script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+
+<h1>Application Details</h1>
+
+<img src="~/images/user-images/@Model.ProfilePhoto" width="400" height="500"/>
+
+<br />
+
+<p>User ID: @Model.UserId</p>
+<p>First name: @Model.FirstName</p>
+<p>Last name: @Model.LastName</p>
+<p>Username: @Model.UserName</p>
+<p>Email: @Model.Email</p>
+<p>Email confirmed: @Model.EmailConfirmed</p>
+<p>Phone number: @Model.PhoneNumber</p>
+<p>Web credit: @Model.WebCredit</p>
+<p>Year of birth: @Model.YearOfBirth</p>
+<p>Amount due: @Model.AmountDue</p>
+
+<br />
+
+<p>Therapist application ID: @Model.TherapistApplicationId</p>
+<p>Application date: @Model.ApplicationDate</p>
+<p>Accepted: @Model.Accepted</p>
+<p>Street: @Model.Street</p>
+<p>House number: @Model.HouseNumber</p>
+<p>City: @Model.City</p>
+<p>Country: @Model.Country</p>
+<p>Postal code: @Model.PostalCode</p>
+<p>Gender: @Model.Gender</p>
+<p>University: @Model.University</p>
+<p>Past companies: @Model.PastCompanies</p>
+
+<br />
+
+<p>Specialities:</p>
+
+<ul>
+    @foreach (var speciality in Model.Specialities)
+    {
+        <li>@speciality.Name [@speciality.Id]</li>
+    }
+</ul>
+
+<br />
+
+@if (Model.Accepted == "0")
+{
+    <button id="btn-accept" type="button" class="btn btn-success">Accept</button>
+    @*<button id="btn-pending" type="submit" class="btn btn-warning">Keep pending</button>*@
+    <a href="@Url.Action("KeepPendingApplication", "Account", new { Area = "Admin" })" class="btn btn-warning">Keep pending</a>
+    <button id="btn-reject" type="button" class="btn btn-danger">Reject</button>
+}
+else
+{
+    if (Model.Accepted == "1")
+    {
+        <h3 class="text-success">Application Accepted</h3>
+    }
+    if (Model.Accepted == "-1")
+    {
+        <h3 class="text-danger">Application Rejected</h3>
+    }
+}
+
+
+<script>
+    $(document).ready(function () {
+        $('#btn-accept').click(function (event) {
+            event.preventDefault();
+            const swalWithBootstrapButtonsAccept = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success delete-buttons-separator',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtonsAccept.fire({
+                title: 'Are you sure you would like to accept therapist\'s application?',
+                icon: 'question',
+                confirmButtonText: 'Accept',
+                showDenyButton: true,
+                denyButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("AcceptApplication", "Account", new { Area = "Admin" })',
+                        data: { userId: '@Model.UserId' },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire(
+                                    response.title,
+                                    response.body,
+                                    'success'
+                                ).then((result => {
+                                    window.location.href = response.location;
+                                }));
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        $('#btn-reject').click(function (event) {
+            event.preventDefault();
+            const swalWithBootstrapButtonsReject = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-danger delete-buttons-separator',
+                    cancelButton: 'btn btn-success'
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtonsReject.fire({
+                    title: 'Are you sure you would like to reject therapist\'s application?',
+                    icon: 'question',
+                    confirmButtonText: 'Reject',
+                    showDenyButton: true,
+                    denyButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("RejectApplication", "Account", new { Area = "Admin" })',
+                        data: { userId: '@Model.UserId' },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire(
+                                    response.title,
+                                    response.body,
+                                    'success'
+                                ).then((result => {
+                                    window.location.href = response.location;
+                                }));
+                            }
+                        }
+                    })
+                }
+            });
+        });
+
+        @*$('#btn-pending').click(function (event) {
+            event.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("KeepPendingApplication", "Account", new { Area = "Admin" })'
+            })
+        });*@
+    });
+</script>
+
+

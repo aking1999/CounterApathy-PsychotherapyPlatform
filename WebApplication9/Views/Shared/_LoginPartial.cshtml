@@ -1,0 +1,47 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Database.Models
+@inject UserManager<CustomClient> UserManager
+@inject SignInManager<CustomClient> SignInManager
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        @*<li class="nav-item" style="padding: 2px 8px 0 8px !important;">
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"><i class="far fa-bell" style="font-size:19px !important;"></i><span class="badge badge-pill badge-danger">23</span></a>
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@await Html.PartialAsync("_RenderNotificationsBellIcon")</a>
+            </li>*@
+
+        <li class="nav-item">
+            @await Html.PartialAsync("_RenderNotificationsBellIcon")
+        </li>
+
+        @*<li class="nav-item">
+                <span class="badge notification-count" id="notificationCount" data-toggle="popover" title="Notifications"></span>
+            </li>*@
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline" asp-area="" asp-controller="Authorization" asp-action="SignOut" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="nav-link btn btn-link text-dark" id="btn-sign-out">Sign out</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        /*<li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>*/
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Authorization" asp-action="SignIn">Sign in</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Authorization" asp-action="Register">Register</a>
+        </li>
+    }
+</ul>

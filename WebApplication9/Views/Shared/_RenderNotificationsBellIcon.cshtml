@@ -1,0 +1,57 @@
+﻿@using Framework.Helpers.ExtensionMethods;
+@using Microsoft.AspNetCore.Identity
+@using Database.Models
+@inject UserManager<CustomClient> UserManager
+@inject SignInManager<CustomClient> SignInManager
+
+<link rel="stylesheet" href="~/notification/notifications.css" />
+
+<li id="a" class="nav-item dropdown notification-ui show">
+    <a class="nav-link dropdown-toggle notification-ui_icon" href="#" id="notif-navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <!--<i class="fa fa-bell"></i>
+        <span class="unread-notification"></span>-->
+        <div id="main-notif" class="notification"></div>
+    </a> <!-- obrisah show odavde ispod-->
+    <div id="notif-dropdown-menu" class="dropdown-menu notification-ui_dd" aria-labelledby="navbarDropdown">
+        <div class="notification-ui_dd-header">
+            <h3 class="text-center">Notifications</h3>
+        </div>
+        <div id="notification-section-dropdown-content" class="notification-ui_dd-content">
+            <aleksajecar id="anchor-main" style="display: none;">
+                <div id="notification-list-main" class="notification-list">
+                    <div class="notification-list_icon">
+                        <i id="notification-icon-main" class="fa-lg"></i>
+                    </div>
+                    <div class="notification-list_detail">
+                        <p class="notification-text" id="notification-text-main"></p>
+
+                        <p>
+                            <small id="days-ago-main"></small>
+                        </p>
+
+                        <p id="paragraph-mark-read-main">
+                            <small id="small-mark-read-main">
+                                <span id="mark-read-main" class="badge badge-primary mark-read">
+                                    Mark as read
+                                </span>
+                            </small>
+                        </p>
+                    </div>
+                    <div class="notification-list_feature-icon">
+                        <p>
+                            <small>
+                                <i id="check-icon-main" class=""></i>
+                                <span id="read-main"></span>
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </aleksajecar>
+        </div>
+        <div class="notification-ui_dd-footer">
+            <a href="#!" class="btn btn-success btn-block">View All</a>
+        </div>
+    </div>
+</li>
+
+@await Html.PartialAsync("_InitializeNotifications") 

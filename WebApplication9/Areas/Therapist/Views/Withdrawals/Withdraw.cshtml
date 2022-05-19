@@ -1,0 +1,129 @@
+﻿@model WebApplication9.Areas.Therapist.ViewModels.WithdrawViewModel
+
+@{
+    ViewData["Title"] = "Withdraw";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Adminty/adminty.css" />
+
+@* !!! Ovaj link=dashboard nije bitan mnogo ovde, dodao sam tek posle*@
+<link rel="stylesheet" href="~/dashboard/dashboard.css" />
+
+<div class="page-header">
+    <div class="row align-items-end">
+        <div class="col-lg-8">
+            <div class="page-header-title">
+                <div class="d-inline">
+                    <h4>Withdrawals</h4>
+                    <span>You can withdraw funds directly to your bank account on this page.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col-md-8">
+        <form id="change-password-form" asp-area="Therapist" asp-controller="Withdrawals" asp-action="Withdraw" method="post">
+
+            @Html.AntiForgeryToken()
+            @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label asp-for="FirstName"></label>
+                    <input asp-for="FirstName" class="form-control">
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label asp-for="LastName"></label>
+                    <input asp-for="LastName" class="form-control">
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label asp-for="Street"></label>
+                    <input asp-for="Street" class="form-control">
+                    <span asp-validation-for="Street" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-4">
+                    <label asp-for="HouseNumber"></label>
+                    <input asp-for="HouseNumber" class="form-control">
+                    <span asp-validation-for="HouseNumber" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-5">
+                    <label asp-for="City"></label>
+                    <input asp-for="City" class="form-control">
+                    <span asp-validation-for="City" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="PostalCode"></label>
+                    <input asp-for="PostalCode" class="form-control">
+                    <span asp-validation-for="PostalCode" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-4">
+                    <label asp-for="Country"></label>
+                    <input asp-for="Country" class="form-control">
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label asp-for="BankAccountNumber"></label>
+                    <input asp-for="BankAccountNumber" class="form-control">
+                    <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-4">
+                    <label asp-for="Amount"></label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text border-0" style="background-color: #e9ecef;">RSD</span>
+                        </div>
+                        <input asp-for="Amount" class="form-control" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Request withdrawal</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+    });
+</script>
+
+@{
+    if (ViewBag.success != null)
+    {
+        ViewBag.success = null;
+
+        <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+        <script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+
+        <script>
+            Swal.fire({
+                title: '@ViewBag.swalTitle',
+                text: '@ViewBag.swalBody',
+                icon: '@ViewBag.swalSeverity',
+                confirmButtonColor: '#28A745',
+                confirmButtonText: 'See details'
+            }).then((result) => {
+                window.location.href = '@ViewBag.redirectUrl';
+            });
+        </script>
+    }
+}

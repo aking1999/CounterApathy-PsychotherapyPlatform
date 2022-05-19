@@ -1,0 +1,783 @@
+﻿@model WebApplication9.Areas.Therapist.ViewModels.TherapistPublicProfileViewModel
+
+@using Database.Models
+@using Newtonsoft.Json
+@using Framework.Helpers
+@using Microsoft.AspNetCore.Identity
+@using Framework.Helpers.ExtensionMethods
+@inject UserManager<CustomClient> UserManager
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Adminty/adminty.css" />
+<link rel="stylesheet" href="~/evocalendar/evo-calendar.css" />
+<link rel="stylesheet" href="~/evocalendar/evo-calendar.royal-navy.min.css" />
+<script src="~/evocalendar/evo-calendar.min.js"></script>
+<script src="~/year-picker/moment.min.js"></script>
+<link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<script src="~/sweet-alert2/sweetalert2.min.js"></script>
+<script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+<link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+<script src="~/multiselect/bootstrap-select.min.js"></script>
+<link rel="stylesheet" href="~/css/profile-info.css" />
+
+<!-- Main-body start -->
+<div class="main-body">
+    <!-- Page-header end -->
+    <!-- Page-body start -->
+    <div class="page-body">
+        <!--profile cover start-->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="cover-profile">
+                    <div class="profile-bg-img">
+                        <img class="profile-bg-img img-fluid" src="~/images/content-images/public-profile-cover-photo.jpg" alt="bg-img">
+                        <div class="card-block user-info">
+                            <div class="col-md-12">
+                                <div class="media-left">
+                                    <a href="#" class="profile-image">
+                                        <img class="user-img img-radius" style="width:118px;height:118px;" src="@await Html.RenderUserProfilePhotoOrDefaultPhoto(Model.Id, UserManager)" alt="user-img">
+                                    </a>
+                                </div>
+                                <div class="media-body row">
+                                    <div class="col-lg-12">
+                                        <div class="user-title">
+                                            <h2>@Model.Firstname @Model.Lastname</h2>
+                                            <span class="text-white">Psychotherapist</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="pull-right cover-btn">
+                                            <button id="main-btn-book-session" type="button" class="btn btn-success m-r-5 m-b-5"><i class="far fa-calendar-plus"></i> Book a session</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--profile cover end-->
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- tab header start -->
+                <div class="tab-header card">
+                    <ul class="nav nav-tabs md-tabs tab-timeline" role="tablist" id="mytab">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="nav-item-personal-info" data-toggle="tab" href="#personal" role="tab">Personal info</a>
+                            <div class="slide"></div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#binfo" role="tab">Specialties</a>
+                            <div class="slide"></div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="nav-item-sessions" data-toggle="tab" href="#sessions" role="tab">Sessions</a>
+                            <div class="slide"></div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#review" role="tab">Reviews</a>
+                            <div class="slide"></div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#blog-posts" role="tab">Blog posts</a>
+                            <div class="slide"></div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- tab header end -->
+                <!-- tab content start -->
+                <div class="tab-content">
+
+                    <!-- tab panel personal start -->
+                    <div class="tab-pane active" id="personal" role="tabpanel">
+                        <!-- personal card start -->
+                        <div class="card" style="margin-bottom: 0 !important;">
+                            <div class="card-header" style="padding: 15px 20px;">
+                                <h5 class="card-header-text">Specialties</h5>
+                            </div>
+                        </div>
+                        @if (Model.SpecialitiesTherapistDescription != null)
+                        {
+                            @for (int i = 0; i < Model.SpecialitiesTherapistDescription.Count; i++)
+                            {
+                                if (i != 0 && i % 4 == 0)
+                                {
+                                    <br />
+                                    <br />
+                                }
+                                <span class="badge" style="background-color: @Model.SpecialitiesTherapistDescription[i].Color; padding: 6px 12px; color: white;">@Model.SpecialitiesTherapistDescription[i].Name&nbsp;&nbsp;<i class="@Model.SpecialitiesTherapistDescription[i].Icon"></i></span>
+                            }
+                        }
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-header-text">About Me</h5>
+                            </div>
+                            <div class="card-block">
+                                <div class="view-info">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="general-info">
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-xl-6">
+                                                        <div class="table-responsive">
+                                                            <table class="table m-0">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th scope="row">Full Name</th>
+                                                                        <td>@Model.Firstname @Model.Lastname</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th scope="row">Gender</th>
+                                                                        <td>@Model.Gender</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end of table col-lg-6 -->
+                                                    <div class="col-lg-12 col-xl-6">
+                                                        <div class="table-responsive">
+                                                            <table class="table">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th scope="row">Year of birth</th>
+                                                                        <td>@Model.YearOfBirth</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th scope="row">Location</th>
+                                                                        <td>@Model.City, @Model.Country</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end of table col-lg-6 -->
+                                                </div>
+                                                <!-- end of row -->
+                                            </div>
+                                            <!-- end of general info -->
+                                        </div>
+                                        <!-- end of col-lg-12 -->
+                                    </div>
+                                    <!-- end of row -->
+                                </div>
+                                <!-- end of view-info -->
+                            </div>
+                            <!-- end of card-block -->
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-header-text">About me</h5>
+                                    </div>
+                                    <div class="card-block user-desc">
+                                        <div class="view-desc">
+                                            <p>&nbsp;&nbsp;&nbsp;@Model.About</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- personal card end-->
+                    </div>
+                    <!-- tab pane personal end -->
+                    <!-- tab pane info start -->
+                    <div class="tab-pane" id="binfo" role="tabpanel">
+                        <!-- info card start -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-header-text">Specialties</h5>
+                            </div>
+                            <div class="card-block">
+
+                                @if (Model.SpecialitiesTherapistDescription != null && Model.SpecialitiesTherapistDescription.Count > 0)
+                                {
+                                    <div class="row">
+                                        @foreach (var speciality in Model.SpecialitiesTherapistDescription)
+                                        {
+                                            <div class="col-md-6">
+                                                @*m-b-20*@
+                                                <div class="card b-l business-info services" style="border-color: @speciality.Color">
+                                                    <div class="card-header">
+                                                        <div class="service-header">
+                                                            <a href="#">
+                                                                <h5 class="card-header-text" style="color: @speciality.Color">@speciality.Name&nbsp;&nbsp;<i class="@speciality.Icon"></i></h5>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    @if (!string.IsNullOrEmpty(speciality.UserDescription) || !string.IsNullOrWhiteSpace(speciality.UserDescription))
+                                                    {
+                                                        <div class="card-block">
+                                                            <div class="row">
+                                                                <div class="col-sm-12">
+                                                                    <p class="task-detail">@speciality.UserDescription</p>
+                                                                </div>
+                                                                @*end of col-sm-8*@
+                                                            </div>
+                                                            @*end of row*@
+                                                        </div>
+                                                        @*end of card-block*@
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <center><h1 style="color: #DC3545; ">No specialties available.</h1></center>
+                                }
+                            </div>
+                        </div>
+                        <!-- info card end -->
+                    </div>
+                    <!-- tab pane info end -->
+                    <!-- tab sessions starts here -->
+                    <div class="tab-pane" id="sessions" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-header-text">Sessions</h5>
+                            </div>
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                    <!-- tab sessions ends here -->
+
+                    <!-- tab review starts here -->
+                    @await Html.PartialAsync("_RenderClientsReviews", Model.ClientReviews)
+                    <!-- tab review ends here -->
+
+                    <!-- tab pane blog-post start -->
+                    <div class="tab-pane" id="blog-posts" role="tabpanel">
+                        <center><h1 style="color: #969996; ">This feature is coming soon.</h1></center>
+                    </div>
+                    <!-- tab pane blog-post end -->
+
+                </div>
+                <!-- tab content end -->
+            </div>
+        </div>
+    </div>
+    <!-- Page-body end -->
+</div>
+
+<div id="book-session" data-toggle="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true" style="padding-right: 0 !important;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-info" id="session-title">Session details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <form id="book-form" asp-controller="Therapists" asp-action="BookSession" class="form-horizontal" method="post" autocomplete="off">
+                    <div class="modal-body">
+                        @*<div class="form-group">
+                                <label for="recipient-name" class="col-form-label">A</label>
+                            </div>*@
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.Id)
+                        <input type="hidden" id="session-id" name="sessionId" />
+
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" class="form-control" value="Session" readonly />
+                        </div>
+
+                        @*<div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea class="form-control" id="description" readonly></textarea>
+                            </div>*@
+
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="text" id="date" class="form-control" readonly />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="time">Time</label>
+                            <input type="text" id="time" class="form-control" readonly />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <input type="text" id="type" class="form-control" readonly />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price">Price</label>
+                            <input type="text" id="price" class="form-control" readonly />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prefered-contact-method">Where do you want the session to be held?</label>
+                            <br />
+                            <select asp-for="Chosen_ContactMethodId"
+                                    class="selectpicker"
+                                    title="Select a place"
+                                    id="prefered-contact-method">
+                                @if (Model.ToChooseFrom_ContactMethods != null && Model.ToChooseFrom_ContactMethods.Any())
+                                {
+                                    foreach (var contactMethod in Model.ToChooseFrom_ContactMethods)
+                                    {
+                                        var iconAndNameAndColor = Helper.GetContactMethodIconAndNameAndColor(contactMethod.Text);
+                                        var icon = iconAndNameAndColor[0];
+                                        var name = iconAndNameAndColor[1];
+                                        var color = iconAndNameAndColor[2];
+
+                                        <option value="@contactMethod.Value" data-content="<i class='@icon' style='color:@color;'></i>&nbsp;&nbsp;@name">
+                                            @name
+                                        </option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled>Contact Methods not available.</option>
+                                }
+                            </select>
+                            <br />
+                            <span asp-validation-for="Chosen_ContactMethodId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group" style="display: none" id="div-contact-info">
+                            <label for="input-contact-info" id="label-contact-info"></label>
+                            <input asp-for="ContactInfo" id="input-contact-info" class="form-control" />
+                            <span asp-validation-for="ContactInfo" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group" style="display: none" id="div-in-person">
+                            <label for="input-in-person" id="label-in-person">Address info</label>
+                            <textarea id="input-in-person" class="form-control" rows="5" readonly>@Model.Address</textarea>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success" id="btn-book-session">Book</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <script>
+                    function mustBeSignedIn() {
+                        $('#book-session').modal('hide');
+
+                        Swal.fire({
+                            title: 'Sign in required!',
+                            text: "You must be signed in to book a session.",
+                            icon: 'info',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Sign in'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '@Url.Action("SignIn", "Authorization", new { Area = "" })';
+                            }
+                            else {
+                                $('#book-session').modal('show');
+                            }
+                        })
+                    }
+                </script>
+
+                <form id="book-form" class="form-horizontal" autocomplete="off">
+                    <div class="modal-body">
+                        @*<div class="form-group">
+                                <label for="recipient-name" class="col-form-label">A</label>
+                            </div>*@
+
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" class="form-control" value="Session" readonly />
+                        </div>
+
+                        @*<div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea class="form-control" id="description" readonly></textarea>
+                            </div>*@
+
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="text" id="date" class="form-control" readonly />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="time">Time</label>
+                            <input type="text" id="time" class="form-control" readonly />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <input type="text" id="type" class="form-control" readonly />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price">Price</label>
+                            <input type="text" id="price" class="form-control" readonly />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prefered-contact-method">Where do you want the session to be held?</label>
+                            <br />
+                            <select asp-for="Chosen_ContactMethodId"
+                                    class="selectpicker"
+                                    title="Select a place"
+                                    id="prefered-contact-method">
+                                @if (Model.ToChooseFrom_ContactMethods != null && Model.ToChooseFrom_ContactMethods.Any())
+                                {
+                                    foreach (var contactMethod in Model.ToChooseFrom_ContactMethods)
+                                    {
+                                        var iconAndNameAndColor = Helper.GetContactMethodIconAndNameAndColor(contactMethod.Text);
+                                        var icon = iconAndNameAndColor[0];
+                                        var name = iconAndNameAndColor[1];
+                                        var color = iconAndNameAndColor[2];
+
+                                        <option value="@contactMethod.Value" data-content="<i class='@icon' style='color:@color;'></i>&nbsp;&nbsp;@name">
+                                            @name
+                                        </option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled>Contact Methods not available.</option>
+                                }
+                            </select>
+                            <br />
+                            <span asp-validation-for="Chosen_ContactMethodId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group" style="display: none" id="div-contact-info">
+                            <label for="input-contact-info" id="label-contact-info"></label>
+                            <input asp-for="ContactInfo" id="input-contact-info" class="form-control" />
+                            <span asp-validation-for="ContactInfo" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group" style="display: none" id="div-in-person">
+                            <label for="input-in-person" id="label-in-person">Address info</label>
+                            <textarea id="input-in-person" class="form-control" rows="5" readonly>@Model.Address</textarea>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" onclick="mustBeSignedIn()" class="btn btn-success">Book</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Main body end -->
+@*<div id="styleSelector">
+
+    </div>*@
+
+<script>
+    $(document).ready(function () {
+        $('header nav.mb-3').removeClass('mb-3');
+
+        let showCalendarTab = function (event) {
+            $('.active').removeClass('active');
+            $('#nav-item-sessions').addClass('active');
+            $('#sessions').addClass('active');
+
+            $('html, body').animate({
+                scrollTop: $("#sessions").offset().top
+            }, 2000);
+        };
+
+        if (sessionStorage.getItem('showCalendarTab') === 'true') {
+            sessionStorage.removeItem('showCalendarTab');
+
+            showCalendarTab();
+        }
+
+        $('#main-btn-book-session').click(function (event) {
+            event.preventDefault();
+
+            showCalendarTab();
+        })
+
+        $("#prefered-contact-method").selectpicker();
+
+        var sessions = [];
+
+        let sessionArray = $.map(@Html.Raw(Model.SerializedSessions), function (value, index) {
+            return [value];
+        });
+
+        $.each(sessionArray, function (i, v) {
+            let startDateTime = new Date(v.StartDateTime);
+            let endDateTime = new Date(v.EndDateTime);
+            let time = 'From ' + moment(startDateTime.getTime()).format("HH:mm") + ' to ' + moment(endDateTime.getTime()).format("HH:mm");
+            let btnClickToBook = v.Booked === 0 ? "&nbsp;&nbsp;<span class='badge badge-success'>Click to Book</span>" : '';
+
+            sessions.push({
+                id: v.SessionId,
+                name: v.Type === 0 ? 'Individual therapy' : 'Group therapy',
+                description: time + btnClickToBook,
+                badge: v.Booked === 0 ? v.Price + ' RSD' : 'Booked',
+                date: (startDateTime.getMonth() + 1) + '/' + startDateTime.getDate() + '/' + startDateTime.getFullYear(),
+                type: 'event',
+                color: v.Booked === 0 ? '#63D867' : '#FF0000',
+                subject: v.Subject,
+                description2: v.Description,
+                startDate: startDateTime.getDate() + '/' + (startDateTime.getMonth() + 1) + '/' + startDateTime.getFullYear(),
+                time: time,
+                type: v.Type === 0 ? "Individual therapy" : "Group therapy",
+                price: v.Price,
+                booked: v.Booked
+            })
+        });
+
+        $('#calendar').evoCalendar({
+            theme: "Royal Navy",
+            eventDisplayDefault: true,
+            eventListToggler: true,
+            calendarEvents: sessions
+        });
+
+        $("#calendar").on("selectEvent", function (event, activeEvent) {
+            $('#prefered-contact-method').selectpicker('refresh');
+            var selectedSession = sessions.find(s => s.id === activeEvent.id);
+
+            if (selectedSession.booked === 0) {
+                $('#book-session').modal('show');
+
+                $('#session-id').val(selectedSession.id);
+                $('#date').val(selectedSession.startDate);
+                $('#time').val(selectedSession.time);
+                $('#type').val(selectedSession.type);
+                $('#price').val(selectedSession.price + ' RSD');
+            }
+            else {
+                Swal.fire(
+                    'This session is booked already.',
+                    'Please select another session.',
+                    'info'
+                );
+            }
+        });
+
+        $("#calendar").on("selectDate", function (newDate, oldDate) {
+            $('#eventListToggler').click();
+        });
+
+        $("#prefered-contact-method").change(function () {
+            //$('#div-contact-info').css('display', 'block');
+
+            var contactName = $.trim($('#prefered-contact-method').find(":selected").text());
+
+            if (contactName !== 'In Person') {
+                $('#div-in-person').css('display', 'none');
+                $('#div-contact-info').css('display', 'block');
+                $('#label-contact-info').html('Your ' + contactName + ' username');
+                $('#input-contact-info').val('');
+                $('#input-contact-info').attr('placeholder', 'Please enter your ' + contactName + ' username');
+            }
+            else {
+                $('#div-contact-info').css('display', 'none');
+                $('#div-in-person').css('display', 'block');
+            }
+
+        });
+
+        $('#book-form').on('submit', function (e) {
+            e.preventDefault();
+            $('#book-session').modal('hide');
+
+            let sessionId = $('#session-id').val();
+
+            const swalBook = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success delete-buttons-separator',
+                    denyButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            });
+
+            swalBook.fire({
+                title: 'Are you sure you would like to book this session?',
+                icon: 'question',
+                confirmButtonText: 'Yes',
+                showDenyButton: true,
+                denyButtonText: 'No'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(this).off('submit').submit();
+                    @*$.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("DeleteSession", "Sessions", new { Area = "Therapist" })',
+                        data: { tracker: args.event.extendedProps.sessionId },
+                        success: function (response) {
+                            if (response.success) {
+                                toastr[response.severity](response.body, response.header);
+                                let filteredSessions = sessions.filter(value => value.extendedProps.sessionId !== args.event.extendedProps.sessionId);
+                                GenerateCalendar(filteredSessions);
+                                $('#view-session').modal('hide');
+                            }
+                            else {
+                                window.location.href = response.location;
+                            }
+                        }
+                    })*@
+                }
+                else {
+                    $('#book-session').modal('show');
+                }
+            });
+        });
+    });
+</script>
+
+@if (ViewBag.validationFailed != null)
+{
+    ViewBag.validationFailed = null;
+
+    <script>
+        window.history.pushState("", "", '@Url.Action("Profile", "Therapists", new { Area = "", therapist = Model.TherapistAccountId })');
+        $('#nav-item-personal-info').removeClass('active');
+        $('#nav-item-sessions').addClass('active');
+
+        $('#personal').removeClass('active');
+        $('#sessions').addClass('active');
+
+        var sessions = [];
+
+        let sessionArray = $.map(@Html.Raw(Model.SerializedSessions), function (value, index) {
+            return [value];
+        });
+
+        $.each(sessionArray, function (i, v) {
+            let startDateTime = new Date(v.StartDateTime);
+            let endDateTime = new Date(v.EndDateTime);
+            let time = 'From ' + moment(startDateTime.getTime()).format("HH:mm") + ' to ' + moment(endDateTime.getTime()).format("HH:mm");
+            let btnClickToBook = v.Booked === 0 ? "&nbsp;&nbsp;<span class='badge badge-success'>Click to Book</span>" : '';
+
+            sessions.push({
+                id: v.SessionId,
+                name: v.Type === 0 ? 'Individual therapy' : 'Group therapy',
+                description: time + btnClickToBook,
+                badge: v.Booked === 0 ? v.Price + ' RSD' : 'Booked',
+                date: (startDateTime.getMonth() + 1) + '/' + startDateTime.getDate() + '/' + startDateTime.getFullYear(),
+                type: 'event',
+                color: v.Booked === 0 ? '#63D867' : '#FF0000',
+                subject: v.Subject,
+                description2: v.Description,
+                startDate: startDateTime.getDate() + '/' + (startDateTime.getMonth() + 1) + '/' + startDateTime.getFullYear(),
+                time: time,
+                type: v.Type === 0 ? "Individual therapy" : "Group therapy",
+                price: v.Price,
+                booked: v.Booked
+            })
+        });
+
+        var selectedSession = sessions.find(s => s.id === '@ViewBag.sessionId');
+
+        $('#session-id').val(selectedSession.id);
+        $('#date').val(selectedSession.startDate);
+        $('#time').val(selectedSession.time);
+        $('#type').val(selectedSession.type);
+        $('#price').val(selectedSession.price + ' RSD');
+
+        $('#book-session').modal('show');
+    </script>
+
+    if (ViewBag.showSwal != null)
+    {
+        ViewBag.showSwal = null;
+
+        <script>
+            window.history.pushState("", "", '@Url.Action("Profile", "Therapists", new { Area = "", therapist = Model.TherapistAccountId })');
+            Swal.fire(
+                "@ViewBag.swalTitle",
+                "@ViewBag.swalBody",
+                "@ViewBag.swalSeverity"
+            );
+        </script>
+    }
+
+    if (ViewBag.showSwalNotEnoughWebCredit != null)
+    {
+        ViewBag.showSwalNotEnoughWebCredit = null;
+
+        <script>
+            window.history.pushState("", "", '@Url.Action("Profile", "Therapists", new { Area = "", therapist = Model.TherapistAccountId })');
+            Swal.fire({
+                title: '@ViewBag.swalTitle',
+                text: '@ViewBag.swalBody',
+                icon: '@ViewBag.swalSeverity',
+                showCancelButton: true,
+                confirmButtonColor: '#28A745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Add web credit'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '@ViewBag.redirectUrl';
+                }
+                //else {
+                //    $('#book-session').modal('show');
+                //}
+            });
+        </script>
+    }
+
+    if (ViewBag.inPersonChosen != null)
+    {
+        ViewBag.inPersonChosen = null;
+
+        <script>
+            window.history.pushState("", "", '@Url.Action("Profile", "Therapists", new { Area = "", therapist = Model.TherapistAccountId })');
+            $('#div-contact-info').css('display', 'none');
+            $('#div-in-person').css('display', 'block');
+        </script>
+    }
+    else if (ViewBag.otherContactMethodChosen != null)
+    {
+        ViewBag.otherContactMethodChosen = null;
+        <script>
+            window.history.pushState("", "", '@Url.Action("Profile", "Therapists", new { Area = "", therapist = Model.TherapistAccountId })');
+            var contactName = $.trim($('#prefered-contact-method').find(":selected").text());
+
+            $('#div-in-person').css('display', 'none');
+            $('#div-contact-info').css('display', 'block');
+            $('#label-contact-info').html('Your ' + contactName + ' username');
+            $('#input-contact-info').val('');
+            $('#input-contact-info').attr('placeholder', 'Please enter your ' + contactName + ' username');
+        </script>
+    }
+}
+
+@if (ViewBag.success != null)
+{
+    ViewBag.success = null;
+
+    <script>
+        window.history.pushState("", "", '@Url.Action("Profile", "Therapists", new { Area = "", therapist = Model.TherapistAccountId })');
+        Swal.fire({
+            title: '@ViewBag.swalTitle',
+            text: '@ViewBag.swalBody',
+            icon: '@ViewBag.swalSeverity',
+            confirmButtonColor: '#28A745',
+            confirmButtonText: 'See details'
+        }).then((result) => {
+            window.location.href = '@ViewBag.redirectUrl';
+        });
+
+        $('#nav-item-personal-info').removeClass('active');
+        $('#nav-item-sessions').addClass('active');
+
+        $('#personal').removeClass('active');
+        $('#sessions').addClass('active');
+    </script>
+}

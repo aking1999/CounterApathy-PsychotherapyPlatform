@@ -1,0 +1,198 @@
+﻿@model List<WebApplication9.Areas.Admin.ViewModels.AdminAddWebCreditUserViewModel>
+
+@using Framework.Helpers
+@using Framework.Helpers.ExtensionMethods
+
+@{
+    ViewData["Title"] = "AddWebCredit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Adminty/adminty.css" />
+<link rel="stylesheet" href="~/css/profile-info.css" />
+<link rel="stylesheet" href="~/dashboard/dashboard.css" />
+<link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<script src="~/sweet-alert2/sweetalert2.min.js"></script>
+<script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+<link rel="stylesheet" href="~/search-box/search-box.css" />
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="main-card mb-3 card">
+            <div class="card-header">
+                Add Web Credit to users
+
+                &nbsp;
+
+                <div class="form-group">
+                    <input type="text" class="search form-control form-control-sm" placeholder="Search users..." />
+                </div>
+                <span class="counter pull-right"></span>
+
+                <div class="btn-actions-pane-right">
+                    <div role="group" class="btn-group-sm btn-group">
+                        @Html.ActionLink("All", "AddWebCredit", "Account", new { Area = "Admin", role = "All" }, new { @class = "btn btn-focus" })
+                        @Html.ActionLink("Admins", "AddWebCredit", "Account", new { Area = "Admin", role = "Admin" }, new { @class = "btn btn-focus" })
+                        @Html.ActionLink("Therapists", "AddWebCredit", "Account", new { Area = "Admin", role = "Therapist" }, new { @class = "btn btn-focus" })
+                        @Html.ActionLink("Clients", "AddWebCredit", "Account", new { Area = "Admin", role = "Client" }, new { @class = "btn btn-focus" })
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="
+                       align-middle
+                       mb-0
+                       table table-borderless table-striped table-hover
+                       results
+                      ">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th>Name</th>
+                            <th class="text-center">Username</th>
+                            <th class="text-center">Role</th>
+                            <th class="text-center">Web Credit</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                        <tr class="bg-warning no-result">
+                            <td colspan="6"><i class="far fa-exclamation-triangle"></i> No results.</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (Model.Count > 0)
+                            {
+                                int orderNumber = 1;
+                                foreach (var user in Model)
+                                {
+                                    string badgeClass = string.Empty;
+
+                                    if (user.Role == "Admin")
+                                    {
+                                        badgeClass = "badge-danger";
+                                    }
+                                    else if (user.Role == "Therapist")
+                                    {
+                                        badgeClass = "badge-info";
+                                    }
+                                    else
+                                    {
+                                        badgeClass = "badge-success";
+                                    }
+
+                                    <tr>
+                                        <td class="text-center text-muted">#@orderNumber</td>
+                                        <td>
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left mr-3">
+                                                        <div class="widget-content-left">
+                                                            <img width="40"
+                                                                 height="40"
+                                                                 class="rounded-circle"
+                                                                 src="@Html.RenderUserProfilePhotoOrDefaultPhoto(user.ProfilePhoto)"
+                                                                 alt="" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="widget-content-left flex2">
+                                                        <div class="widget-heading">@user.FullName</div>
+                                                        <div class="widget-subheading opacity-7">
+                                                            Email: @user.Email
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center username">@user.Username</td>
+                                        <td class="text-center">
+                                            <div class="badge @badgeClass">@user.Role</div>
+                                        </td>
+                                        <td class="text-center" id="amount-@user.UserId">@user.WebCredit</td>
+                                        <td class="text-center">
+                                            <button onclick="showAddWebCreditSwal('@user.UserId')"
+                                                    type="button"
+                                                    class="btn btn-success btn-sm">
+                                                Add Web Credit
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    orderNumber++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <p class="text-danger">Currently no user with specified role exists.</p>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var showAddWebCreditSwal;
+
+    $(document).ready(function () {
+        showAddWebCreditSwal = function (tracker) {
+            const swalWithBootstrapButtonsAddWebCredit = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success delete-buttons-separator',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtonsAddWebCredit.fire({
+                title: 'Top up user\'s Web Credit',
+                html: 'Please enter the amount of Web Credit that you would like to add to the selected user. <br /> <br />' +
+                      '<input id="input-web-credit" class= "form-control" type="text" /> ',
+                icon: 'info',
+                confirmButtonText: 'Add',
+                showCancelButton: true,
+                showLoaderOnConfirm: true,
+                preConfirm: function () {
+                    try {
+                        if (!$('#input-web-credit').val()) throw new Error("Positive number is required.");
+                        if (!$.isNumeric($('#input-web-credit').val())) throw new Error("Positive number is required.");
+                        if ($('#input-web-credit').val() <= 0) throw new Error("Entered number must be higher than 0.");
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("AddWebCredit", "Account", new { Area = "Admin" })',
+                            data: { 'tracker': tracker, 'webCreditAmount': $('#input-web-credit').val() },
+                            success: function (response) {
+                                if (response.success) {
+                                    $('#amount-' + tracker).html(response.newAmount);
+
+                                    Swal.fire(
+                                        response.title,
+                                        response.body,
+                                        response.icon
+                                    )
+                                }
+                                else {
+                                    Swal.fire(
+                                        response.title,
+                                        response.body,
+                                        response.icon
+                                    )
+                                }
+                            }
+                        })
+                    }
+                    catch (error) {
+                        Swal.showValidationMessage(error);
+                    }
+                }
+            })
+        }
+    })
+</script>
+
+<script src="~/search-box/search-box.js"></script>
+

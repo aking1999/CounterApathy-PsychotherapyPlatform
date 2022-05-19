@@ -1,0 +1,17 @@
+﻿@model double
+
+<link rel="stylesheet" href="~/star-rating/star-rating.css" />
+<link rel="stylesheet" href="~/fontawesome-pro/css/all.min.css">
+
+@for (int i = 1; i <= 5; i++)
+{
+    if (i <= Model)
+    {
+        <label aria-label="@i star" class="rating__label mb-0"><i class="rating__icon rating__icon--star fa fa-star" style="color: #ffc107;"></i></label>
+    }
+    else
+    {
+        <label aria-label="@i star" class="rating__label mb-0"><i class="rating__icon rating__icon--star fa fa-star unchecked"></i></label>
+    }
+}
+

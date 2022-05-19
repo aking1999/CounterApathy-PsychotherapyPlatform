@@ -1,0 +1,173 @@
+﻿@model List<Database.Models.Withdrawals>
+
+@using Framework.Helpers
+
+@{
+    ViewData["Title"] = "Withdraw";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Adminty/adminty.css" />
+
+@* !!! sa ovim, tabela izgleda malo drugacije, treba kasnije da odlucim u kom slucaju izgleda lepse, pa da dodam ili sklonim dashboard.css *@
+@*<link rel="stylesheet" href="~/dashboard/dashboard.css" />*@
+
+
+<div class="page-header">
+    <div class="row align-items-end">
+        <div class="col-lg-8">
+            <div class="page-header-title">
+                <div class="d-inline">
+                    <h4>Withdrawals</h4>
+                    <span>You can view all your withdrawals easily on this page.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="page-body invoice-list-page">
+    <div class="row">
+        <div class="col-md-12 filter-bar">
+            <!-- Navigation start -->
+            <nav class="navbar navbar-light bg-faded m-b-30 p-10">
+                <ul class="nav navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#!">Filter: <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#!" id="bydate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-calendar-alt"></i> By Date</a>
+                        <div class="dropdown-menu" aria-labelledby="bydate">
+                            <a class="dropdown-item" href='@Url.Action("All", "Withdrawals", new { Area = "Therapist" })'>Show all</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href='@Url.Action("All", "Withdrawals", new { Area = "Therapist", filter = "date", predicate = "today" })'>Today</a>
+                            <a class="dropdown-item" href='@Url.Action("All", "Withdrawals", new { Area = "Therapist", filter = "date", predicate = "this week" })'>This week</a>
+                            <a class="dropdown-item" href='@Url.Action("All", "Withdrawals", new { Area = "Therapist", filter = "date", predicate = "this month" })'>This month</a>
+                            <a class="dropdown-item" href='@Url.Action("All", "Withdrawals", new { Area = "Therapist", filter = "date", predicate = "this year" })'>This year</a>
+                        </div>
+                    </li>
+                    <!-- end of by date dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#!" id="bystatus" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-analytics"></i> By Status</a>
+                        <div class="dropdown-menu" aria-labelledby="bystatus">
+                            <a class="dropdown-item" href='@Url.Action("All", "Withdrawals", new { Area = "Therapists" })'>Show all</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-warning" href='@Url.Action("All", "Withdrawals", new { Area = "Therapist", filter = "status", predicate = "requested" })'>Requested</a>
+                            <a class="dropdown-item text-success" href='@Url.Action("All", "Withdrawals", new { Area = "Therapist", filter = "status", predicate = "completed" })'>Completed</a>
+
+                        </div>
+                    </li>
+                    <!-- end of by status dropdown -->
+                </ul>
+                @*<div class="nav-item nav-grid">
+                        <span class="m-r-15">View Mode: </span>
+                        <button type="button" class="btn btn-sm btn-primary waves-effect waves-light m-r-10" data-toggle="tooltip" data-placement="top" title="list view">
+                            <i class="icofont icofont-listine-dots"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="grid view">
+                            <i class="icofont icofont-table"></i>
+                        </button>
+                    </div>*@
+                <!-- end of by priority dropdown -->
+            </nav>
+
+            @if (Model != null && Model.Count > 0)
+            {
+                <div class="table-responsive">
+                    <table class="
+                               align-middle
+                               mb-0
+                               table table-borderless table-striped table-hover
+                              ">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th class="text-center">Name</th>
+                                <th class="text-center">Amount (RSD)</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Request Date</th>
+                                <th class="text-center">Accept Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int orderNumber = 1;
+                                foreach (var withdraw in Model)
+                                {
+                                    string badgeClass = string.Empty;
+                                    string badgeText = string.Empty;
+
+                                    if (withdraw.Status == 0)
+                                    {
+                                        badgeClass = "badge-warning";
+                                        badgeText = "Requested";
+                                    }
+                                    else if (withdraw.Status == 1)
+                                    {
+                                        badgeClass = "badge-success";
+                                        badgeText = "Completed";
+                                    }
+                                    else
+                                    {
+                                        badgeClass = "badge-primary";
+                                        badgeText = "Undefined";
+                                    }
+
+                                    <tr>
+                                        <td class="text-center text-muted">#@orderNumber</td>
+                                        <td class="text-center">
+                                            @withdraw.FirstName @withdraw.LastName
+                                            &nbsp;
+                                            <a href="#"
+                                               id="popover-@withdraw.Id"
+                                               class="col-form-label"
+                                               data-placement="bottom"
+                                               title="Receiver"
+                                               style="margin-bottom: 20px !important;"
+                                               data-html="true"
+                                               data-content="@withdraw.FirstName @withdraw.LastName<br /> @withdraw.Street @withdraw.HouseNumber, @withdraw.City @withdraw.PostalCode, @withdraw.Country<br /><i class='far fa-phone'></i> @withdraw.PhoneNumber<br /><i class='far fa-envelope'></i> @withdraw.Email<br /><br /><strong>Bank Account Number:</strong><br />@withdraw.BankAccountNumber">
+                                                <i class="far fa-address-card"></i>
+                                            </a>
+                                        </td>
+                                        <td class="text-center">@withdraw.Amount</td>
+                                        <td class="text-center">
+                                            <span class="badge @badgeClass">@badgeText</span>
+                                        </td>
+                                        <td class="text-center">@withdraw.RequestDateTime.ToString("dd/MMM/yyyy HH:mm")</td>
+                                        @if (withdraw.Status == 1)
+                                        {
+                                            <td class="text-center">@withdraw.AcceptDateTime.ToString("dd/MMM/yyyy HH:mm")</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">-</td>
+                                        }
+                                    </tr>
+                                    orderNumber++;
+
+                                    <script>
+                                            $(document).ready(function () {
+                                                $('#popover-' + '@withdraw.Id').popover({
+                                                    trigger: 'focus'
+                                                });
+                                            })
+                                    </script>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <h3 class="text-primary">You have not made any withdrawal request yet. To request a withdrawal of funds, go to your, then under the Earnings, click <span class="badge badge-primary">Withdraw</span>.</h3>
+                <br />
+                <a href='@Url.Action("Profile", "Account", new { Area = "Therapist" })' class="btn btn-primary">Profile</a>
+            }
+
+        </div>
+    </div>
+</div>
+

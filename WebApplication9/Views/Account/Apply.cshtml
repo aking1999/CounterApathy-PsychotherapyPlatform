@@ -1,0 +1,266 @@
+﻿@model WebApplication9.ViewModels.TherapistApplicationsViewModel
+
+@using Microsoft.AspNetCore.Identity
+@using Database.Models
+@using Framework.Helpers.ExtensionMethods
+@inject SignInManager<CustomClient> SignInManager
+@inject UserManager<CustomClient> UserManager
+
+@{
+    ViewData["Title"] = "Apply";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/therapists-application-form/therapists-application-form.css" />
+<link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+<link rel="stylesheet" href="~/fontawesome-pro/css/all.min.css" />
+<link rel="stylesheet" href="~/css/profile-info.css" />
+<link rel="stylesheet" href="~/country-codes-phone-input/intlTelInput.min.css" />
+<link rel="stylesheet" href="~/country-codes-phone-input/demo.css" />
+<link rel="stylesheet" href="~/year-picker/yearpicker.css" />
+<link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<script src="~/country-codes-phone-input/intlTelInput.min.js"></script>
+<script id="wwwroot-utils" src="~/country-codes-phone-input/utils.js"></script>
+<script src="~/multiselect/bootstrap-select.min.js"></script>
+<script src="~/year-picker/moment.min.js"></script>
+<script src="~/year-picker/yearpicker.js"></script>
+<script src="~/sweet-alert2/sweetalert2.min.js"></script>
+<script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+
+<h2>Join our team of highly trained specialists to help other people live better lives.</h2>
+
+<hr />
+
+<h4 class="application-form">Application form</h4>
+
+<div class="page-content">
+
+    <div class="form-v10-content">
+
+        <form class="form-detail" asp-action="Apply" asp-controller="Account" method="post" id="myform" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div class="form-left">
+                <h2>Personal Infomation</h2>
+
+
+                <div class="profile-pic">
+                    <label class="-label" for="file">
+                        <span class="fa fa-camera"></span>
+                        <span>Change Image</span>
+                    </label>
+                    <input asp-for="ProfilePhoto" id="file" onchange="loadFile(event)" />
+                    @* !!! ovo ne radi <img class="profile-photo apply-photo" src="@await Html.RenderUserProfilePhotoOrDefaultPhoto(User, UserManager)" id="output" width="200" />*@
+                    <img class="profile-photo apply-photo" src="~/images/content-images/default-user-image.png" id="output" width="200" />
+
+                </div>
+                <div class="form-row form-group">
+                    <span asp-validation-for="ProfilePhoto" class="text-danger"></span>
+                </div> 
+
+                <div class="form-group">
+                    <div class="form-row form-row-1">
+                        <input asp-for="FirstName" class="input-text input-disabled-color" readonly disabled />
+                    </div>
+                    <div class="form-row form-row-2">
+                        <input asp-for="LastName" class="input-text input-disabled-color" readonly disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+
+                    <div class="form-row form-group">
+                        <select asp-for="Gender"
+                                class="selectpicker"
+                                title="Gender">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                        <span asp-validation-for="Gender" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-row form-row-2">
+                        <label asp-for="YearOfBirth" class="input-year"></label>
+                        <input type="text" asp-for="YearOfBirth" class="input-disabled-color" readonly disabled />
+                    </div>
+                </div>
+
+                <h2>Contact Infomation</h2>
+
+                <div class="form-row">
+                    <input asp-for="Email" class="input-text input-disabled-color" readonly disabled />
+                </div>
+
+                <div class="form-group">
+                    <div class="form-row form-row-3">
+                        <input asp-for="Street" class="input-text">
+                        <span asp-validation-for="Street" class="text-danger"></span>
+                    </div>
+                    <div class="form-row form-row-4">
+                        <input asp-for="HouseNumber" class="input-text">
+                        <span asp-validation-for="HouseNumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-row form-row-3">
+                        <input asp-for="City" class="input-text">
+                        <span asp-validation-for="City" class="text-danger"></span>
+                    </div>
+                    <div class="form-row form-row-4">
+                        <input asp-for="PostalCode" class="input-text">
+                        <span asp-validation-for="PostalCode" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-row form-row-1">
+                        <input asp-for="Country" class="input-text">
+                        <span asp-validation-for="Country" class="text-danger"></span>
+                    </div>
+                    <div class="form-row form-row-2">
+                        <input type="tel" id="PhoneNumber" asp-for="PhoneNumber" class="input-text input-disabled-color" readonly disabled>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-right">
+
+                <h2>Career Information</h2>
+
+                <div class="form-row">
+                    <input asp-for="University" class="input-text" />
+                    <span asp-validation-for="University" class="text-danger"></span>
+                </div>
+
+                <div class="form-row form-group">
+                    <textarea asp-for="PastCompanies" class="input-companies form-control" id="input-companies"></textarea>
+                    <span asp-validation-for="PastCompanies" class="text-danger"></span>
+                </div>
+
+                <div class="form-row form-group">
+                    <select asp-for="Chosen_SpecialitiesIds"
+                            class="selectpicker"
+                            id="specialities"
+                            multiple data-live-search="true"
+                            title="Your specialities"
+                            data-selected-text-format="count"
+                            data-size="5">
+                        @if (Model.ToChooseFrom_Specialities.Any())
+                        {
+                            foreach (var speciality in Model.ToChooseFrom_Specialities)
+                            {
+                                <option value="@speciality.Value" data-icon="fal fa-file-medical">&nbsp;&nbsp;@speciality.Text</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="" disabled>Specialities not available.</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Chosen_SpecialitiesIds" class="text-danger"></span>
+                </div>
+
+                @*<div class="form-checkbox">
+                        <label class="container">
+                            <p>I do accept the <a href="#" class="text">Terms and Conditions</a> of your site.</p>
+                            <input type="checkbox" name="checkbox">
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>*@
+
+                @*<div class="form-checkbox">
+                        <label class="container">
+                        <p>I do accept the <a href="#" class="text">Terms and Conditions</a> of your site.</p>
+                        <input asp-for="TermsAndConditions">
+                        <span class="checkmark"></span>
+                        </label>
+                    </div>*@
+
+                <div class="form-checkbox">
+                    <label class="container">
+                        <p>I do accept the <a href="#" class="text">Terms and Conditions</a> of your site.</p>
+                        <input asp-for="TermsAndConditions">
+                        <span asp-validation-for="TermsAndConditions" class="text-danger"></span>
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+
+
+                <div class="form-row-last">
+                    <input type="submit" name="register" class="register" value="Apply">
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (ViewBag.showSwal != null)
+{
+    if (ViewBag.showSwal)
+    {
+        ViewBag.showSwal = null;
+
+        <script>
+            Swal.fire(
+                'Congratulations!',
+                'You have successfully applied for the therapist account. <br /><strong>Soon, you will be contacted through your email to proceed further with your application.</strong>',
+                'success'
+            ).then((() => {
+                window.location.href = '@Url.Action("Profile", "Account")';
+            }));
+        </script>
+    }
+}
+
+<script>
+    $(document).ready(function () {
+        $("#specialities").selectpicker('refresh');
+
+        let currentYear = new Date().getFullYear();
+
+        var input = document.querySelector("#PhoneNumber");
+        window.intlTelInput(input, {
+            // allowDropdown: false,
+            //autoHideDialCode: false,
+            //autoPlaceholder: "off",
+            // dropdownContainer: document.body,
+            // excludeCountries: ["us"],
+            formatOnDisplay: true,
+            // geoIpLookup: function(callback) {
+            //   $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //     var countryCode = (resp && resp.country) ? resp.country : "";
+            //     callback(countryCode);
+            //   });
+            // },
+            // hiddenInput: "full_number",
+            initialCountry: "rs",
+            // localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            // onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],
+            placeholderNumberType: "MOBILE",
+            preferredCountries: ["rs", "me", "ba", "hr"],
+            // separateDialCode: true,
+            utilsScript: document.getElementById("wwwroot-utils").href
+        });
+    })
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script type="text/javascript">
+
+        var loadFile = function (event) {
+            var image = document.getElementById("output");
+            image.src = URL.createObjectURL(event.target.files[0]);
+        };
+
+        // Add the following code if you want the name of the file appear on select
+        //$(".custom-file-input").on("change", function () {
+        //    var fileName = $(this).val().split("\\").pop();
+        //    $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        //});
+    </script>
+}
+

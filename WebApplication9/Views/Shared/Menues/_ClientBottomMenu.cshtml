@@ -1,0 +1,28 @@
+﻿<link rel="stylesheet" href="~/bottom-menu/bottom-menu.css" />
+<script src="~/bottom-menu/bottom-menu.js"></script>
+
+<div class="mobile-bm">
+    <div class="navigation-bm">
+        <ul>
+            <li class="list active">
+                <a asp-controller="Account" asp-action="Profile">
+                    <span class="icon"><i class="far fa-user"></i></span>
+                    <span class="text">Profile</span>
+                </a>
+            </li>
+            <li class="list">
+                <a asp-controller="Sessions" asp-action="BookedSessions">
+                    <span class="icon"><i class="far fa-clipboard-user"></i></span>
+                    <span class="text">Booked Sessions</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="#">
+                    <span class="icon"><i class="far fa-cog"></i></span>
+                    <span class="text">Settings</span>
+                </a>
+            </li>
+            <div class="indicator-bm"></div>
+        </ul>
+    </div>
+</div>

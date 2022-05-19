@@ -1,0 +1,39 @@
+﻿@model WebApplication9.PartialViewModels.CountdownPartialViewModel
+@using Framework.Helpers
+
+<p class="task-due"><strong class="badge badge-info" id="badge-@Model.CountdownId">Starts in: <span id="countdown-@Model.CountdownId"></span></strong></p>
+
+<script>
+    $(document).ready(function () {
+        var countDownDate = new Date("@Helper.ParseDateForJavascriptCountdown(Model.SessionDate) @Model.SessionStartTime").getTime();
+
+        var x = setInterval(function () {
+            var now = new Date().getTime();
+
+            var distance = countDownDate - now;
+
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("countdown-" + '@Model.CountdownId').innerHTML = days + "d " + hours + "h "
+                + minutes + "m " + seconds + "s ";
+
+            // If the count down is finished, write some text
+            if (distance < 0) {
+                document.getElementById("countdown-" + '@Model.CountdownId').innerHTML = "Session Started";
+
+                var finished = new Date("@Helper.ParseDateForJavascriptCountdown(Model.SessionDate) @Model.SessionEndTime").getTime();
+                var dateTimeNow = new Date();
+
+                if (dateTimeNow >= finished) {
+                    clearInterval(x);
+
+                    document.getElementById("countdown-" + '@Model.CountdownId').remove();
+                    document.getElementById("badge-" + '@Model.CountdownId').innerHTML = 'Please Rate This Session';
+                }
+            }
+        }, 1000);
+    });
+</script>

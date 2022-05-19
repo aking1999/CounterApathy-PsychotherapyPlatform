@@ -1,0 +1,178 @@
+﻿:root {
+    --clr: #222327;
+    --blue-bm: #1977cc;
+}
+
+.mobile-bm {
+    position: fixed;
+    right: 50%;
+    bottom: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /*background: var(--clr);*/
+
+    z-index: 9;
+}
+
+.navigation-bm {
+    width: 360px;
+    height: 70px;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    /*!!! ovo ja dodajem*/
+    /*align-self: flex-end;*/
+    /*    margin: 15px 15px;*/
+    background-color: var(--blue-bm);
+}
+
+    .navigation-bm ul {
+        display: flex;
+        width: 350px;
+    }
+
+        .navigation-bm ul li {
+            position: relative;
+            list-style: none;
+            width: 70px;
+            height: 70px;
+            z-index: 1;
+        }
+
+            .navigation-bm ul li a {
+                position: relative;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+                font-weight: 500;
+            }
+
+                .navigation-bm ul li a .icon {
+                    position: relative;
+                    display: block;
+                    line-height: 75px;
+                    font-size: 1.5rem;
+                    text-align: center;
+                    transition: 0.5s;
+                    color: white;
+                }
+
+            .navigation-bm ul li.active a .icon {
+                transform: translateY(-38px);
+                color: var(--blue-bm);
+            }
+
+            .navigation-bm ul li a .text {
+                position: absolute;
+                /*color: var(--clr);*/
+                color: white;
+                font-weight: 400;
+                font-size: 0.75rem;
+                letter-spacing: 0.05rem;
+                transition: 0.5s;
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            .navigation-bm ul li.active a .text {
+                opacity: 1;
+                transform: translateY(10px);
+            }
+
+.indicator-bm {
+    position: absolute;
+    top: -58%;
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 50%;
+    /*border: 6px solid var(--clr);*/
+    border: 6px solid var(--blue-bm);
+    transition: 0.5s;
+}
+
+/*.indicator-bm::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: -25.5px;
+        width: 20px;
+        height: 20px;
+        background: transparent;
+        border-top-right-radius: 50px;
+        box-shadow: 1px -10px 0 0 var(--clr);
+        box-shadow: 1px -10px 0 0 white;
+    }*/
+
+/*.indicator-bm::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: -25.5px;
+        width: 20px;
+        height: 20px;
+        background: transparent;
+        border-top-left-radius: 50px;
+        box-shadow: -1px -10px 0 0 var(--clr);
+        box-shadow: -1px -10px 0 0 white;
+    }*/
+
+.navigation-bm ul li:nth-child(1).active ~ .indicator-bm {
+    transform: translateX(calc(70px * 0));
+}
+
+.navigation-bm ul li:nth-child(2).active ~ .indicator-bm {
+    transform: translateX(calc(70px * 1));
+}
+
+.navigation-bm ul li:nth-child(3).active ~ .indicator-bm {
+    transform: translateX(calc(70px * 2));
+}
+
+.navigation-bm ul li:nth-child(4).active ~ .indicator-bm {
+    transform: translateX(calc(70px * 3));
+}
+
+.navigation-bm ul li:nth-child(5).active ~ .indicator-bm {
+    transform: translateX(calc(70px * 4));
+}
+
+.first-bm {
+    transform: translateX(calc(70px * 0));
+}
+
+.second-bm {
+    transform: translateX(calc(70px * 1));
+}
+
+.third-bm {
+    transform: translateX(calc(70px * 2));
+}
+
+.fourth-bm {
+    transform: translateX(calc(70px * 3));
+}
+
+.fifth-bm {
+    transform: translateX(calc(70px * 4));
+}
+
+@media (min-width: 676px) {
+    .mobile-bm {
+        display: none;
+    }
+
+    .navigation-bm {
+        display: none;
+    }
+
+    .indicator-bm {
+        display: none;
+    }
+}

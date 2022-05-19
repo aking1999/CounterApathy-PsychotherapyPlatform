@@ -1,0 +1,168 @@
+﻿@model WebApplication9.Areas.Admin.ViewModels.AdminDashboardViewModel
+
+@using Microsoft.AspNetCore.Identity
+@using Database.Models
+@using Framework.Helpers
+@using Framework.Helpers.ExtensionMethods
+@inject UserManager<CustomClient> UserManager
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Adminty/adminty.css" />
+<link rel="stylesheet" href="~/dashboard/dashboard.css" />
+
+<div class="page-header">
+    <div class="row align-items-end">
+        <div class="col-lg-8">
+            <div class="page-header-title">
+                <div class="d-inline">
+                    <h4>Therapists' Applications</h4>
+                    <span>You can manage therapists' applications easily on this page.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="page-body invoice-list-page">
+    <div class="row">
+        <div class="col-md-12 filter-bar">
+            <!-- Navigation start -->
+            <nav class="navbar navbar-light bg-faded m-b-30 p-10">
+                <ul class="nav navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#!">Filter: <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#!" id="bydate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-analytics"></i> By Status</a>
+                        <div class="dropdown-menu" aria-labelledby="bydate">
+                            <a class="dropdown-item" href='@Url.Action("Dashboard", "Account", new { Area = "Admin" })'>Show all</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-success" href='@Url.Action("Dashboard", "Account", new { Area = "Admin", applications = "accepted" })'>Accepted</a>
+                            <a class="dropdown-item text-warning" href='@Url.Action("Dashboard", "Account", new { Area = "Admin", applications = "pending" })'>Pending</a>
+                            <a class="dropdown-item text-danger" href='@Url.Action("Dashboard", "Account", new { Area = "Admin", applications = "rejected" })'>Rejected</a>
+                        </div>
+                    </li>
+                    <!-- end of by status dropdown -->
+                </ul>
+            </nav>
+
+            @if (Model != null && Model.AggregatedInformationParsed != null &&
+               Model.AggregatedInformationParsed.Count > 0)
+            {
+                <div class="table-responsive">
+                    <table class="
+                        align-middle
+                        mb-0
+                        table table-borderless table-striped table-hover
+                      ">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Name</th>
+                                <th class="text-center">Application Date</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int orderNumber = 1;
+                                foreach (var application in Model.AggregatedInformationParsed)
+                                {
+                                    string badgeClass = string.Empty;
+                                    string badgeText = string.Empty;
+
+                                    if (application.Accepted == 1)
+                                    {
+                                        badgeClass = "badge-success";
+                                        badgeText = "Accepted";
+                                    }
+                                    else if (application.Accepted == 0)
+                                    {
+                                        badgeClass = "badge-warning";
+                                        badgeText = "Pending";
+                                    }
+                                    else if (application.Accepted == -1)
+                                    {
+                                        badgeClass = "badge-danger";
+                                        badgeText = "Rejected";
+                                    }
+                                    else
+                                    {
+                                        badgeClass = "badge-primary";
+                                        badgeText = "Undefined";
+                                    }
+
+                                    <tr>
+                                        <td class="text-center text-muted">#@orderNumber</td>
+                                        <td>
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left mr-3">
+                                                        <div class="widget-content-left">
+                                                            <img width="40"
+                                                                 height="40"
+                                                                 class="rounded-circle"
+                                                                 src="@Html.RenderUserProfilePhotoOrDefaultPhoto(application.ProfilePhoto)"
+                                                                 alt="" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="widget-content-left flex2">
+                                                        <div class="widget-heading">@application.FirstName @application.LastName</div>
+                                                        <div class="widget-subheading opacity-7">
+                                                            @application.Email
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">@Helper.GetFullDateInfo(application.ApplicationDate)</td>
+                                        <td class="text-center">
+                                            <div class="badge @badgeClass">@badgeText</div>
+                                        </td>
+                                        <td class="text-center">
+                                            <form asp-area="Admin" asp-controller="Account" asp-action="ApplicationDetails" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="userId" value="@application.UserId" />
+                                                <button type="submit"
+                                                        id="PopoverCustomT-1"
+                                                        class="btn btn-primary btn-sm">
+                                                    Details
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    orderNumber++;
+                                }
+                            }
+
+                            @*@{
+                            if (Model.AggregatedInformationParsed.Count > 0)
+                            {
+
+                            }
+                            else
+                            {
+                                <tr>
+                                    <p class="text-danger">Currently no application with specified criteria has beed submitted.</p>
+                                </tr>
+                            }
+                        }*@
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <h3 class="text-primary">No new therapists' application yet.</h3>
+            }
+        </div>
+    </div>
+</div>
+

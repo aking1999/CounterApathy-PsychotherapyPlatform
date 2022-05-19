@@ -1,0 +1,237 @@
+﻿@model List<WebApplication9.Areas.Admin.ViewModels.PendingRatingViewModel>
+
+@{
+    ViewData["Title"] = "PendingRatings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Adminty/adminty.css" />
+<link rel="stylesheet" href="~/Dashboard/dashboard.css" />
+<link rel="stylesheet" href="~/search-box/search-box.css" />
+
+<div class="page-header">
+    <div class="row align-items-end">
+        <div class="col-lg-8">
+            <div class="page-header-title">
+                <div class="d-inline">
+                    <h4>Manage Pending Ratings</h4>
+                    <span>You can view, approve or refuse pending session ratings easily on this page.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="page-body invoice-list-page">
+    <div class="row">
+        <div class="col-md-12 filter-bar">
+            <!-- Navigation start -->
+            <nav class="navbar navbar-light bg-faded m-b-30 p-10">
+                <ul class="nav navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#!">Filter: <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#!" id="bydate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-analytics"></i> By Status</a>
+                        <div class="dropdown-menu" aria-labelledby="bydate">
+                            <a class="dropdown-item" href='@Url.Action("PendingRatings", "Dashboard", new { Area = "Admin", filter = "show all" })'>Show all</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-warning" href='@Url.Action("PendingRatings", "Dashboard", new { Area = "Admin", filter = "pending" })'>Pending</a>
+                            <a class="dropdown-item text-danger" href='@Url.Action("PendingRatings", "Dashboard", new { Area = "Admin", filter = "refused" })'>Refused</a>
+                        </div>
+                    </li>
+                    <!-- end of by date dropdown -->
+                </ul>
+                <!-- end of by priority dropdown -->
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="main-card mb-3 card">
+            <div class="table-responsive">
+                <table class="
+                       align-middle
+                       mb-0
+                       table table-borderless table-striped table-hover
+                       results
+                      ">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th>Therapist</th>
+                            <th class="text-center">Average Rating</th>
+                            <th class="text-center">Client's Email</th>
+                            <th class="text-center">Client's Rating</th>
+                            <th class="text-center">Session Date</th>
+                            <th class="text-center">Rating Date</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (Model != null && Model.Count > 0)
+                            {
+                                int orderNumber = 1;
+                                foreach (var pendingRating in Model)
+                                {
+                                    <tr>
+                                        <td class="text-center text-muted">#@orderNumber</td>
+                                        <td>
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left flex2">
+                                                        <div class="widget-heading">@pendingRating.TherapistFirstName @pendingRating.TherapistLastName</div>
+                                                        <div class="widget-subheading opacity-7">
+                                                            Email: @pendingRating.TherapistEmail
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">@await Html.PartialAsync("_RenderStars", pendingRating.TherapistAverageStarsRating)</td>
+                                        <td class="text-center username">@pendingRating.ClientEmail</td>
+                                        <td class="text-center">
+                                            @await Html.PartialAsync("_RenderStars", pendingRating.StarsRating)
+
+                                            &nbsp;
+
+                                            <a href="#"
+                                               id="btn-show-popover-@pendingRating.Id"
+                                               class="col-form-label"
+                                               data-placement="bottom"
+                                               title="Comment"
+                                               style="margin-bottom: 20px !important;"
+                                               data-content="@pendingRating.Comment">
+                                                <i class="far fa-comment"></i>
+                                            </a>
+                                        </td>
+                                        <td class="text-center">@pendingRating.SessionDate, @pendingRating.SessionStartTime - @pendingRating.SessionEndTime</td>
+                                        <td class="text-center">@pendingRating.RatingDate</td>
+
+                                        @if (!pendingRating.IsRefused)
+                                        {
+                                            <td class="text-center">
+                                                <button id="btn-approve-@pendingRating.Id"
+                                                        type="button"
+                                                        class="btn btn-success btn-mini">
+                                                    Approve
+                                                </button>
+                                                <button id="btn-refuse-@pendingRating.Id"
+                                                        type="button"
+                                                        class="btn btn-danger btn-mini">
+                                                    Refuse
+                                                </button>
+
+                                                <script>
+                                                    $(document).ready(function () {
+                                                        $('#btn-show-popover-' + '@pendingRating.Id').popover({
+                                                            trigger: 'focus'
+                                                        });
+
+                                                        $('#btn-approve-' + '@pendingRating.Id').click({
+                                                            ratingId: '@pendingRating.Id',
+                                                            therapistId: '@pendingRating.TherapistId',
+                                                            ClientId: '@pendingRating.ClientId',
+                                                            sessionId: '@pendingRating.SessionId',
+                                                            bookedSessionId: '@pendingRating.BookedSessionId'
+                                                        }, function (event) {
+                                                            $.ajax({
+                                                                type: 'POST',
+                                                                url: '@Url.Action("ApproveRating", "Dashboard", new { Area = "Admin" })',
+                                                                data: {
+                                                                    ratingId: event.data.ratingId,
+                                                                    therapistId: event.data.therapistId,
+                                                                    ClientId: event.data.ClientId,
+                                                                    sessionId: event.data.sessionId,
+                                                                    bookedSessionId: event.data.bookedSessionId
+                                                                }
+                                                            }).then(function (response) {
+                                                                if (response.success)
+                                                                    window.location.href = '@Url.Action("PendingRatings", "Dashboard", new { Area = "Admin" })';
+                                                            })
+                                                        });
+
+                                                        $('#btn-refuse-' + '@pendingRating.Id').click({
+                                                            ratingId: '@pendingRating.Id',
+                                                            therapistId: '@pendingRating.TherapistId',
+                                                            ClientId: '@pendingRating.ClientId',
+                                                            sessionId: '@pendingRating.SessionId',
+                                                            bookedSessionId: '@pendingRating.BookedSessionId'
+                                                        }, function (event) {
+                                                            $.ajax({
+                                                                type: 'POST',
+                                                                url: '@Url.Action("RefuseRating", "Dashboard", new { Area = "Admin" })',
+                                                                data: {
+                                                                    ratingId: event.data.ratingId,
+                                                                    therapistId: event.data.therapistId,
+                                                                    ClientId: event.data.ClientId,
+                                                                    sessionId: event.data.sessionId,
+                                                                    bookedSessionId: event.data.bookedSessionId
+                                                                }
+                                                            }).then(function (response) {
+                                                                if (response.success)
+                                                                    window.location.href = '@Url.Action("PendingRatings", "Dashboard", new { Area = "Admin" })';
+                                                            })
+                                                        });
+
+                                                    @*let approve = function ('@pendingRating.Id') {
+                                                        $.ajax({
+                                                            type: 'POST',
+                                                            url: '@Url.Action("ApproveRating", "Dashboard", new { Area = "Admin" })',
+                                                        }).then(function (response) {
+                                                            if (response.success)
+                                                                window.location.href = '@Url.Action("PendingRatings", "Dashboard", new { Area = "Admin" })';
+                                                        })
+                                                    }
+
+                                                    let refuse = function ('@pendingRating.Id') {
+
+                                                    }*@
+                                                    });
+                                                </script>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <button type="button"
+                                                        class="btn btn-success btn-mini" disabled>
+                                                    Approve
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-danger btn-mini" disabled>
+                                                    Refuse
+                                                </button>
+
+                                                <script>
+                                                    $(document).ready(function () {
+                                                        $('#btn-show-popover-' + '@pendingRating.Id').popover({
+                                                            trigger: 'focus'
+                                                        });
+                                                    });
+                                                </script>
+                                            </td>
+                                        }
+                                    </tr>
+                                    orderNumber++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <p class="text-danger">Currently no user rating with specified criteria exists.</p>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,641 @@
+﻿@model WebApplication9.Areas.Therapist.ViewModels.TherapistProfileViewModel
+
+@using Database.Models
+@using System.Threading
+@using Framework.Helpers
+@using System.Globalization
+@using Microsoft.AspNetCore.Identity
+@using Framework.Helpers.ExtensionMethods
+@inject UserManager<CustomClient> UserManager
+@inject SignInManager<CustomClient> SignInManager
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/year-picker/moment.min.js"></script>
+<script src="~/year-picker/yearpicker.js"></script>
+<link rel="stylesheet" href="~/css/profile-info.css" />
+<link rel="stylesheet" href="~/year-picker/yearpicker.css" />
+
+<link rel="stylesheet" href="~/country-codes-phone-input/intlTelInput.min.css" />
+<link rel="stylesheet" href="~/country-codes-phone-input/demo.css" />
+<script src="~/country-codes-phone-input/intlTelInput.min.js"></script>
+<script id="wwwroot-utils" src="~/country-codes-phone-input/utils.js"></script>
+
+<link rel="stylesheet" href="~/animations/trash-can/trash-can.css" />
+<link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+<link rel="stylesheet" href="~/css/profile-info2.css" />
+<link rel="stylesheet" href="~/dropdown/dropdown.css" />
+<link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+<script src="~/multiselect/bootstrap-select.min.js"></script>
+
+<div class="main-content-pi">
+    <!-- Header -->
+    <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center">
+        <!-- Mask -->
+        <span id="aleksa" class="mask bg-gradient-default opacity-8"></span>
+        <!-- Header container -->
+        <div class="container d-flex align-items-center">
+            <div class="row-pi">
+                <div class="col-lg-7 col-md-10">
+                    <h1 class="h1-pi display-2 text-white" style="text-wrap:none;">Hello @Model.FirstName</h1>
+                    <p class="p-pi text-white mt-0 mb-5">
+                        This is your private profile page. Only you can see this page. If you want to see your public profile, which everybody else can see too, click @Html.ActionLink("here.", "PublicProfile", "Account", new { Area = "Therapist" })
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Page content -->
+    <div class="container mt--7">
+        <div class="row-pi">
+            <div class="col-xl-4 order-xl-2 mb-5 mb-xl-0">
+                <div class="card card-profile shadow">
+                    <div class="row-pi justify-content-center">
+                        <div class="col-lg-3 order-lg-2">
+                            <div class="card-profile-image">
+                                <a href="#" class="a-pi">
+                                    <img src="@await Html.RenderUserProfilePhotoOrDefaultPhoto(User, UserManager)" class="img-pi rounded-circle" style="width: 180px; height: 185px;" id="output" width="200" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+                        <div class="d-flex justify-content-between"></div>
+                    </div>
+
+                    <div class="card-body pt-0 pt-md-4">
+                        <div class="row-pi">
+                            <div class="col">
+                                <div class="card-profile-stats d-flex justify-content-center mt-md-5">
+                                    <div>
+                                        <span class="heading">22</span>
+                                        <span class="description">Friends</span>
+                                    </div>
+                                    <div>
+                                        <span class="heading">10</span>
+                                        <span class="description">Photos</span>
+                                    </div>
+                                    <div>
+                                        <span class="heading">89</span>
+                                        <span class="description">Comments</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+
+                            <h3 class="h3-pi">
+                                @Model.FirstName @Model.LastName<span class="font-weight-light">, @(DateTime.Now.Year - Model.YearOfBirth)</span>
+                            </h3>
+
+                            <div class="h5 font-weight-300">
+                                <i class="ni location_pin mr-2"></i>@Model.Gender
+                            </div>
+
+                            <div class="h5 mt-4">
+                                <p class="text-success">Status: Psychotherapist</p>
+                            </div>
+
+                            @Html.ActionLink("Public profile", "PublicProfile", "Account", new { Area = "Therapist" }, new { @class = "btn btn-sm btn-primary", title = "View your public profile." })
+
+                            <hr class="hr-pi my-4" />
+
+                            @*<p class="p-pi">
+                                        Ryan — the name taken by Melbourne-raised, Brooklyn-based
+                                        Nick Murphy — writes, performs and records all of his own
+                                        music.
+                                    </p>
+                                <a href="#" class="a-pi">Show more</a>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-8 order-xl-1">
+                <div class="card bg-secondary shadow">
+                    <div class="card-header bg-white border-0">
+                        <div class="row-pi align-items-center">
+                            <div class="col-8">
+                                <h3 class="h3-pi mb-0">My account</h3>
+                            </div>
+
+                            <div class="offset-sm-1 col-3 text">
+                                <input class="dropdown" type="checkbox" id="dropdown" name="dropdown" />
+                                <label class="for-dropdown btn btn-primary" for="dropdown">Settings <i class="fas fa-cog"></i></label>
+                                <div class="section-dropdown">
+
+                                    @if (Model.ProfilePhoto.FileName != "default-user-image.png")
+                                    {
+                                        <a href="#" class="a-drp" id="btn-delete-photo">
+                                            <span class="trash">
+                                                <span id="span-trash"></span>
+                                                <i></i>
+                                            </span>
+                                            Delete photo
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span id="span-to-disable">
+                                            <a href="#" class="a-drp" id="btn-to-disable">
+                                                <span class="trash">
+                                                    <span id="span-trash"></span>
+                                                    <i style="cursor: not-allowed;"></i>
+                                                </span>
+                                                Delete photo
+                                            </a>
+                                        </span>
+
+                                        <script>
+                                            $('#btn-to-disable').css('pointer-events', 'none');
+                                            $('#span-to-disable').attr('title', 'You already do not have a profile photo.');
+                                            $('#btn-to-disable').attr("disabled", "disabled").fadeTo(5, 0.5);
+                                            $('#span-to-disable').css("cursor", "not-allowed");
+                                            $('#btn-to-disable').click(function (event) {
+                                                event.preventDefault();
+                                            });
+                                        </script>
+                                    }
+
+                                    <a href="@Url.Action("AddWebCredit", "Account", new { Area = "Therapist" })" class="a-drp">Add web credit</a>
+
+                                    <a href="@Url.Action("ChangePassword", "Account", new { Area = "Therapist" })" class="a-drp">Change password</a>
+
+                                    <a href="#" id="btn-delete-account" class="a-drp">Delete account</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form asp-controller="Account" asp-action="Edit" method="post" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(c => c.Id)
+                            @*<hr class="hr-pi my-4" />*@
+                            <h6 class="h6-pi heading-small text-muted mb-4">
+                                User information
+                            </h6>
+                            <div class="pl-lg-4">
+                                <div class="row-pi">
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label asp-for="FirstName" class="label-pi form-control-label"></label>
+                                            <input asp-for="FirstName" class="input-pi form-control form-control-alternative-pi" readonly />
+                                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="LastName" class="label-pi form-control-label"></label>
+                                            <input asp-for="LastName" class="input-pi form-control form-control-alternative-pi" readonly />
+                                            <span asp-validation-for="LastName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row-pi">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="YearOfBirth" class="label-pi form-control-label"></label>
+                                            <input asp-for="YearOfBirth" class="input-pi form-control form-control-alternative-pi" readonly />
+                                            <span asp-validation-for="YearOfBirth" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="ProfilePhoto" class="label-pi form-control-label"></label>
+                                            <input asp-for="ProfilePhoto" class="input-pi form-control form-control-alternative-pi" readonly />
+                                            <span asp-validation-for="ProfilePhoto" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="WebCredit" class="label-pi form-control-label"></label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text border-0" style="background-color: #e9ecef;">RSD</span>
+                                                </div>
+                                                <input asp-for="WebCredit" class="input-pi form-control form-control-alternative-pi" readonly />
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text border-0" style="background-color: #e9ecef;">
+                                                        <span class="badge add-credit-badge badge-primary" id="badge-add-credit">Add credit</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="Earnings" class="label-pi form-control-label"></label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text border-0" style="background-color: #e9ecef;">RSD</span>
+                                                </div>
+                                                <input asp-for="Earnings" class="input-pi form-control form-control-alternative-pi" readonly />
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text border-0" style="background-color: #e9ecef;">
+                                                        <span class="badge badge-primary withdraw-badge" id="badge-withdraw">Withdraw</span>
+
+                                                        @if (Model.HasEarnings)
+                                                        {
+                                                            <script>
+                                                            $(document).ready(function () {
+                                                                $('#badge-withdraw').click(function () {
+                                                                    window.location.href = '@Url.Action("Withdraw", "Withdrawals", new { Area = "Therapist" })';
+                                                                });
+                                                            })
+                                                            </script>
+                                                        }
+                                                        else
+                                                        {
+                                                            <script>
+                                                            $(document).ready(function () {
+                                                                $('#badge-withdraw').click(function () {
+                                                                    Swal.fire(
+                                                                        'You do not have earnings to withdraw!',
+                                                                        '',
+                                                                        'info'
+                                                                    );
+                                                                });
+                                                            })
+                                                            </script>
+                                                        }
+
+                                                        @*<input type="submit" value="Submit" class="btn btn-sm btn-outline-primary py-0" style="font-size: 0.8em;">*@
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label asp-for="Specialities" class="label-pi form-control-label"></label>
+                                            <textarea asp-for="Specialities"
+                                                      rows="@Model.NumberOfSpecialities"
+                                                      class="textarea-pi form-control form-control-alternative-pi" readonly>
+                                            </textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label asp-for="ToChooseFrom_ContactMethods" class="label-pi form-control-label"></label>
+                                            <select asp-for="Chosen_ContactMethodsIds"
+                                                    class="selectpicker"
+                                                    id="contact-methods"
+                                                    multiple data-live-search="true"
+                                                    title="Your Contact Methods"
+                                                    data-selected-text-format="count"
+                                                    data-size="6">
+                                                @if (Model.ToChooseFrom_ContactMethods.Any())
+                                                {
+                                                    foreach (var contactMethod in Model.ToChooseFrom_ContactMethods)
+                                                    {
+                                                        var iconAndNameAndColor = Helper.GetContactMethodIconAndNameAndColor(contactMethod.Text);
+                                                        var icon = iconAndNameAndColor[0];
+                                                        var name = iconAndNameAndColor[1];
+                                                        var color = iconAndNameAndColor[2];
+
+                                                        if (contactMethod.Selected)
+                                                        {
+                                                            <option selected value="@contactMethod.Value" data-content="<i class='@icon' style='color:@color;'></i>&nbsp;&nbsp;@name">
+                                                                @name
+                                                            </option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@contactMethod.Value" data-content="<i class='@icon' style='color:@color;'></i>&nbsp;&nbsp;@name">
+                                                                @name
+                                                            </option>
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <option value="" disabled>Contact Methods not available.</option>
+                                                }
+                                            </select>
+                                            <br />
+                                            <span asp-validation-for="Chosen_ContactMethodsIds" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="hr-pi my-4" />
+                            <!-- Address -->
+                            <h6 class="h6-pi heading-small text-muted mb-4">Contact information</h6>
+                            <div class="pl-lg-4">
+                                <div class="row-pi">
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label asp-for="Email" class="label-pi form-control-label"></label>
+                                            <input asp-for="Email" class="input-pi form-control form-control-alternative-pi" readonly />
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label asp-for="PhoneNumber" class="label-pi form-control-label"></label>
+                                            <br />
+                                            <input asp-for="PhoneNumber" class="input-pi form-control form-control-alternative-pi" style="width:13rem;" />
+                                            <br />
+                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="hr-pi my-4" />
+
+                            <!-- Description -->
+                            <h6 class="h6-pi heading-small text-muted mb-4">About</h6>
+                            <div class="pl-lg-4">
+                                <div class="form-group focused">
+                                    <label asp-for="About" class="label-pi form-control-label"></label>
+                                    <textarea asp-for="About"
+                                              rows="5"
+                                              class="textarea-pi form-control form-control-alternative-pi">
+                                    </textarea>
+                                    <span asp-validation-for="About" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <hr class="hr-pi my-4" />
+
+                            <h6 class="h6-pi heading-small text-muted mb-4">Address information</h6>
+                            <div class="pl-lg-4">
+                                <div class="row-pi">
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label asp-for="Street" class="label-pi form-control-label"></label>
+                                            <input asp-for="Street" class="input-pi form-control form-control-alternative-pi" />
+                                            <span asp-validation-for="Street" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="HouseNumber" class="label-pi form-control-label"></label>
+                                            <input asp-for="HouseNumber" class="input-pi form-control form-control-alternative-pi" />
+                                            <span asp-validation-for="HouseNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row-pi">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="City" class="label-pi form-control-label"></label>
+                                            <input asp-for="City" class="input-pi form-control form-control-alternative-pi" />
+                                            <span asp-validation-for="City" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="Country" class="label-pi form-control-label"></label>
+                                            <input asp-for="Country" class="input-pi form-control form-control-alternative-pi" />
+                                            <span asp-validation-for="Country" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    @* !!! OVAJ JEDAN div-class-col-lg-6 PostalCode bi trebalo da bude u odvojenom row-pi,
+                                        ali ovde trenutno ne pravi problema !!! *@
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label asp-for="PostalCode" class="label-pi form-control-label"></label>
+                                            <input asp-for="PostalCode" class="input-pi form-control form-control-alternative-pi" />
+                                            <span asp-validation-for="PostalCode" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" name="btn-save" class="btn btn-primary">Save</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('nav.mb-3').removeClass('mb-3');
+        $('#container-main').removeClass('container');
+
+        $('#badge-add-credit').click(function () {
+            window.location.href = '@Url.Action("AddWebCredit", "Account", new { Area = "Therapist" })';
+        });
+
+        @*$('#badge-pay-due').click(function () {
+            const swalWithBootstrapButtonsPayDue = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success delete-buttons-separator',
+                    denyButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtonsPayDue.fire({
+                title: 'Are you sure you would like to pay the due amount?',
+                icon: 'question',
+                confirmButtonText: 'Yes',
+                showDenyButton: true,
+                denyButtonText: 'No'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("PayDue", "Account", new { Area = "Therapist" })',
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire(
+                                    response.title,
+                                    response.body,
+                                    response.icon
+                                ).then((result => {
+                                    window.location.href = response.location;
+                                }))
+                            }
+                            else {
+                                const swalWithBootstrapButtonsPayDueNotEnoughtWebCredit = Swal.mixin({
+                                    customClass: {
+                                        confirmButton: 'btn btn-success delete-buttons-separator',
+                                        denyButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
+
+                                swalWithBootstrapButtonsPayDueNotEnoughtWebCredit.fire({
+                                    title: response.title,
+                                    text: response.body,
+                                    icon: response.icon,
+                                    confirmButtonText: 'Add web credit',
+                                    showDenyButton: true,
+                                    denyButtonText: 'Close'
+                                }).then((result => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = '@Url.Action("AddWebCredit", "Account", new { Area = "Therapist" })';
+                                    }
+                                }))
+                            }
+                        }
+                    })
+                }
+            })
+
+        });*@
+
+        var input = document.querySelector("#PhoneNumber");
+        window.intlTelInput(input, {
+            @*allowDropdown: false,
+            autoHideDialCode: false,
+            autoPlaceholder: "off",
+            dropdownContainer: document.body,
+            excludeCountries: ["us"],*@
+            formatOnDisplay: true,
+             @*geoIpLookup: function(callback) {
+               $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+                 var countryCode = (resp && resp.country) ? resp.country : "";
+                 callback(countryCode);
+               });
+             },
+             hiddenInput: "full_number",*@
+            initialCountry: "rs",
+            // localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            // onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],
+            placeholderNumberType: "MOBILE",
+            preferredCountries: ["rs", "me", "ba", "hr"],
+            // separateDialCode: true,
+            utilsScript: document.getElementById("wwwroot-utils").href
+        });
+
+        $('#btn-delete-photo').hover(function () {
+            $('#span-trash').css({
+                transform: 'rotate(-45deg)',
+                transition: 'transform 250ms'
+            });
+        });
+
+        $('#btn-delete-photo').mouseleave(function () {
+            $('#span-trash').css({
+                transform: 'rotate(0deg)',
+                transition: 'transform 250ms'
+            });
+        });
+
+        $('#btn-delete-photo').click(function (event) {
+            event.preventDefault();
+            const swalWithBootstrapButtonsDeletePhoto = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success delete-buttons-separator',
+                    denyButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtonsDeletePhoto.fire({
+                title: 'Are you sure you would like to delete your profile photo?',
+                icon: 'question',
+                confirmButtonText: 'Yes',
+                showDenyButton: true,
+                denyButtonText: 'No'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("DeleteProfilePhoto", "Account", new { Area = "Therapist" })',
+                        success: function (response) {
+                            if (response.success) {
+                                window.location.href = response.location;
+                            }
+                        }
+                    })
+                }
+            })
+        });
+
+        $('#btn-delete-account').click(function (event) {
+            event.preventDefault();
+            const swalWithBootstrapButtonsDelete = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-danger delete-buttons-separator',
+                    cancelButton: 'btn btn-success'
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtonsDelete.fire({
+                title: '<div class="swal-title">Are you sure you would like to delete your account?</div>',
+                html:
+                    'Deleting your account removes: <br/>' +
+                    '- Your personal data <br/>' +
+                    '- Your account data <br/>' +
+                    '- Your contact information <br/>' +
+                    '- Your uploaded photos <br/>' +
+                    '- Your complete usage history <br/>' +
+                    '<br/>' +
+                    '<label for="password" class="confirm-password">Confirm your password</label>' +
+                    '<input id="password" class="form-control" type="password" />',
+                icon: 'error',
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                showLoaderOnConfirm: true,
+                preConfirm: function () {
+                    try {
+                        if (!$('input[type=password]').val()) throw new Error("Password confirmation is required.");
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("DeleteAccount", "Account", new { Area = "Therapist" })',
+                            data: { 'password': $('input[type=password]').val() },
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: response.errorMessage,
+                                        icon: 'success'
+                                    }).then((result => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = '@Url.Action("Index", "Home")';
+                                        }
+                                        if (!result.isConfirmed) {
+                                            window.location.href = '@Url.Action("Index", "Home")';
+                                        }
+                                    }))
+                                }
+                                else {
+                                    Swal.fire({
+                                        title: response.errorMessage,
+                                        icon: 'error'
+                                    })
+                                }
+                            }
+                        })
+                    }
+                    catch (error) {
+                        Swal.showValidationMessage(error);
+                    }
+                }
+            })
+        });
+
+        var loadFile = function (event) {
+            var image = document.getElementById("output");
+            image.src = URL.createObjectURL(event.target.files[0]);
+        };
+    })
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+
+}

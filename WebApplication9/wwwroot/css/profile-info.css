@@ -1,0 +1,157 @@
+﻿.btn-margin {
+    margin-left: 1rem;
+}
+
+.input-border-radius {
+    border-top-right-radius: 0.25rem !important;
+    border-bottom-right-radius: 0.25rem !important;
+}
+
+.check-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.vertical-center-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center
+}
+
+.two-button-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center
+}
+
+.separator {
+    margin: 0;
+}
+
+.delete-buttons-separator {
+    margin-right: 5px;
+}
+
+.confirm-password {
+    float: left;
+    font-weight: bold;
+}
+
+.swal-title {
+    font-weight: bolder;
+}
+
+.apply-photo {
+    margin: auto;
+    margin-bottom: 3px;
+}
+
+@media (max-width:991px) {
+    .separator {
+        margin-right: 5px;
+    }
+}
+
+@media (max-width:1199px) {
+    .separator {
+        margin-right: 5px;
+    }
+}
+
+.profile-photo {
+    width: 30%;
+    height: 30%;
+    border: 2px solid #1977cc;
+    border-radius: 50%;
+    padding: 3px;
+}
+
+.edit-profile-separator {
+    border-top: 1px solid #1977cc;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.not-confirmed {
+    padding-left: 90px !important;
+}
+
+.add-credit-badge, .not-confirmed-badge {
+/*    position: absolute;
+    left: 1.5rem;
+    top: 2.9rem;*/
+    cursor: pointer;
+}
+
+.add-credit-badge:hover {
+    background-color: #2bb9ed;
+}
+
+.withdraw-badge {
+/*    position: absolute;
+    left: 1.5rem;
+    top: 2.9rem;*/
+    cursor: pointer;
+}
+
+.withdraw-badge:hover {
+    background-color: #2bb9ed;
+}
+
+#btn-delete-account:hover {
+    color: red;
+}
+
+.profile-pic {
+    color: transparent;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.profile-pic input {
+    display: none;
+}
+
+.profile-pic img {
+    position: absolute;
+    object-fit: cover;
+    width: 165px;
+    height: 165px;
+    box-shadow: 0 0 10px 0 rgba(255, 255, 255, .35);
+    border-radius: 100px;
+    z-index: 0;
+}
+
+.profile-pic .-label {
+    cursor: pointer;
+    height: 165px;
+    width: 165px;
+}
+
+.profile-pic:hover .-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, .8);
+    z-index: 10000;
+    color: #fafafa;
+    transition: background-color 0.2s ease-in-out;
+    border-radius: 100px;
+    margin-bottom: 0;
+}
+
+.profile-pic span {
+    display: inline-flex;
+    padding: 0.2em;
+    height: 2em;
+}
+
+.input-disabled-color {
+    background-color: #e6e1e1;
+}

@@ -1,0 +1,74 @@
+﻿@using Database.Models
+@using Microsoft.AspNetCore.Identity
+@using Framework.Helpers.ExtensionMethods
+@inject UserManager<CustomClient> UserManager
+
+<link rel="stylesheet" href="~/css/left-side-nav-bar.css" />
+
+<div class="sidebar">
+    <div class="logo-details">
+        <i class="icon"></i>
+        <div class="logo_name">Lajsna</div>
+        <i tabindex="1" class="far fa-bars" id="btn"></i>
+    </div>
+    <ul class="nav-list">
+        <li>
+            <a asp-controller="Account" asp-action="Profile">
+                <i class="far fa-user"></i>
+                <span class="links_name">Profile</span>
+            </a>
+            <span class="tooltip">Profile</span>
+        </li>
+        <li>
+            <a asp-controller="Sessions" asp-action="BookedSessions">
+                <i class="far fa-clipboard-user"></i>
+                <span class="links_name">Booked Sessions</span>
+            </a>
+            <span class="tooltip">Booked Sessions</span>
+        </li>
+        <li>
+            <a href="#">
+                <i class="far fa-cog"></i>
+                <span class="links_name">Settings</span>
+            </a>
+            <span class="tooltip">Settings</span>
+        </li>
+        <li class="profile">
+            <a href="" id="href-sign-out">
+                <i class="far fa-sign-out-alt"></i>
+                <span class="links_name">Sign out</span>
+            </a>
+            <span class="tooltip">Sign out</span>
+        </li>
+    </ul>
+</div>
+
+<script>
+    let sidebar = document.querySelector(".sidebar");
+    let closeBtn = document.querySelector("#btn");
+
+    closeBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+        menuBtnChange();
+    });
+
+    closeBtn.addEventListener("focusout", () => {
+        if (sidebar.classList.contains('open')) {
+            sidebar.classList.remove("open");
+            menuBtnChange();
+        }
+    });
+
+    function menuBtnChange() {
+        if (sidebar.classList.contains("open")) {
+            closeBtn.classList.replace("fa-bars", "fa-caret-left");
+        } else {
+            closeBtn.classList.replace("fa-caret-left", "fa-bars");
+        }
+    }
+
+    $('#href-sign-out').click(function (event) {
+        event.preventDefault();
+        $('#btn-sign-out').click();
+    });
+</script>

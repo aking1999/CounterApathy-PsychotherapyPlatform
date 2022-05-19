@@ -1,0 +1,248 @@
+﻿@model List<WebApplication9.ViewModels.BookedSessionViewModel>
+@using Framework.Helpers
+@using Framework.Helpers.ExtensionMethods
+@{
+    ViewData["Title"] = "BookedSessions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Adminty/adminty.css" />
+<link rel="stylesheet" href="~/star-rating/star-rating.css" />
+<link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+
+<div class="page-header">
+    <div class="row align-items-end">
+        <div class="col-lg-8">
+            <div class="page-header-title">
+                <div class="d-inline">
+                    <h4>Booked Sessions</h4>
+                    <span>You can view all your booked session easily on this page.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+@if (Model != null && Model.Count > 0)
+{
+    <div class="page-body invoice-list-page">
+        <div class="row">
+            <div class="col-md-12 filter-bar">
+                <!-- Navigation start -->
+                <nav class="navbar navbar-light bg-faded m-b-30 p-10">
+                    <ul class="nav navbar-nav">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#!">Filter: <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#!" id="bydate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-calendar-alt"></i> By Date</a>
+                            <div class="dropdown-menu" aria-labelledby="bydate">
+                                <a class="dropdown-item" href='@Url.Action("BookedSessions", "Sessions", new { Area = "" })'>Show all</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href='@Url.Action("BookedSessions", "Sessions", new { Area = "", filter = "date", predicate = "today" })'>Today</a>
+                                @*<a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "date", predicate = "this week" })'>This week</a>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "date", predicate = "this month" })'>This month</a>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "date", predicate = "this year" })'>This year</a>*@
+                            </div>
+                        </li>
+                        <!-- end of by date dropdown -->
+                        @*<li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#!" id="bypriority" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-list-ul"></i> By Priority</a>
+                                <div class="dropdown-menu" aria-labelledby="bypriority">
+                                    <a class="dropdown-item" href="#!">Show all</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "priority", predicate = "highest" })'>Highest (&lt;3h)</a>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "priority", predicate = "high" })'>High (&lt;12h)</a>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "priority", predicate = "normal" })'>Normal (&lt;24h)</a>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "priority", predicate = "low" })'>Low (&gt;24h)</a>
+                                </div>
+                            </li>*@
+                    </ul>
+                    @*<div class="nav-item nav-grid">
+                            <span class="m-r-15">View Mode: </span>
+                            <button type="button" class="btn btn-sm btn-primary waves-effect waves-light m-r-10" data-toggle="tooltip" data-placement="top" title="list view">
+                                <i class="icofont icofont-listine-dots"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="grid view">
+                                <i class="icofont icofont-table"></i>
+                            </button>
+                        </div>*@
+                    <!-- end of by priority dropdown -->
+                </nav>
+                <!-- Navigation end  -->
+                <div class="row">
+                    <!-- Invoice list card start -->
+                    @{
+                        var idCounter = 0;
+                        var idCounterString = idCounter.ToString();
+                    }
+                    @foreach (var bookedSession in Model)
+                    {
+                        var canRateSession = DateTime.Now >= (bookedSession.SessionDate.Date + bookedSession.EndTime.TimeOfDay);
+                        <div class="col-sm-6">
+                            <div class="card card-border-primary">
+                                <div class="card-header">
+                                    <img src="@bookedSession.TherapistProfilePhoto" width="50" height="50" style="border-radius: 50px" />
+                                    &nbsp;
+                                    <h5>@bookedSession.TherapistFirstName @bookedSession.TherapistLastName</h5>
+                                    <div class="f-right m-t-10">
+                                        <span id="status-@bookedSession.BookingId" class="badge badge-warning" style="color: black;">Session Pending</span>
+                                    </div>
+                                </div>
+                                <div class="card-block">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <ul class="list list-unstyled">
+                                                <li>Client: @bookedSession.ClientFirstName @bookedSession.ClientLastName</li>
+                                                <li>Session date: @bookedSession.SessionDate.Date.ToString("dd/MM/yyyy")</li>
+                                                <li>Session time: @bookedSession.StartTime.TimeOfDay.ToString() - @bookedSession.EndTime.TimeOfDay.ToString()</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <ul class="list list-unstyled text-right">
+                                                @{
+                                                    var sessionTypeText = string.Empty;
+                                                    var sessionTypeIcon = string.Empty;
+
+                                                    if (bookedSession.Type == 0)
+                                                    {
+                                                        sessionTypeText = "Individual session";
+                                                        sessionTypeIcon = "fa-user";
+                                                    }
+                                                    else
+                                                    {
+                                                        sessionTypeText = "Group session";
+                                                        sessionTypeIcon = "fa-user-friends";
+                                                    }
+                                                }
+                                                <li><i class="far @sessionTypeIcon" style="color: #0000FF"></i>&nbsp;@sessionTypeText</li>
+                                                <li>Method: <i class="@bookedSession.ContactMethodIcon" style="color: @bookedSession.ContactMethodColor"></i>&nbsp;@bookedSession.ContactMethodName</li>
+                                                <li>Price: @bookedSession.Price RSD</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="task-list-table">
+                                        @if (!bookedSession.Rating.HasRating)
+                                        {
+                                            @await Html.PartialAsync("_RenderCountdown", new WebApplication9.PartialViewModels.CountdownPartialViewModel()
+                                            {
+                                                CountdownId = bookedSession.BookingId,
+                                                SessionDate = bookedSession.SessionDate.Date.ToString("dd/MM/yyyy"),
+                                                SessionStartTime = bookedSession.StartTime.TimeOfDay.ToString() + "00",
+                                                SessionEndTime = bookedSession.EndTime.TimeOfDay.ToString() + "00"
+                                            })
+
+                                            @await Html.PartialAsync("_RenderSessionStatus", new WebApplication9.PartialViewModels.SessionStatusPartial()
+                                            {
+                                                SessionStatusId = bookedSession.BookingId,
+                                                SessionDate = bookedSession.SessionDate.Date.ToString("dd/MM/yyyy"),
+                                                SessionStartTime = bookedSession.StartTime.TimeOfDay.ToString() + "00",
+                                                SessionEndTime = bookedSession.EndTime.TimeOfDay.ToString() + "00"
+                                            });
+                                        }
+                                        else
+                                        {
+                                            @await Html.PartialAsync("_RenderStars", bookedSession.Rating.StarsRating);
+
+                                            @await Html.PartialAsync("_RenderSessionStatus", new WebApplication9.PartialViewModels.SessionStatusPartial()
+                                            {
+                                                SessionStatusId = bookedSession.BookingId,
+                                                SessionDate = bookedSession.SessionDate.Date.ToString("dd/MM/yyyy"),
+                                                SessionStartTime = bookedSession.StartTime.TimeOfDay.ToString() + "00",
+                                                SessionEndTime = bookedSession.EndTime.TimeOfDay.ToString() + "00"
+                                            });
+                                        }
+                                    </div>
+
+                                    <div class="task-board m-0">
+                                        <a href='@Url.Action("SessionDetails", "Sessions", new { bookingId = bookedSession.BookingId })'
+                                           class="btn btn-info btn-mini b-none"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Session details">
+                                            <i class="far fa-eye m-0"></i>
+                                        </a>
+                                        @if (!bookedSession.Rating.HasRating)
+                                        {
+                                            @await Html.PartialAsync("_RenderRateSessionButton", bookedSession)
+                                        }
+                                    </div>
+                                    <!-- end of pull-right class -->
+                                </div>
+                                <!-- end of card-footer -->
+                            </div>
+                        </div>
+                        idCounter++;
+                        idCounterString = idCounter.ToString();
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Page body end -->
+}
+else
+{
+    <div class="page-body invoice-list-page">
+        <div class="row">
+            <div class="col-md-12 filter-bar">
+                <!-- Navigation start -->
+                <nav class="navbar navbar-light bg-faded m-b-30 p-10">
+                    <ul class="nav navbar-nav">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#!">Filter: <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#!" id="bydate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-calendar-alt"></i> By Date</a>
+                            <div class="dropdown-menu" aria-labelledby="bydate">
+                                <a class="dropdown-item" href='@Url.Action("BookedSessions", "Sessions", new { Area = "" })'>Show all</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href='@Url.Action("BookedSessions", "Sessions", new { Area = "", filter = "date", predicate = "today" })'>Today</a>
+                                @*<a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "date", predicate = "this week" })'>This week</a>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "date", predicate = "this month" })'>This month</a>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "date", predicate = "this year" })'>This year</a>*@
+                            </div>
+                        </li>
+                        <!-- end of by date dropdown -->
+                        @*<li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#!" id="bypriority" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-list-ul"></i> By Priority</a>
+                                <div class="dropdown-menu" aria-labelledby="bypriority">
+                                    <a class="dropdown-item" href="#!">Show all</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "priority", predicate = "highest" })'>Highest (&lt;3h)</a>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "priority", predicate = "high" })'>High (&lt;12h)</a>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "priority", predicate = "normal" })'>Normal (&lt;24h)</a>
+                                    <a class="dropdown-item" href='@Url.Action("BookedSessions", "Therapists", new { Area = "", filter = "priority", predicate = "low" })'>Low (&gt;24h)</a>
+                                </div>
+                            </li>*@
+                    </ul>
+                    @*<div class="nav-item nav-grid">
+                            <span class="m-r-15">View Mode: </span>
+                            <button type="button" class="btn btn-sm btn-primary waves-effect waves-light m-r-10" data-toggle="tooltip" data-placement="top" title="list view">
+                                <i class="icofont icofont-listine-dots"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="grid view">
+                                <i class="icofont icofont-table"></i>
+                            </button>
+                        </div>*@
+                    <!-- end of by priority dropdown -->
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="text-primary">You currently do not have any booked sessions. When you book a session with any of our therapists, the session(s) will appear here.</h3>
+    <br />
+    <a href='@Url.Action("All", "Therapists")' class="btn btn-success">See our therapists</a>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("[data-toggle='tooltip']").tooltip();
+    })
+</script>

@@ -1,0 +1,347 @@
+﻿@model WebApplication9.Areas.Admin.ViewModels.AdminProfileViewModel
+
+@using Database.Models
+@using System.Threading
+@using System.Globalization
+@using Microsoft.AspNetCore.Identity
+@using Framework.Helpers.ExtensionMethods
+@inject SignInManager<CustomClient> SignInManager
+@inject UserManager<CustomClient> UserManager
+
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/year-picker/moment.min.js"></script>
+<script src="~/year-picker/yearpicker.js"></script>
+<link rel="stylesheet" href="~/css/profile-info.css" />
+<link rel="stylesheet" href="~/year-picker/yearpicker.css" />
+
+<link rel="stylesheet" href="~/country-codes-phone-input/intlTelInput.min.css" />
+<link rel="stylesheet" href="~/country-codes-phone-input/demo.css" />
+<script src="~/country-codes-phone-input/intlTelInput.min.js"></script>
+<script id="wwwroot-utils" src="~/country-codes-phone-input/utils.js"></script>
+
+<link rel="stylesheet" href="~/animations/trash-can/trash-can.css" />
+<link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<script src="~/sweet-alert2/sweetalert2.min.js"></script>
+<script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+
+<link rel="stylesheet" href="~/css/profile-info2.css" />
+
+<link rel="stylesheet" href="~/dropdown/dropdown.css" />
+
+<div class="main-content-pi">
+    <!-- Header -->
+    <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center">
+        <!-- Mask -->
+        <span id="aleksa" class="mask bg-gradient-default opacity-8"></span>
+        <!-- Header container -->
+        <div class="container d-flex align-items-center">
+            <div class="row-pi">
+                <div class="col-lg-7 col-md-10">
+                    <h1 class="h1-pi display-2 text-white">Hello @Model.FirstName</h1>
+                    <p class="p-pi text-white mt-0 mb-5">
+                        This is your private profile page.
+                        Only you can see and edit this page.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Page content -->
+    <div class="container mt--7">
+        <div class="row-pi">
+            <div class="col-xl-4 order-xl-2 mb-5 mb-xl-0">
+                <div class="card card-profile shadow">
+                    <div class="row-pi justify-content-center">
+                        <div class="col-lg-3 order-lg-2">
+                            <div class="card-profile-image">
+                                <a href="#" class="a-pi">
+                                    <img src="@await Html.RenderUserProfilePhotoOrDefaultPhoto(User, UserManager)" class="img-pi rounded-circle" style="width: 180px; height: 185px;" id="output" width="200" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+                        <div class="d-flex justify-content-between"></div>
+                    </div>
+
+                    <div class="card-body pt-0 pt-md-4">
+                        <div class="row-pi">
+                            <div class="col">
+                                <div class="card-profile-stats d-flex justify-content-center mt-md-5">
+                                    <div>
+                                        <span class="heading">22</span>
+                                        <span class="description">Friends</span>
+                                    </div>
+                                    <div>
+                                        <span class="heading">10</span>
+                                        <span class="description">Photos</span>
+                                    </div>
+                                    <div>
+                                        <span class="heading">89</span>
+                                        <span class="description">Comments</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+
+                            <h3 class="h3-pi">
+                                @Model.FirstName @Model.LastName<span class="font-weight-light">, @(DateTime.Now.Year - Model.YearOfBirth)</span>
+                            </h3>
+
+                            @*<div class="h5 font-weight-300">
+                                <i class="ni location_pin mr-2"></i>@RegionInfo.CurrentRegion.DisplayName
+                            </div>*@
+
+                            <div class="h5 mt-4">
+                                <p class="text-success">Status: @await UserManager.GetUserRoleAsync(User)</p>
+                            </div>
+
+                            <hr class="hr-pi my-4" />
+
+                            @*<p class="p-pi">
+                                    Ryan — the name taken by Melbourne-raised, Brooklyn-based
+                                    Nick Murphy — writes, performs and records all of his own
+                                    music.
+                                </p>
+
+                                <a href="#" class="a-pi">Show more</a>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-8 order-xl-1">
+                <div class="card bg-secondary shadow">
+                    <div class="card-header bg-white border-0">
+                        <div class="row-pi align-items-center">
+                            <div class="col-8">
+                                <h3 class="h3-pi mb-0">My account</h3>
+                            </div>
+
+                            <div class="offset-sm-1 col-3 text">
+                                <input class="dropdown" type="checkbox" id="dropdown" name="dropdown" />
+                                <label class="for-dropdown btn btn-primary" for="dropdown">Settings <i class="fas fa-cog"></i></label>
+                                <div class="section-dropdown">
+
+                                    @if (Model.ProfilePhoto.FileName != "default-user-image.png")
+                                    {
+                                        <a href="#" class="a-drp" id="btn-delete-photo">
+                                            <span class="trash">
+                                                <span id="span-trash"></span>
+                                                <i></i>
+                                            </span>
+                                            Delete photo
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span id="span-to-disable">
+                                            <a href="#" class="a-drp" id="btn-to-disable">
+                                                <span class="trash">
+                                                    <span id="span-trash"></span>
+                                                    <i style="cursor: not-allowed;"></i>
+                                                </span>
+                                                Delete photo
+                                            </a>
+                                        </span>
+
+                                        <script>
+                                            $('#btn-to-disable').css('pointer-events', 'none');
+                                            $('#span-to-disable').attr('title', 'You already do not have a profile photo.');
+                                            $('#btn-to-disable').attr("disabled", "disabled").fadeTo(5, 0.5);
+                                            $('#span-to-disable').css("cursor", "not-allowed");
+                                            $('#btn-to-disable').click(function (event) {
+                                                event.preventDefault();
+                                            });
+                                        </script>
+                                    }
+
+                                    <a href="@Url.Action("ChangePassword", "Account", new { Area = "Admin" })" class="a-drp">Change password</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form asp-controller="Account" asp-action="Edit" asp-area="Admin" method="post" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(c => c.Id)
+                            <h6 class="h6-pi heading-small text-muted mb-4">
+                                User information
+                            </h6>
+                            <div class="pl-lg-4">
+                                <div class="row-pi">
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label asp-for="FirstName" class="label-pi form-control-label"></label>
+                                            <input asp-for="FirstName" class="input-pi form-control form-control-alternative-pi" />
+                                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="LastName" class="label-pi form-control-label"></label>
+                                            <input asp-for="LastName" class="input-pi form-control form-control-alternative-pi" />
+                                            <span asp-validation-for="LastName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row-pi">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="YearOfBirth" class="label-pi form-control-label"></label>
+                                            <input asp-for="YearOfBirth" class="input-pi form-control form-control-alternative-pi yearpicker" readonly />
+                                            <span asp-validation-for="YearOfBirth" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="ProfilePhoto" class="label-pi form-control-label"></label>
+                                            <input asp-for="ProfilePhoto" class="input-pi form-control form-control-alternative-pi" readonly />
+                                            <span asp-validation-for="ProfilePhoto" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label asp-for="WebCredit" class="label-pi form-control-label"></label>
+                                            <input asp-for="WebCredit" value="@Model.WebCredit RSD" class="input-pi form-control form-control-alternative-pi" readonly />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="hr-pi my-4" />
+                            <!-- Address -->
+                            <h6 class="h6-pi heading-small text-muted mb-4">
+                                Contact information
+                            </h6>
+                            <div class="pl-lg-4">
+                                <div class="row-pi">
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label asp-for="Email" class="label-pi form-control-label"></label>
+                                            <input asp-for="Email" class="input-pi form-control form-control-alternative-pi" />
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label asp-for="PhoneNumber" class="label-pi form-control-label"></label>
+                                            <br />
+                                            <input asp-for="PhoneNumber" class="input-pi form-control form-control-alternative-pi" style="width:13rem;" />
+                                            <br />
+                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="hr-pi my-4" />
+
+                            <button type="submit" name="btn-save" class="btn btn-primary">Save</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        //$('link#bootstrap-min-css').remove();
+
+        $('nav.mb-3').removeClass('mb-3');
+        $('#container-main').removeClass('container');
+
+        $(".yearpicker").yearpicker({
+            year: @Model.YearOfBirth,
+            startYear: 1950,
+            endYear: 2015,
+        });
+
+        var input = document.querySelector("#PhoneNumber");
+        window.intlTelInput(input, {
+            // allowDropdown: false,
+            //autoHideDialCode: false,
+            //autoPlaceholder: "off",
+            // dropdownContainer: document.body,
+            // excludeCountries: ["us"],
+            formatOnDisplay: true,
+            // geoIpLookup: function(callback) {
+            //   $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //     var countryCode = (resp && resp.country) ? resp.country : "";
+            //     callback(countryCode);
+            //   });
+            // },
+            // hiddenInput: "full_number",
+            initialCountry: "rs",
+            // localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            // onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],
+            placeholderNumberType: "MOBILE",
+            preferredCountries: ["rs", "me", "ba", "hr"],
+            // separateDialCode: true,
+            utilsScript: document.getElementById("wwwroot-utils").href
+        });
+
+        $('#btn-delete-photo').hover(function () {
+            $('#span-trash').css({
+                transform: 'rotate(-45deg)',
+                transition: 'transform 250ms'
+            });
+        });
+
+        $('#btn-delete-photo').mouseleave(function () {
+            $('#span-trash').css({
+                transform: 'rotate(0deg)',
+                transition: 'transform 250ms'
+            });
+        });
+
+        $('#btn-delete-photo').click(function (event) {
+            event.preventDefault();
+            const swalWithBootstrapButtonsDeletePhoto = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success delete-buttons-separator',
+                    denyButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtonsDeletePhoto.fire({
+                title: 'Are you sure you would like to delete your profile photo?',
+                icon: 'question',
+                confirmButtonText: 'Yes',
+                showDenyButton: true,
+                denyButtonText: 'No'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("DeleteProfilePhoto", "Account", new { Area = "Admin" })',
+                        success: function (response) {
+                            if (response.success) {
+                                window.location.href = response.location;
+                            }
+                        }
+                    })
+                }
+            })
+        });
+    })
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script type="text/javascript">
+        // Add the following code if you want the name of the file appear on select
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+}

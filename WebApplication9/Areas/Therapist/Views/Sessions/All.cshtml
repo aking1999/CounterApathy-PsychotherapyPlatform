@@ -1,0 +1,549 @@
+﻿@model WebApplication9.Areas.Therapist.ViewModels.AddSessionViewModel
+
+@using Framework.Helpers.ExtensionMethods
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor Accessor
+@{
+    ViewData["Title"] = "All";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/profile-info.css" />
+<link rel="stylesheet" href="~/fullcalendar/main.min.css" />
+<link rel="stylesheet" href="~/session-manager/session-manager.css" />
+<link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<script src="~/sweet-alert2/sweetalert2.min.js"></script>
+<script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+<link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+<script src="~/multiselect/bootstrap-select.min.js"></script>
+<script src="~/year-picker/moment.min.js"></script>
+
+<link rel="stylesheet" href="~/timepicker/timepicker.css" />
+<script src="~/timepicker/timepicker.js"></script>
+<script src="~/fullcalendar/main.min.js"></script>
+
+<h2>View, add, edit and delete sessions easily.</h2>
+
+<hr />
+
+<h3 id="no-sessions-message" class="text-danger"></h3>
+
+@*<button class="btn btn-sm btn-success">Add session</button>
+
+    <br />*@
+
+<div id='calendar'></div>
+
+<div id="tile-add-session" data-toggle="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true" style="padding-right: 0 !important;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-info" id="session-title">Add a new session</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-area="Therapist" asp-controller="Sessions" asp-action="AddSessionTileClicked" method="post" class="form-horizontal" autocomplete="off">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label asp-for="TileClicked.Subject"></label>
+                        <input asp-for="TileClicked.Subject" class="form-control" value="Session" />
+                        <span asp-validation-for="TileClicked.Subject" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="TileClicked.Description"></label>
+                        <textarea asp-for="TileClicked.Description" class="form-control"></textarea>
+                        <span asp-validation-for="TileClicked.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="TileClicked.StartEndDate"></label>
+                        <input asp-for="TileClicked.StartEndDate" id="tile-start-end-date" class="form-control" readonly />
+                        <span asp-validation-for="TileClicked.StartEndDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="TileClicked.StartTime"></label>
+                        <div class="input-group date" id="tile-datetimepicker-start" data-target-input="nearest">
+                            <input asp-for="TileClicked.StartTime" id="tile-input-datetimepicker-start" class="form-control datetimepicker-input" data-target="#tile-datetimepicker-start" />
+                            <div id="tile-div-datetimepicker-start" class="input-group-append" data-target="#tile-datetimepicker-start" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="far fa-clock"></i></div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="TileClicked.StartTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="TileClicked.EndTime"></label>
+                        <div class="input-group date" id="tile-datetimepicker-end" data-target-input="nearest">
+                            <input asp-for="TileClicked.EndTime" id="tile-input-datetimepicker-end" class="form-control datetimepicker-input" data-target="#tile-datetimepicker-end" />
+                            <div id="tile-div-datetimepicker-end" class="input-group-append" data-target="#tile-datetimepicker-end" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="far fa-clock"></i></div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="TileClicked.EndTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="TileClicked.Type"></label>
+                        <br />
+                        <select asp-for="TileClicked.Type"
+                                class="selectpicker"
+                                title="Choose type">
+                            <option value="0" data-content="<i class='far fa-user' style='color:#0000FF;'></i>&nbsp;&nbsp;Individual session">
+                                Individual session
+                            </option>
+                            <option value="1" data-content="<i class='far fa-user-friends' style='color:#0000FF;'></i>&nbsp;&nbsp;Group session">
+                                Group session
+                            </option>
+                        </select>
+                        <br />
+                        <span asp-validation-for="TileClicked.Type" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="TileClicked.Price"></label>
+                        <input asp-for="TileClicked.Price" class="form-control" />
+                        <span asp-validation-for="TileClicked.Price" class="text-danger"></span>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Add</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="btnclick-add-session" data-toggle="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true" style="padding-right: 0 !important;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-info" id="session-title">Add a new session</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-area="Therapist" asp-controller="Sessions" asp-action="AddSessionButtonClicked" method="post" class="form-horizontal" autocomplete="off">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.Subject"></label>
+                        <input asp-for="ButtonClicked.Subject" class="form-control" value="Session" />
+                        <span asp-validation-for="ButtonClicked.Subject" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.Description"></label>
+                        <textarea asp-for="ButtonClicked.Description" class="form-control"></textarea>
+                        <span asp-validation-for="ButtonClicked.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.StartEndDate"></label>
+                        <div class="input-group date" id="btnclick-datetimepicker-start-end-date" data-target-input="nearest">
+                            <input asp-for="ButtonClicked.StartEndDate" id="btnclick-input-start-end-date" class="form-control datetimepicker-input" data-target="#btnclick-datetimepicker-start-end-date" />
+                            <div id="btnclick-div-datetimepicker-start-end-date" class="input-group-append" data-target="#btnclick-datetimepicker-start-end-date" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="far fa-calendar-alt"></i></div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="ButtonClicked.StartEndDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.StartTime"></label>
+                        <div class="input-group date" id="btnclick-datetimepicker-start" data-target-input="nearest">
+                            <input asp-for="ButtonClicked.StartTime" id="btnclick-input-datetimepicker-start" class="form-control datetimepicker-input" data-target="#btnclick-datetimepicker-start" />
+                            <div id="btnclick-div-datetimepicker-start" class="input-group-append" data-target="#btnclick-datetimepicker-start" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="far fa-clock"></i></div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="ButtonClicked.StartTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.EndTime"></label>
+                        <div class="input-group date" id="btnclick-datetimepicker-end" data-target-input="nearest">
+                            <input asp-for="ButtonClicked.EndTime" id="btnclick-input-datetimepicker-end" class="form-control datetimepicker-input" data-target="#btnclick-datetimepicker-end" />
+                            <div id="btnclick-div-datetimepicker-end" class="input-group-append" data-target="#btnclick-datetimepicker-end" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="far fa-clock"></i></div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="ButtonClicked.EndTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.Type"></label>
+                        <br />
+                        <select asp-for="ButtonClicked.Type"
+                                class="selectpicker btn-click"
+                                title="Choose a type">
+                            <option value="0" data-content="<i class='far fa-user' style='color:#0000FF;'></i>&nbsp;&nbsp;Individual session">
+                                Individual session
+                            </option>
+                            <option value="1" data-content="<i class='far fa-user-friends' style='color:#0000FF;'></i>&nbsp;&nbsp;Group session">
+                                Group session
+                            </option>
+                        </select>
+                        <br />
+                        <span asp-validation-for="ButtonClicked.Type" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.Price"></label>
+                        <input asp-for="ButtonClicked.Price" class="form-control" />
+                        <span asp-validation-for="ButtonClicked.Price" class="text-danger"></span>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Add</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="view-session" data-toggle="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true" style="padding-right: 0 !important;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-info" id="session-title">Session details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @*<div class="form-group">
+                        <label for="recipient-name" class="col-form-label">A</label>
+                    </div>*@
+                <form class="form-horizontal">
+                    <input type="hidden" value="0" id="event-id" />
+
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" class="form-control" value="Session" disabled />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" disabled></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="start-date">Start date</label>
+                        <input type="text" id="start-date" class="form-control" disabled />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="end-date">End date</label>
+                        <input type="text" id="end-date" class="form-control" disabled />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <input type="text" id="type" class="form-control" disabled />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="text" id="price" class="form-control" disabled />
+                    </div>
+
+                    <div class="alert" id="status" role="alert">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="btn-delete-session">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+@*<table class="table table-bordered">
+    <thead>
+        <tr>
+            <td>#</td>
+            <td>Subject</td>
+            <td>Date</td>
+            <td>Start time</td>
+            <td>End time</td>
+            <td>Duration</td>
+            <td>Price</td>
+            <td>Status</td>
+            <td>Action</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>*@
+
+<a data-target="#btnclick-add-session" data-toggle="modal" class="floating-btn d-flex align-items-center justify-content-center"><i class="far fa-plus-circle"></i>&nbsp;Add session</a>
+
+<script>
+    $(document).ready(function () {
+        $('#back-to-top').remove();
+
+        $('#tile-datetimepicker-start').datetimepicker({
+            format: 'HH:mm',
+            defaultDate: moment().format()
+        });
+
+        $('#tile-datetimepicker-end').datetimepicker({
+            format: 'HH:mm',
+            defaultDate: moment().format()
+        });
+
+        $('#btnclick-datetimepicker-start').datetimepicker({
+            format: 'HH:mm',
+            defaultDate: moment().format()
+        });
+
+        $('#btnclick-datetimepicker-end').datetimepicker({
+            format: 'HH:mm',
+            defaultDate: moment().format()
+        });
+
+        //var currentDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+        //var day = currentDate.getDate();
+        //var month = currentDate.getMonth() + 1;
+        //var year = currentDate.getFullYear();
+
+        $('#btnclick-datetimepicker-start-end-date').datetimepicker({
+            format: 'DD/MM/YYYY',
+            defaultDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+        });
+
+        var sessions = [];
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetSessions", "Sessions", new { Area = "Therapist" })',
+            success: function (response) {
+                if (response.success) {
+                    let sessionArray = $.map(response.sessions, function (value, index) {
+                        return [value];
+                    });
+
+                    if (sessionArray.length == 0)
+                        $('#no-sessions-message').html('You have not added any session yet.');
+
+                    $.each(sessionArray, function (i, v) {
+                        sessions.push({
+                            start: v.startDateTime,
+                            end: v.endDateTime,
+                            color: v.booked === 1 ? '#DC3545' : '#28A745',
+                            extendedProps: {
+                                sessionId: v.sessionId,
+                                description: v.description,
+                                type: v.type,
+                                price: v.price,
+                                icon: v.booked === 1 ? 'far fa-address-book' : 'far fa-check-circle',
+                                booked: v.booked
+                            }
+                        });
+                    });
+
+                    GenerateCalendar(sessions);
+                }
+                else {
+                    window.location.href = response.location;
+                }
+            }
+        });
+
+        function GenerateCalendar(sessions) {
+            //$('#calendar').fullCalendar('destroy'); baca TypeScript Error: FullCalendar is not a fucntion
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: sessions,
+                eventClick: function (args) {
+                    //$('#subject').val(args.event.title);
+                    $('#description').val(args.event.extendedProps.description);
+                    $('#start-date').val(args.event.start.toString().split(' ')[4] + ' Belgrade Time');
+                    $('#end-date').val(args.event.end.toString().split(' ')[4] + ' Belgrade Time');
+
+                    if (args.event.extendedProps.type === 0) {
+                        $('#type').val('Individual session');
+                    }
+                    else if (args.event.extendedProps.type === 1) {
+                        $('#type').val('Group session');
+                    }
+
+                    $('#price').val(args.event.extendedProps.price + ' RSD');
+
+                    if (args.event.extendedProps.booked === 0) {
+                        $('#status').addClass('alert-success');
+                        $('#status').removeClass('alert-danger');
+                        $('#status').html("<i class='" + args.event.extendedProps.icon + "'></i> This session is not booked yet.");
+                        $('#btn-delete-session').prop('disabled', false);
+                        $('#btn-delete-session').removeAttr('title');
+                    }
+                    else if (args.event.extendedProps.booked === 1) {
+                        $('#status').addClass('alert-danger');
+                        $('#status').removeClass('alert-success');
+                        $('#status').html("<i class='" + args.event.extendedProps.icon + "'></i> This session is booked.");
+                        $('#btn-delete-session').prop('disabled', true);
+                        $('#btn-delete-session').attr('title', 'Not allowed to delete booked sessions.');
+                    }
+
+                    $('#btn-delete-session').click(function () {
+                        const swalWithBootstrapButtonsDeleteSession = Swal.mixin({
+                            customClass: {
+                                confirmButton: 'btn btn-success delete-buttons-separator',
+                                denyButton: 'btn btn-danger'
+                            },
+                            buttonsStyling: false
+                        });
+
+                        swalWithBootstrapButtonsDeleteSession.fire({
+                            title: 'Are you sure you would like to delete this session?',
+                            icon: 'question',
+                            confirmButtonText: 'Yes',
+                            showDenyButton: true,
+                            denyButtonText: 'No'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '@Url.Action("DeleteSession", "Sessions", new { Area = "Therapist" })',
+                                    data: { tracker: args.event.extendedProps.sessionId },
+                                    success: function (response) {
+                                        if (response.success) {
+                                            toastr[response.severity](response.body, response.header);
+                                            let filteredSessions = sessions.filter(value => value.extendedProps.sessionId !== args.event.extendedProps.sessionId);
+                                            GenerateCalendar(filteredSessions);
+                                            $('#view-session').modal('hide');
+                                        }
+                                        else {
+                                            window.location.href = response.location;
+                                        }
+                                    }
+                                })
+                            }
+                        })
+                    });
+
+                    $('#view-session').modal('show');
+                },
+                eventTimeFormat: { // like '14:30:00'
+                    //hour: 'numeric',
+                    //minute: '2-digit',
+                    //meridiem: 'short'
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    omitZeroMinute: true,
+                    meridiem: 'narrow'
+                },
+                selectable: true,
+                dateClick: function (args) {
+                    $('#tile-start-end-date').val(moment(args.dateStr).format('DD/MM/YYYY'));
+
+                    $('#tile-datetimepicker-start').datetimepicker({
+                        format: 'HH:mm',
+                        defaultDate: moment().format()
+                    });
+
+                    $('#tile-datetimepicker-end').datetimepicker({
+                        format: 'HH:mm',
+                        defaultDate: moment().format()
+                    });
+
+                    $('#tile-add-session').modal('show');
+                }
+                //eventContent: { html: '' }
+            });
+            calendar.render();
+        }
+    });
+</script>
+
+@if (ViewBag.tileClickFailed != null)
+{
+    ViewBag.tileClickFailed = null;
+    <script>
+        $(window).on('load', function () {
+            $('#tile-add-session').modal('show');
+        });
+    </script>
+
+    if (ViewBag.showSwal != null)
+    {
+        ViewBag.showSwal = null;
+        <script>
+            Swal.fire(
+                "@ViewBag.swalTitle",
+                "@ViewBag.swalBody",
+                "@ViewBag.swalSeverity"
+            )
+        </script>
+    }
+}
+
+@if (ViewBag.buttonClickFailed != null)
+{
+    ViewBag.buttonClickFailed = null;
+    <script>
+        $(window).on('load', function () {
+            $('#btnclick-add-session').modal('show');
+        });
+    </script>
+
+    if (ViewBag.showSwal != null)
+    {
+        ViewBag.showSwal = null;
+        <script>
+            Swal.fire(
+                "@ViewBag.swalTitle",
+                "@ViewBag.swalBody",
+                "@ViewBag.swalSeverity"
+            )
+        </script>
+    }
+}
+
+@if (TempData["success"] != null)
+{
+    TempData["success"] = null;
+
+    <script>
+        Swal.fire({
+            title: "@TempData["swalTitle"]",
+            html:
+                '@TempData["Review"]:<br />' +
+                "<ul style='text-align: left;'>" +
+                '<li>Subject: <b>@TempData["Subject"]</b></li>' +
+                '<li>Description: <b>@TempData["Description"]</b></li>' +
+                '<li>Price: <b>@TempData["Price"]</b></li>' +
+                '<li>Type: <b>@TempData["Type"]</b></li>' +
+                '<li>Date: <b>@TempData["Date"]</b></li>' +
+                '<li>Start time: <b>@TempData["StartTime"]</b></li>' +
+                '<li>End time: <b>@TempData["EndTime"]</b></li>' +
+                '<li>Duration: <b>@TempData["SessionDuration"]</b></li>' +
+                '</ul>',
+            icon: "@TempData["swalSeverity"]"
+        })
+    </script>
+}
+
