@@ -1,0 +1,167 @@
+﻿:root {
+  --clr: #222327;
+  --navbar-background: var(--body-color);
+}
+
+.mobile-bm {
+  position: fixed;
+  right: 50%;
+  bottom: 1.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9;
+}
+
+.navigation-bm {
+  width: 100vw;
+  height: 3.5rem;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+  /*!!! ovo ja dodajem*/
+  /*align-self: flex-end;*/
+  /*    margin: 15px 15px;*/
+  background-color: var(--navbar-background);
+  border-top: 1px solid var(--border) !important;
+}
+
+.navigation-bm ul {
+  display: flex;
+  /*width: 350px; OVO kad stavim, mogu dodavati do 7 ikonica i onda nece biti centrirane*/
+  margin-bottom: 0 !important;
+}
+
+.navigation-bm ul li {
+  position: relative;
+  list-style: none;
+  width: 60px;
+  /*height: 70px;*/
+  z-index: 1;
+}
+
+.navigation-bm ul li a {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  text-align: center;
+  font-weight: 500;
+}
+
+.navigation-bm ul li a .icon {
+  position: relative;
+  display: block;
+  /*line-height: 80px !important;*/
+  font-size: 1.3rem;
+  text-align: center;
+  transition: 0.5s;
+}
+
+.navigation-bm ul li a .text {
+  position: absolute;
+  /*color: var(--clr);*/
+  color: white;
+  font-weight: 400;
+  font-size: 0.75rem;
+  letter-spacing: 0.05rem;
+  transition: 0.5s;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/*.indicator-bm {
+    position: absolute;
+    top: -58%;
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 50%;
+    border: 6px solid var(--blue-bm);
+    transition: 0.5s;
+}*/
+
+/*.indicator-bm::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: -25.5px;
+        width: 20px;
+        height: 20px;
+        background: transparent;
+        border-top-right-radius: 50px;
+        box-shadow: 1px -10px 0 0 var(--clr);
+        box-shadow: 1px -10px 0 0 white;
+    }*/
+
+/*.indicator-bm::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: -25.5px;
+        width: 20px;
+        height: 20px;
+        background: transparent;
+        border-top-left-radius: 50px;
+        box-shadow: -1px -10px 0 0 var(--clr);
+        box-shadow: -1px -10px 0 0 white;
+    }*/
+
+/*.navigation-bm ul li:nth-child(1).active ~ .indicator-bm {
+    transform: translateX(calc(70px * 0));
+}
+
+.navigation-bm ul li:nth-child(2).active ~ .indicator-bm {
+    transform: translateX(calc(70px * 1));
+}
+
+.navigation-bm ul li:nth-child(3).active ~ .indicator-bm {
+    transform: translateX(calc(70px * 2));
+}
+
+.navigation-bm ul li:nth-child(4).active ~ .indicator-bm {
+    transform: translateX(calc(70px * 3));
+}
+
+.navigation-bm ul li:nth-child(5).active ~ .indicator-bm {
+    transform: translateX(calc(70px * 4));
+}*/
+
+.first-bm {
+  transform: translateX(calc(10px * 0));
+}
+
+.second-bm {
+  transform: translateX(calc(10px * 1));
+}
+
+.third-bm {
+  transform: translateX(calc(10px * 2));
+}
+
+.fourth-bm {
+  transform: translateX(calc(100px * 3));
+}
+
+.fifth-bm {
+  transform: translateX(calc(10px * 4));
+}
+
+@media (min-width: 1300px) {
+  .mobile-bm {
+    display: none;
+  }
+
+  .navigation-bm {
+    display: none;
+  }
+
+  /*.indicator-bm {
+        display: none;
+    }*/
+}

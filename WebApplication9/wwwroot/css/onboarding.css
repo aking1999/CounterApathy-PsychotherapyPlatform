@@ -1,0 +1,603 @@
+.walkthrough {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.23), 0 10px 40px rgba(0, 0, 0, 0.19);
+  background: linear-gradient(to right bottom, #9e66c6, #6027e1);
+  border-radius: 0.75rem;
+  display: none;
+  flex-direction: column;
+  flex: 0 0 auto;
+  font-size: 14px;
+  /*height: 444px;*/
+  height: 484px;
+  overflow: hidden;
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  width: 280px;
+  z-index: 1000;
+}
+
+.walkthrough.show {
+  display: flex;
+  opacity: 0;
+  transform: translateY(72px);
+}
+
+.walkthrough.reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.walkthrough .walkthrough-body {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  text-align: center;
+}
+
+.walkthrough .walkthrough-body .prev-screen,
+.walkthrough .walkthrough-body .next-screen {
+  align-self: stretch;
+  background: none;
+  border: 0;
+  margin-top: 40px;
+  color: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  flex: 0 0 auto;
+  /*font-size: 24px;*/
+  opacity: 1;
+  outline: none;
+  padding: 16px;
+  transform: scale(1);
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 1000;
+}
+
+.walkthrough .walkthrough-body .prev-screen:hover,
+.walkthrough .walkthrough-body .next-screen:hover,
+.walkthrough .walkthrough-body .prev-screen:active,
+.walkthrough .walkthrough-body .next-screen:active {
+  color: white;
+  transform-origin: center;
+  transform: scale(1.25);
+}
+
+.walkthrough .walkthrough-body .prev-screen:disabled,
+.walkthrough .walkthrough-body .next-screen:disabled {
+  opacity: 0;
+}
+
+.walkthrough .walkthrough-body .prev-screen {
+  order: 1;
+}
+
+.walkthrough .walkthrough-body .next-screen {
+  order: 3;
+}
+
+.walkthrough .walkthrough-body .screens {
+  flex: 1;
+  align-self: stretch;
+  position: relative;
+  margin: 0 -16px;
+  padding: 0;
+  order: 2;
+}
+
+.walkthrough .walkthrough-body .screens .screen {
+  position: absolute;
+  list-style-type: none;
+}
+
+.walkthrough .walkthrough-body .symbol {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 132px;
+  height: 132px;
+  margin: 32px auto;
+  width: 132px;
+}
+
+.walkthrough .walkthrough-body h3 {
+  font-size: 15px;
+  line-height: 1.4em;
+}
+
+.walkthrough .walkthrough-body p {
+  /*line-height: 1.6em;*/
+  font-size: 13px;
+  margin-top: 16px;
+  padding-top: 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.walkthrough .walkthrough-pagination {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.walkthrough .walkthrough-pagination .dot {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  height: 8px;
+  margin: 0 4px;
+  transform: scale(0.75);
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    background 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  width: 8px;
+}
+
+.walkthrough .walkthrough-pagination .dot.active {
+  background: white;
+  transform: scale(1);
+  transition-delay: 0.4s;
+}
+
+.walkthrough .walkthrough-footer {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: space-around;
+  padding: 0;
+}
+
+.walkthrough .walkthrough-footer button {
+  height: 40px;
+  border: 0;
+  background: var(--primary);
+  /*font-weight: bold;
+  letter-spacing: 0.1em;*/
+  border-radius: 0.4rem;
+  color: white;
+  flex: 1;
+  /*font-size: 12px;*/
+  margin: 14px;
+  outline: 0;
+  /*padding: 12px;*/
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    background 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  z-index: 10000;
+}
+
+.walkthrough .walkthrough-footer button:hover {
+  background: var(--darker-primary);
+}
+
+.walkthrough .walkthrough-footer button:active {
+  background: var(--darker-primary);
+}
+
+.walkthrough .walkthrough-footer button:disabled {
+  cursor: pointer;
+}
+
+.walkthrough .walkthrough-footer button.finish {
+  background: var(--primary);
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 90%;
+  opacity: 0;
+  transform: scale(0, 1);
+  transform-origin: center;
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    background 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.walkthrough .walkthrough-footer button.finish:hover {
+  background: var(--darker-primary);
+}
+
+.walkthrough .walkthrough-footer button.finish:active {
+  background: var(--darker-primary);
+}
+
+.walkthrough .walkthrough-footer button.finish.active {
+  transform: scale(1, 1);
+  opacity: 1;
+}
+
+.walkthrough .screens {
+  margin: 0;
+}
+
+.walkthrough .screens .symbol .status-badge {
+  left: 136px;
+  opacity: 0;
+  position: absolute;
+  top: 104px;
+  transform: scale(0);
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition-delay: 0.6s;
+}
+
+.walkthrough .screens .symbol .status-badge i {
+  display: inline;
+}
+
+.walkthrough .screens .symbol.logo .logo {
+  margin-top: 40px;
+  opacity: 0;
+  transform: translateY(-60px);
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  width: 80px;
+}
+
+.walkthrough .screens .symbol .icon {
+  position: absolute;
+  opacity: 0;
+  transform: translateY(-30px);
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  width: 132px;
+  left: 51px;
+  top: 32px;
+}
+
+.walkthrough .screens .screen {
+  opacity: 0;
+  position: absolute;
+  transform: translateX(-72px);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.walkthrough .screens .screen.active {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  transition-delay: 0.4s;
+}
+
+.walkthrough .screens .screen.active ~ .screen {
+  opacity: 0;
+  transform: translateX(72px);
+}
+
+.walkthrough .screens .screen.active .symbol .status-badge {
+  opacity: 1;
+  transform: scale(1.75);
+}
+
+.walkthrough .screens .screen.active .symbol.logo .logo {
+  opacity: 0.8;
+  transform: translateY(0);
+  transition-delay: 0.6s;
+}
+
+.walkthrough .screens .screen.active .symbol.logo .status-badge {
+  transition-delay: 1s;
+}
+
+/*                    money                        */
+.walkthrough .screens .screen .symbol.money .icon {
+  width: 120px;
+  left: 55px;
+  top: 78px;
+}
+
+.walkthrough .screens .screen.active .symbol.money .icon {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.6s;
+}
+
+.walkthrough .screens .screen.active .symbol.money .icon:nth-child(2) {
+  transition-delay: 0.725s;
+}
+
+.walkthrough .screens .screen.active .symbol.money .icon:nth-child(3) {
+  transition-delay: 0.85s;
+}
+
+.walkthrough .screens .screen.active .symbol.money .status-badge {
+  transition-delay: 1.4s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*                    user-honor                   */
+.walkthrough .screens .screen .symbol.user-honor .icon {
+  width: 60px;
+  left: 85px;
+  top: 54px;
+  z-index: 1;
+}
+
+.walkthrough .screens .screen .symbol.user-honor .icon:nth-child(2) {
+  width: 35px;
+  left: 165px;
+  top: 100px;
+  z-index: 2;
+}
+
+.walkthrough .screens .screen.active .symbol.user-honor .icon {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.6s;
+}
+
+.walkthrough .screens .screen.active .symbol.user-honor .icon:nth-child(2) {
+  opacity: 1;
+  transform: translateX(-42px);
+  transition-delay: 0.8s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*                    people-connect               */
+.walkthrough .screens .screen .symbol.people-connect .icon {
+  width: 100px;
+  left: 65px;
+  top: 48px;
+}
+
+.walkthrough .screens .screen.active .symbol.people-connect .icon {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.6s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*                professional-email                */
+.walkthrough .screens .screen .symbol.professional-email .icon {
+  width: 70px;
+  left: 80px;
+  top: 71px;
+}
+
+.walkthrough .screens .screen.active .symbol.professional-email .icon {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.6s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*                email-signature                */
+.walkthrough .screens .screen .symbol.email-signature .icon {
+  width: 60px;
+  left: 87.5px;
+  top: 58px;
+}
+
+.walkthrough .screens .screen.active .symbol.email-signature .icon {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.6s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*                    books                        */
+.walkthrough .screens .screen.active .symbol.books .icon {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.6s;
+}
+
+.walkthrough .screens .screen.active .symbol.books .icon:nth-child(2) {
+  transition-delay: 0.725s;
+}
+
+.walkthrough .screens .screen.active .symbol.books .icon:nth-child(3) {
+  transition-delay: 0.85s;
+}
+
+.walkthrough .screens .screen.active .symbol.books .status-badge {
+  transition-delay: 1.4s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*             calendar-session-booking            */
+.walkthrough .screens .screen .symbol.calendar-session-booking .icon {
+  width: 100px;
+  left: 65px;
+  top: 49px;
+  z-index: 1;
+}
+
+.walkthrough .screens .screen.active .symbol.calendar-session-booking .icon {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.6s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*                    stars                        */
+.walkthrough .screens .screen .symbol.stars .icon {
+  width: 120px;
+  left: 55px;
+  top: 83px;
+}
+
+.walkthrough .screens .screen.active .symbol.stars .icon {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.6s;
+}
+
+.walkthrough .screens .screen.active .symbol.stars .icon:nth-child(2) {
+  transition-delay: 0.725s;
+}
+
+.walkthrough .screens .screen.active .symbol.stars .icon:nth-child(3) {
+  transition-delay: 0.85s;
+}
+
+.walkthrough .screens .screen.active .symbol.stars .icon:nth-child(4) {
+  transition-delay: 0.975s;
+}
+
+.walkthrough .screens .screen.active .symbol.stars .icon:nth-child(5) {
+  transition-delay: 1.1s;
+}
+
+.walkthrough .screens .screen.active .symbol.stars .status-badge {
+  transition-delay: 1.4s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*                    network                      */
+.walkthrough .screens .screen .symbol.network .icon {
+  width: 100px;
+  left: 65px;
+  top: 47px;
+  z-index: 1;
+  transform: scale(0.25);
+}
+
+.walkthrough .screens .screen.active .symbol.network .icon {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.6s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*                    leaderboard                   */
+.walkthrough .screens .screen .symbol.leaderboard .icon {
+  width: 80px;
+  left: 75px;
+  top: 52px;
+  z-index: 1;
+  transform: scale(0.25);
+}
+
+.walkthrough .screens .screen.active .symbol.leaderboard .icon {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.6s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*                    bars                         */
+.walkthrough .screens .symbol.bars .icon {
+  transform: translate(40px, 20px);
+}
+
+.walkthrough .screens .symbol.bars .icon:nth-of-type(2) {
+  transform: scale(0.25);
+  transform-origin: 30% 54%;
+}
+
+.walkthrough .screens .symbol.bars .icon:nth-of-type(3) {
+  transform: scale(0.25);
+  transform-origin: 30% 40%;
+}
+
+.walkthrough .screens .symbol.bars .icon:nth-of-type(4) {
+  transform: scale(0.25);
+  transform-origin: 30% 26%;
+}
+
+.walkthrough .screens .screen.active .symbol.bars .icon {
+  opacity: 1;
+  transform: translate(0) scale(1);
+  transition-delay: 0.6s;
+}
+
+.walkthrough .screens .screen.active .symbol.bars .icon:nth-child(2) {
+  transition-delay: 1.05s;
+}
+
+.walkthrough .screens .screen.active .symbol.bars .icon:nth-child(3) {
+  transition-delay: 0.925s;
+}
+
+.walkthrough .screens .screen.active .symbol.bars .icon:nth-child(4) {
+  transition-delay: 0.8s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*                    files                        */
+.walkthrough .screens .symbol.files .icon {
+  transform: translate(40px, 20px);
+}
+
+.walkthrough .screens .screen.active .symbol.files .icon {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.9s;
+}
+
+.walkthrough .screens .screen.active .symbol.files .icon:nth-child(3) {
+  transition-delay: 0.8s;
+}
+
+.walkthrough .screens .screen.active .symbol.files .icon:nth-child(2) {
+  transition-delay: 0.7s;
+}
+
+.walkthrough .screens .screen.active .symbol.files .icon:nth-child(1) {
+  transition-delay: 0.6s;
+}
+
+.walkthrough .screens .screen.active .symbol.files .status-badge {
+  transition-delay: 1.6s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*                    comm                         */
+.walkthrough .screens .symbol.comm .icon {
+  transform: scale(0.25);
+  transform-origin: 29% 73%;
+}
+
+.walkthrough .screens .symbol.comm .icon:nth-child(2) {
+  transform-origin: 66% 85%;
+}
+
+.walkthrough .screens .screen.active .symbol.comm .icon {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.6s;
+}
+
+.walkthrough .screens .screen.active .symbol.comm .icon:nth-child(2) {
+  transition-delay: 0.8s;
+}
+
+.walkthrough .screens .screen.active .symbol.comm .status-badge {
+  transition-delay: 1.6s;
+}
+/*//////////////////////////////////////////////////*/
+
+/*            performance-improvement              */
+.walkthrough .screens .screen .symbol.improvement .icon {
+  width: 90px;
+  left: 72px;
+  top: 71px;
+}
+
+.walkthrough .screens .screen .symbol.improvement .icon:nth-child(2) {
+  width: 60px;
+  left: 73px;
+  top: 37px;
+  transform: translate(-60px, 20px);
+}
+
+.walkthrough .screens .screen.active .symbol.improvement .icon {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.6s;
+}
+
+.walkthrough .screens .screen.active .symbol.improvement .icon:nth-child(2) {
+  transition-delay: 0.725s;
+}
+
+.walkthrough .screens .screen.active .symbol.improvement .status-badge {
+  transition-delay: 1.6s;
+}
+
+/*@-webkit-keyframes slide {
+  100% {
+    left: 66px;
+  }
+}
+
+@keyframes slide {
+  100% {
+    left: 66px;
+  }
+}*/
+/*//////////////////////////////////////////////////*/

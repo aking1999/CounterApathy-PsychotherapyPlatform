@@ -1,0 +1,77 @@
+﻿@using Framework.Helpers.ExtensionMethods 
+
+<link rel="stylesheet" href="~/css/left-side-nav-bar.css" />
+
+<div class="sidebar">
+    <div class="logo-details">
+        <div class="logo_name">CounterApathy</div>
+        <i tabindex="1" class="fal fa-bars no-tick" id="btn"></i>
+    </div>
+    <ul class="nav-list pl-0">
+        <li>
+            <a asp-area="Therapist" asp-controller="Account" asp-action="Profile">
+                <i class="fal fa-user text-primary"></i>
+                <span class="links_name">Profil</span>
+            </a>
+            <span class="tooltip">Profil</span>
+        </li>
+        @*<li>
+            <a asp-area="Therapist" asp-controller="Dashboard" asp-action="Main">
+                <i class="fal fa-chart-bar"></i>
+                <span class="links_name">Dashboard</span>
+            </a>
+            <span class="tooltip">Dashboard</span>
+        </li>*@
+        <li>
+            <a href="@Url.AllPsychotherapistBookedConsultationsUrl()">
+                <i class="fal fa-comments-alt text-primary"></i>
+                <span class="links_name">Zakazane konsultacije</span>
+            </a>
+            <span class="tooltip">Zakazane konsultacije</span>
+        </li>
+        <li>
+            <a href="@Url.AllPsychotherapistBookedSessionsUrl()">
+                <i class="fal fa-calendar-check text-success"></i>
+                <span class="links_name">Zakazane seanse</span>
+            </a>
+            <span class="tooltip">Zakazane seanse</span>
+        </li>
+        <li>
+            <a asp-area="Therapist" asp-controller="Consultations" asp-action="ChooseAppointmentType">
+                <i class="fal fa-calendar-plus text-success"></i>
+                <span class="links_name">Menadžer termina</span>
+            </a>
+            <span class="tooltip">Menadžer termina</span>
+        </li>
+        <li>
+            <a asp-area="Therapist" asp-controller="Notifications" asp-action="All">
+                <i class="fal fa-bells text-danger"></i>
+                <span class="links_name">Centar za notifikacije</span>
+            </a>
+            <span class="tooltip">Centar za notifikacije</span>
+        </li>
+        <li>
+            <a href="@Url.AllTherapistWithdrawalsUrl()">
+                <i class="far fa-dollar-sign text-success"></i>
+                <span class="links_name">Isplate</span>
+            </a>
+            <span class="tooltip">Isplate</span>
+        </li>
+        @*<li>
+            <a asp-area="Therapist" asp-controller="Settings" asp-action="Main">
+                <i class="fal fa-cog"></i>
+                <span class="links_name">Settings</span>
+            </a>
+            <span class="tooltip">Settings</span>
+        </li>*@
+        <li class="profile">
+            <a role="button" id="href-sign-out">
+                <i class="fal fa-sign-out-alt text-primary"></i>
+                <span class="links_name">Odjava</span>
+            </a>
+            <span class="tooltip">Odjava</span>
+        </li>
+    </ul>
+</div>
+
+@Html.PartialSectionScripts(@<script async src="~/js/left-side-nav-bar.js"></script>)

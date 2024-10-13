@@ -1,0 +1,36 @@
+﻿@using Framework.Helpers.ExtensionMethods
+@using WebApplication9.SharedPartialViewModels
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    ViewData.SetTitle("Uputstva za psihoterapeute");
+    ViewData.SetMetaDescription("Pročitajte uputstva koja Vam pomažu u rešavanju nedoumica i " +
+        $"korišćenju {Configuration.GetSection("Application:AppName")?.Value} platforme.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    @await Html.TryPartialAsync("~/Views/Shared/Menues/_SideMenu.cshtml",
+        new SideMenuPartialViewModel("fal fa-info-circle", "Centar za pomoć", "text-info",
+        new List<SideMenuItemPartialViewModel>()
+        {
+            new SideMenuItemPartialViewModel("", null, "Home", "About", "fal fa-address-card fa-fw text-info", "O nama"),
+            new SideMenuItemPartialViewModel("", null, "Consultations", "Index", "fal fa-comments-alt fa-fw text-primary", "Besplatne konsultacije"),
+            new SideMenuItemPartialViewModel("", null, "Guides", "BookingRoadmap", "fal fa-calendar-check fa-fw text-success", "Lako zakažite seansu"),
+                        new SideMenuItemPartialViewModel("", null, "Therapists", "PsychotherapistsExperiences", "fal fa-star fa-fw text-warning", "Iskustva sa psihoterapije"),
+            //new SideMenuItemPartialViewModel("", null, "Home", "EasySiteNavigation", "fal fa-map-marked fa-fw text-info", "Easy site navigation"),
+            new SideMenuItemPartialViewModel("", null, "Home", "FAQ", "fal fa-question fa-fw text-info", "Česta pitanja"),
+            new SideMenuItemPartialViewModel("active", null, "Guides", "All", "fal fa-book-open fa-fw text-primary", "Uputstva za terapeute"),
+            new SideMenuItemPartialViewModel("", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi korišćenja"),
+            new SideMenuItemPartialViewModel("", null, "Home", "TherapistsTerms", "fal fa-scroll fa-fw text-primary", "Uslovi za terapeute"),
+            new SideMenuItemPartialViewModel("", null, "Home", "Privacy", "fal fa-shield fa-fw text-primary", "Politika privatnosti"),
+            new SideMenuItemPartialViewModel("", "Therapist", "Account", "Support", "fal fa-headset fa-fw text-orange", "Podrška za terapeute")
+        })
+    )
+    <div class="col-lg-9">
+        <div class="alert alert-pink text-center mb-0" role="alert">
+            <i class="far fa-bullhorn mr-2"></i>Uputstva za psihoterapeute biće dodata uskoro.
+        </div>
+    </div>
+</div>
+

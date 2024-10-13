@@ -1,0 +1,12 @@
+﻿@{
+    if (ViewBag.toast != null)
+    {
+        var toast = (Framework.Models.Toast)ViewBag.toast;
+
+        <script>
+            toastr["@toast.Severity"]("@toast.Body", "@toast.Header");
+        </script>
+
+        ViewBag.toast = null;
+    }
+}

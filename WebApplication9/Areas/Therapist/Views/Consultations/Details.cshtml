@@ -1,0 +1,321 @@
+﻿@model DataTransferObjects.ViewModels.Therapist.BookedConsultationAddInviteLinkViewModel
+@using static Framework.Providers.ContactMethodsProvider
+@using Framework.Helpers.ExtensionMethods
+@inject Framework.Interfaces.IDateTimeHelper DateHelper
+@{
+    ViewData.SetTitle("Detalji besplatnih konsultacija");
+    ViewData.SetMetaDescription($"Detalji zakazanih konsultacija #{Model.BookedConsultation.BookingId}.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    @if(!Model.BookedConsultation.SessionEnded && Model.BookedConsultation.ContactMethod.Id != InPerson.Id)
+    { 
+        <link rel="stylesheet" href="~/animations/btn-send-paper-plane/btn-send-paper-plane.css" />
+    }
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-receipt fa-sm",
+        "text-info",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row justify-content-between align-items-center">
+            <div class="col-md">
+                <h5 class="mb-2 mb-md-0 text-secondary">ID zakazivanja #@Model.BookedConsultation.BookingId</h5>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-sm btn-falcon-info"
+                        type="button"
+                        onclick="window.print()">
+                    <i class="fas fa-print mr-2"></i>Odštampaj
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@if (!Model.BookedConsultation.SessionEnded)
+{
+    if (Model.BookedConsultation.ContactMethod.Id != InPerson.Id)
+    {
+        <div class="alert alert-pink" role="alert">
+            <center id="alert-invite-link-text">
+                <div id="invite-link-notice-placeholder">
+                    @if (!string.IsNullOrWhiteSpace(Model.InviteLink))
+                    {
+                        <div>
+                            <i class="far fa-link mr-2"></i>@Model.BookedConsultation.ContactMethod.Name link za pristup konsultacijama:
+                            <p class="text-primary mt-3 mb-4 text-break">@Model.InviteLink</p>
+                        </div>
+                    }
+                    else
+                    {
+                        var requiredTimeEarlier = Model.BookedConsultation.StartDateTime.Subtract(new TimeSpan(4, 0, 0));
+
+                        <div class="mb-3">
+                            <p>
+                                <strong>Trenutno niste dodali @Model.BookedConsultation.ContactMethod.Name link za pristup ovim konsultacijama</strong>.
+                            </p>
+                            Molimo da najkasnije 4 sata pre početka dodate link za pristup konsultacijama.
+                            <br />
+                            Ova seansa počinje datuma @DateHelper.DateStringFromDateTime(Model.BookedConsultation.StartDateTime),
+                            u @DateHelper.TimeStringFromDateTime(Model.BookedConsultation.StartDateTime)h,
+                            stoga dodajte @Model.BookedConsultation.ContactMethod.Name link za pristup
+                            najkasnije do datuma @DateHelper.DateStringFromDateTime(requiredTimeEarlier), u @DateHelper.TimeStringFromDateTime(requiredTimeEarlier)h.
+                            <br />
+                            Odmah nakon dodavanja linka, klijent će primiti notifikaciju i imejl sa linkom. 
+                        </div>
+                    }
+                </div>
+                <button id="btn-launch-modal"
+                        data-target="#add-invite-link-modal"
+                        data-toggle="modal"
+                        class="btn btn-sm btn-soft-success mb-2"
+                        data-contactmethodname="@Model.BookedConsultation.ContactMethod.Name">
+                    <i class="far fa-link mr-2"></i>Dodajte novi @Model.BookedConsultation.ContactMethod.Name link za pristup
+                </button>
+            </center>
+        </div>
+
+        <div id="add-invite-link-modal"
+             data-toggle="modal"
+             data-backdrop="static"
+             data-keyboard="false"
+             class="modal fade p-0"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="ModelLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content border overflow-hidden">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title text-center mx-auto">Dodajte @Model.BookedConsultation.ContactMethod.Name link za pristup</h5>
+                        <button type="button" id="btn-dismiss-modal-times" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvori">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="add-invite-link-form" autocomplete="off">
+                        @Html.AntiForgeryToken()
+                        <input asp-for="BookedConsultation.BookingId" type="hidden" />
+                        <input asp-for="BookedConsultation.ConsultationId" type="hidden" />
+                        <div class="modal-body pb-0">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-pink mb-3" role="alert">
+                                        <center>
+                                            Odmah nakon dodavanja linka za pristup, klijent prima notifikaciju i imejl sa linkom.
+                                        </center>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="far fa-link text-info no-tick"></i>
+                                                </span>
+                                            </div>
+                                            <textarea asp-for="InviteLink"
+                                                      class="form-control"
+                                                      rows="6"
+                                                      placeholder="Unesite @Model.BookedConsultation.ContactMethod.Name link za pristup konsultacijama...">
+                                            </textarea>
+                                        </div>
+                                        <span asp-validation-for="InviteLink" class="invalid-feedback"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0">
+                            <button id="btn-submit" type="button" class="button p-0">
+                                <span class="btn btn-sm text-white default">Dodaj</span>
+                                <span class="success text-secondary"><i class="fas fa-check text-success mr-2 no-tick"></i>Link dodat</span>
+                                <div class="left"></div>
+                                <div class="right"></div>
+                            </button>
+                            <button id="cancel" type="button" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Zatvori</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+}
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row text-center d-sm-flex justify-content-sm-center">
+            <div class="col-sm-6 text-sm-left">
+                <div class="avatar avatar-5xl">
+                    <img src="@Model.BookedConsultation.ProfilePhoto"
+                         class="rounded-circle d-inline-block"
+                         alt="Klijent @Model.BookedConsultation.ClientFirstName @Model.BookedConsultation.ClientLastName" />
+                </div>
+            </div>
+            <div class="col text-sm-right mt-3 mt-sm-0">
+                <h4 class="mb-3 text-secondary">Klijent</h4>
+                <p class="fs--1 mb-0">@Model.BookedConsultation.ClientFirstName @Model.BookedConsultation.ClientLastName</p>
+                <p class="fs--1 mb-0"><i class="far fa-envelope text-info mr-2"></i><a href="mailto:@Model.BookedConsultation.ClientEmail">@Model.BookedConsultation.ClientEmail</a></p>
+                <p class="fs--1 mb-0">
+                    <i class="far fa-phone text-success mr-1"></i>
+                    @if (!string.IsNullOrWhiteSpace(Model.BookedConsultation.ClientPhoneNumber))
+                    {
+                        <a href="tel:@Model.BookedConsultation.ClientPhoneNumber">@Model.BookedConsultation.ClientPhoneNumber</a>
+                    }
+                    else
+                    {
+                        <text>Broj telefona nije dodat.</text>
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row justify-content-center justify-content-md-between">
+            <div class="col mb-3">
+                <h4 class="mb-3 text-secondary">Psihoterapeut</h4>
+                <p class="fs--1 mb-0">@Model.BookedConsultation.TherapistFirstName @Model.BookedConsultation.TherapistLastName</p>
+                <p class="fs--1 mb-0"><i class="far fa-envelope text-info fa-fw mr-2"></i>@Model.BookedConsultation.TherapistEmail</p>
+                <p class="fs--1 mb-0"><i class="far fa-phone text-success fa-fw mr-2"></i>@Model.BookedConsultation.TherapistPhoneNumber</p>
+            </div>
+            <div class="col-sm-auto ml-md-auto d-flex align-items-center">
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless fs--1 mb-0">
+                        <tbody class="text-secondary">
+                            <tr>
+                                <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-calendar-check fa-fw text-success mr-2"></i>Datum zakazivanja:</th>
+                                <td class="text-sm-left pl-0 pl-md-3 text-secondary">@DateHelper.DateTimeStringFromDateTime(Model.BookedConsultation.BookingDate)h</td>
+                            </tr>
+                            @if (Model.BookedConsultation.EndDateTime.Day > Model.BookedConsultation.StartDateTime.Day)
+                            {
+                                <tr>
+                                    <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-calendar fa-fw text-success mr-2"></i>Datum konsultacija:</th>
+                                    <td class="text-sm-left pl-0 pl-md-3 text-secondary">
+                                        @DateHelper.DateTimeStringFromDateTime(Model.BookedConsultation.StartDateTime)h &minus; @DateHelper.DateTimeStringFromDateTime(Model.BookedConsultation.EndDateTime)h
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-calendar fa-fw text-success mr-2"></i>Datum konsultacija:</th>
+                                    <td class="text-sm-left pl-0 pl-md-3 text-secondary">@DateHelper.DateStringFromDateTime(Model.BookedConsultation.StartDateTime)</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-clock fa-fw text-success mr-2"></i>Vreme konsultacija:</th>
+                                    <td class="text-sm-left pl-0 pl-md-3 text-secondary">
+                                        @DateHelper.TimeStringFromDateTime(Model.BookedConsultation.StartDateTime)h &minus; @DateHelper.TimeStringFromDateTime(Model.BookedConsultation.EndDateTime)h
+                                    </td>
+                                </tr>
+                            }
+                            <tr>
+                                <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-stopwatch text-primary fa-fw mr-2"></i>Trajanje konsultacija:</th>
+                                <td class="text-sm-left pl-0 pl-md-3 text-secondary">
+                                    @{
+                                        var dateDiff = Model.BookedConsultation.EndDateTime - Model.BookedConsultation.StartDateTime;
+                                        var dateDiffFormatted = $"{dateDiff.Minutes} minuta";
+                                        if (dateDiff.Days > 0) dateDiffFormatted = $"{dateDiff.Days} dana, {dateDiffFormatted}";
+                                    }
+                                    @dateDiffFormatted
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pl-0 pl-md-3" colspan="2">
+                                    <span id="status" class="badge badge-soft-warning d-block w-100"><i class="fas fa-stream mr-1"></i>Na čekanju</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pl-0 pl-md-3" colspan="2">
+                                    <strong id="badge-countdown" class="badge badge-soft-info d-block w-100">
+                                        Počinje za:
+                                        <span id="countdown" class="ml-1"></span>
+                                    </strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive mt-3 fs--1">
+            <table class="table table-striped border-bottom">
+                <thead>
+                    <tr class="bg-primary text-white">
+                        <th class="border-0 text-center align-middle">Usluga</th>
+                        <th class="border-0 text-center align">Kontakt metoda</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fs--1 align-middle text-center">
+                            <h6 class="mb-0 text-nowrap">Besplatne konsultacije</h6>
+                        </td>
+                        <td class="fs--1 align-middle text-center">
+                            <i class="@Model.BookedConsultation.ContactMethod.Icon mr-1" style="color: @Model.BookedConsultation.ContactMethod.Color"></i>@Model.BookedConsultation.ContactMethod.Name
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/year-picker/moment.min.js"></script>
+    <script async>
+        $(document).ready(function () {
+            let badgeCountdown = $('#badge-countdown');
+            let status = $('#status');
+            let countdown = $("#countdown");
+            let countDownDate = new Date(moment("@DateHelper.ConvertDateTimeToDateTimeStringISO(Model.BookedConsultation.StartDateTime)").valueOf());
+
+            var x = setInterval(function () {
+                var distance = countDownDate - ((new Date()).getTime()); //now
+
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                countdown.html(days + "d " + hours + "h " + minutes + "m " + seconds + "s ")
+
+                if (distance < 0) {
+                    if (status.hasClass('badge-soft-warning')) {
+                        status.removeClass('badge-soft-warning');
+                        status.addClass('badge-soft-primary');
+
+                        if (!status.has('i.fa-spinner.fa-spin').length)
+                            status.html('<i class="fas fa-spinner fa-spin mr-1 no-tick"></i>Konsultacije u toku');
+                    }
+
+                    var finished = new Date(moment("@DateHelper.ConvertDateTimeToDateTimeStringISO(Model.BookedConsultation.EndDateTime)").valueOf());
+
+                    if (new Date() >= finished) {
+                        clearInterval(x);
+                        badgeCountdown.closest('td').remove();
+
+                        if (status.hasClass('badge-soft-primary')) {
+                            status.removeClass('badge-soft-primary');
+                            status.addClass('badge-soft-success');
+                            status.html('<i class="fas fa-check mr-1"></i>Konsultacije završene');
+                        }
+                    } else {
+                        if (!$('strong.badge i.fa-play').length)
+                            badgeCountdown.html("<i class='far fa-play mr-1'></i>Konsultacije počele");
+                    }
+                }
+            }, 1000);
+        });
+    </script>
+    @if (!Model.BookedConsultation.SessionEnded && Model.BookedConsultation.ContactMethod.Id != InPerson.Id)
+    {
+        <partial name="_ValidationScriptsPartial" />
+        <script>
+            var consultationInviteLinkEndpoint = '@Url.Action("AddConsultationInviteLink", "Consultations", new { Area = "Therapist" })';
+        </script>
+        <script src="~/animations/btn-send-paper-plane/gsap.min.js"></script>
+        <script src="~/animations/btn-send-paper-plane/send-consultation-invite-link.js"></script>
+    }
+}

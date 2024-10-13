@@ -1,0 +1,227 @@
+#main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /*min-height: 70vh;
+  overflow: hidden;*/
+}
+
+.container-ms {
+  position: relative;
+  width: 400px;
+  /*border: 2px solid black;*/
+  box-shadow: var(--card-shadow);
+  -webkit-box-shadow: var(--card-shadow);
+  /*text-align: center;*/
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.container-ms .form-outer {
+  width: 100%;
+  overflow: hidden;
+}
+
+.container-ms .form-outer form {
+  display: flex;
+  width: 400%;
+}
+
+.form-outer form .page {
+  width: 25%;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.form-outer form .page .title {
+  text-align: left;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.form-outer form .page .field {
+  /*width: 330px;*/
+  height: 45px;
+  margin: 45px 0;
+  display: flex;
+  position: relative;
+}
+
+/*form .page .field .label {
+    position: absolute;
+    top: -30px;
+    font-weight: 500;
+}*/
+
+/*form .page .field input {
+    height: 100%;
+    width: 100%;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    padding-left: 15px;
+    font-size: 18px;
+}*/
+
+form .page .field select {
+  width: 100%;
+  padding-left: 10px;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+/*form .page .field button {
+    width: 100%;
+    height: calc(100% + 5px);
+    border: none;
+    background: #34a4ff;
+    margin-top: -20px;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: 0.5s ease;
+}*/
+
+form .page .field button:hover {
+  background: #0e78cf;
+}
+
+form .page .btns button {
+  margin-top: -20px !important;
+}
+
+form .page .btns button.prev {
+  margin-right: 3px;
+  font-size: 17px;
+}
+
+form .page .btns button.next {
+  margin-left: 3px;
+}
+
+.container-ms .progress-bar-ms {
+  display: flex;
+  margin: 2rem 0;
+  user-select: none;
+}
+
+.container-ms .progress-bar-ms .step {
+  text-align: center;
+  width: 100%;
+  position: relative;
+}
+
+.container-ms .progress-bar-ms .step p {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.progress-bar-ms .step .bullet {
+  height: 25px;
+  width: 25px;
+  border: 2px solid var(--border);
+  display: inline-block;
+  border-radius: 50%;
+  position: relative;
+  transition: 0.2s;
+  font-size: 0.9rem;
+  line-height: 25px;
+}
+
+.progress-bar-ms .step .bullet.active {
+  border-color: var(--success);
+  background: var(--soft-success);
+}
+
+.progress-bar-ms .step .bullet span {
+  top: -2px;
+  position: absolute;
+  /*left: 50%;*/
+  transform: translateX(-50%);
+}
+
+.progress-bar-ms .step .bullet.active span {
+  display: none;
+}
+
+.progress-bar-ms .step .bullet:before,
+.progress-bar-ms .step .bullet:after {
+  position: absolute;
+  content: "";
+  bottom: 9.5px;
+  right: -64px;
+  height: 2px;
+  width: 59px;
+  background: var(--border);
+}
+
+.progress-bar-ms .step .bullet.active:after {
+  background: var(--success);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: animate 0.3s linear forwards;
+}
+
+@keyframes animate {
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.progress-bar-ms .step:last-child .bullet:before,
+.progress-bar-ms .step:last-child .bullet:after {
+  display: none !important;
+}
+
+.progress-bar-ms .step p.active {
+  color: var(--success);
+  transition: 0.2s linear;
+}
+
+.progress-bar-ms .step .check {
+  position: absolute;
+  left: 49.5%;
+  top: 69%;
+  font-size: 13px;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+.progress-bar-ms .step .check.active {
+  display: block;
+  color: var(--success);
+}
+
+@media (max-width: 474px) {
+  .container-ms {
+    position: relative;
+    width: 300px;
+    /*box-shadow: 0 2px 4px rgb(0 0 0 / 10%), 0 8px 16px rgb(0 0 0 / 10%) !important;*/
+    /*border: 2px solid black;*/
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%), 0 8px 16px rgb(0 0 0 / 10%) !important;
+    /*text-align: center;*/
+    border-radius: 10px !important;
+  }
+
+  .container-ms .progress-bar-ms .step p {
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+  }
+
+  .progress-bar-ms .step .bullet:before,
+  .progress-bar-ms .step .bullet:after {
+    right: -40px;
+    width: 35px;
+  }
+
+  /*    .progress-bar-ms .step .check {
+        position: absolute;
+        left: 49%;
+        top: 68%;
+        font-size: 15px;
+        transform: translate(-50%, -50%);
+        display: none;
+    }*/
+}

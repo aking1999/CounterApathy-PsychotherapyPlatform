@@ -1,0 +1,47 @@
+﻿@using Framework.Helpers.ExtensionMethods
+
+<link rel="stylesheet" href="~/css/bottom-menu.css" />
+
+<div class="mobile-bm">
+    <div class="navigation-bm">
+        <ul class="pl-0">
+            <li class="list">
+                <a asp-controller="Account" asp-action="Profile">
+                    <span class="icon"><i class="fal fa-user text-primary"></i></span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="@Url.AllPsychotherapistsUrl()">
+                    <span class="icon"><i class="fal fa-users text-info"></i></span>
+                </a>
+            </li>
+            <li class="list">
+                <a asp-area="" asp-controller="Consultations" asp-action="Index">
+                    <span class="icon"><i class="fal fa-comments-alt text-primary"></i></span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="@Url.AllBookedSessionsUrl()">
+                    <span class="icon"><i class="fal fa-calendar-check text-success"></i></span>
+                </a>
+            </li>
+            <li class="list">
+                <a asp-controller="Notifications" asp-action="All">
+                    <span class="icon"><i class="fal fa-bells text-danger"></i></span>
+                </a>
+            </li>
+            @*<li class="list">
+            <a asp-controller="Therapists" asp-action="PsychotherapistsExperiences">
+                <span class="icon"><i class="fal fa-star text-warning"></i></span>
+            </a>
+        </li>*@
+            @*<li class="list">
+            <a asp-controller="Settings" asp-action="Main">
+                <span class="icon"><i class="fal fa-cog"></i></span>
+            </a>
+        </li>*@
+        </ul>
+    </div>
+</div>
+
+@Html.PartialSectionScripts(@<script async src="~/js/bottom-menu.js"></script>)

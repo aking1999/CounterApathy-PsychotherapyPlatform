@@ -1,0 +1,153 @@
+﻿@model DataTransferObjects.ViewModels.Client.TherapistApplicationChoicesViewModel
+@using static Framework.Providers.UserRoles
+@using Framework.Helpers.ExtensionMethods
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+
+    ViewData.SetTitle("Poslovi za terapeute");
+    ViewData.SetMetaDescription("Pridružite se našem timu posvećenih i licenciranih terapeuta " +
+        $"na {appName} platformi. Pomozite da napravimo razliku u životima onih koji traže " +
+        "podršku u mentalnom zdravlju i već danas se prijavite da radite sa nama. Postupak prijave je jednostavan i direktan.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var userRole = await User.GetRoleAsync();
+    var psychotherapistApplicationButtonText = "Pridružite nam se";
+    var psychotherapistApplicationButtonDisabled = string.Empty;
+    if (userRole == Therapist || userRole == Admin || User.HasAppliedForTherapistAccount())
+    {
+        psychotherapistApplicationButtonText = "Uradjeno";
+        psychotherapistApplicationButtonDisabled = "disabled";
+    }
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-paste fa-sm",
+        "text-info",
+        ViewData.GetTitle(),
+        $"Pridružite se našem timu posvećenih i licenciranih terapeuta na {appName} platformi."))
+
+@*Join our team of highly trained specialists to help people live better lives.*@
+
+<div class="row">
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-3">
+        <div class="card h-100 card-span">
+            <div class="card-body">
+                <div class="card-img-top mb-3 d-flex justify-content-center">
+                    <div class="text-center py-5 py-md-4 py-lg-4 py-xl-5 bg-soft-info text-info w-100 rounded-soft">
+                        <i class="fal fa-fw fa-7x fa-users"></i>
+                    </div>
+                </div>
+                <h5 class="card-title text-800 mb-2">Psihoterapeuti</h5>
+                <p class="card-text fs--1 mb-2">
+                    Proširite krug klijenata i fleksibilnost u radu pružajući
+                    terapijske usluge sa bilo koje lokacije.
+                </p>
+                <div class="d-flex justify-content-between fs--1 text-muted">
+                    <p class="mb-0">Psihoterapeuti</p>
+                    <p class="mb-0">Klijenti</p>
+                </div>
+                <div class="d-flex justify-content-between fs--1">
+                    <p class="mb-2">@Model.PsychotherapistCount</p>
+                    <p class="mb-2">@Model.PsychotherapistClientCount</p>
+                </div>
+                <a class="btn btn-primary btn-block btn-sm btn-join @psychotherapistApplicationButtonDisabled" asp-area="" asp-controller="Account" asp-action="Apply">
+                    <span class="btn-join-text">&nbsp;@psychotherapistApplicationButtonText&nbsp;</span>
+                </a>
+                <button id="btn-benefits-of-working-psychotherapists"
+                        class="btn btn-soft-primary btn-block btn-sm"
+                        type="button"
+                        data-toggle="modal"
+                        data-target="#benefits-of-working-psychotherapists-modal">
+                    Benefiti rada sa nama
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-3">
+        <div class="card h-100 card-span">
+            <div class="card-body">
+                <div class="card-img-top mb-3 d-flex justify-content-center">
+                    <div class="text-center py-5 py-md-4 py-lg-4 py-xl-5 bg-soft-info text-info w-100 rounded-soft">
+                        <i class="fal fa-fw fa-7x fa-head-side-brain"></i>
+                    </div>
+                </div>
+                <h5 class="card-title text-800 mb-2">Psihijatri</h5>
+                <p class="card-text fs--1 mb-2">
+                    Izgradite profesionalnu reputaciju i ugled, te se postavite
+                    kao pouzdan izvor u zajednici ... @*mentalnoj zdravstvenoj zajednici*@
+                </p>
+                <div class="d-flex justify-content-between fs--1 text-muted">
+                    <p class="mb-0">Psihijatri</p>
+                    <p class="mb-0">Klijenti</p>
+                </div>
+                <div class="d-flex justify-content-between fs--1 text-muted">
+                    <p class="mb-2">-</p>
+                    <p class="mb-2">-</p>
+                </div>
+                <a class="btn btn-secondary disabled btn-block btn-sm">Uskoro</a>
+                <button class="btn disabled btn-block btn-sm">Benefiti rada sa nama</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-3">
+        <div class="card h-100 card-span">
+            <div class="card-body">
+                <div class="card-img-top mb-3 d-flex justify-content-center">
+                    <div class="text-center py-5 py-md-4 py-lg-4 py-xl-5 bg-soft-success text-success w-100 rounded-soft">
+                        <i class="fal fa-fw fa-7x fa-transporter"></i>
+                    </div>
+                </div>
+                <h5 class="card-title text-800 mb-2">Fizioterapeuti</h5>
+                <p class="card-text fs--1 mb-2">
+                    Proširite krug klijenata, povećavajući svoju prepoznatljivost i profesionalni ugled.
+                </p>
+                <div class="d-flex justify-content-between fs--1 text-muted">
+                    <p class="mb-0">Fizioterapeuti</p>
+                    <p class="mb-0">Klijenti</p>
+                </div>
+                <div class="d-flex justify-content-between fs--1 text-muted">
+                    <p class="mb-2">-</p>
+                    <p class="mb-2">-</p>
+                </div>
+                <a class="btn btn-secondary disabled btn-block btn-sm">Uskoro</a>
+                <button class="btn disabled btn-block btn-sm">Benefiti rada sa nama</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-3">
+        <div class="card h-100 card-span">
+            <div class="card-body">
+                <div class="card-img-top mb-3 d-flex justify-content-center">
+                    <div class="text-center py-5 py-md-4 py-lg-4 py-xl-5 bg-soft-primary text-primary w-100 rounded-soft">
+                        <i class="fal fa-fw fa-7x fa-clinic-medical"></i>
+                    </div>
+                </div>
+                <h5 class="card-title text-800 mb-2">Klinike</h5>
+                <p class="card-text fs--1 mb-2">
+                    Unapredite poslovanje i uspeh klinike predstavljanjem
+                    svojih jedinstvenih usluga novim ... @*novim klijentima.*@
+                </p>
+                <div class="d-flex justify-content-between fs--1 text-muted">
+                    <p class="mb-0">Klinike</p>
+                    <p class="mb-0">Klijenti</p>
+                </div>
+                <div class="d-flex justify-content-between fs--1 text-muted">
+                    <p class="mb-2">-</p>
+                    <p class="mb-2">-</p>
+                </div>
+                <a class="btn btn-secondary disabled btn-block btn-sm">Uskoro</a>
+                <button class="btn disabled btn-block btn-sm">Benefiti rada sa nama</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.TryPartialAsync("~/Views/Shared/Onboardings/BenefitsOfWorkingWithUs/_BenefitsForPsychotherapists.cshtml")
+
+@if (userRole == None || userRole == Client)
+{
+    @section Scripts {
+        <script async src="~/js/client/therapist-applications.js"></script>
+    }
+}

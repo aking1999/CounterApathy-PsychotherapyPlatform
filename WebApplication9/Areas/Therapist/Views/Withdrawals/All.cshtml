@@ -1,0 +1,136 @@
+﻿@model List<Database.Models.Withdrawals>
+@using Framework.Helpers.ExtensionMethods
+@using Framework.Interfaces
+@inject IDateTimeHelper dateHelper
+@{
+    ViewData.SetTitle("Isplate");
+    ViewData.SetMetaDescription("Sve Vaše isplate sredstava na jednom mestu.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("far fa-dollar-sign fa-sm",
+        "text-success",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavFilter.cshtml",
+    new WebApplication9.WidgetViewModels.NavFilterWithClearWidgetViewModel("Therapist",
+        "Withdrawals",
+        "All",
+        new List<WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel>()
+        {
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("bydate", false, "far fa-calendar", "text-success", "Datum", "date-dropdown", "bydate", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>()
+            {
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Withdrawals", "All", "datum", "danas", "Danas"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Withdrawals", "All", "datum", "ova-nedelja", "Ova nedelja"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Withdrawals", "All", "datum", "ovaj-mesec", "Ovaj mesec"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Withdrawals", "All", "datum", "ova-godina", "Ova godina")
+            }),
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("bystatus", false, "far fa-analytics", "text-danger", "Status", "status-dropdown", "bystatus", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>()
+            {
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-warning", "Therapist", "Withdrawals", "All", "status", "na-čekanju", "Na čekanju"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-success", "Therapist", "Withdrawals", "All", "status", "isplaćeno", "Isplaćeno"),
+            })
+        }))
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header border-bottom-0">
+                    <div class="row align-items-center justify-content-between">
+                        <div class="col-4 col-sm-auto d-flex align-items-center pr-0">
+                            <h5 class="text-secondary fs-0 mb-0 text-nowrap">Zahtevi za isplatu</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="falcon-data-table table-responsive pb-3">
+                        <table class="table table-borderless table-sm mb-0 table-striped table-dashboard fs--1 data-table" data-options='{"searching":false,"responsive":false,"pageLength":12,"info":false,"lengthChange":false,"sWrapper":"falcon-data-table-wrapper","dom":"<&#39;row mx-1&#39;<&#39;col-sm-12 col-md-6&#39;l><&#39;col-sm-12 col-md-6&#39;f>><&#39;table-responsive&#39;tr><&#39;row no-gutters px-1 py-3 align-items-center justify-content-center&#39;<&#39;col-auto&#39;p>>","language":{"paginate":{"next":"<span class="fas fa-chevron-right"></span>","previous":"<span class="fas fa-chevron-left"></span>"}}}'>
+                            <thead class="bg-200 text-900">
+                                <tr>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center pr-2">Primalac</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center">Količina (RSD)</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center" style="min-width: 150px;">Datum slanja zahteva</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center">Status</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center">Datum prihvatanja zahteva</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    string badgeClass = string.Empty;
+                                    string badgeText = string.Empty;
+                                    string icon = string.Empty;
+                                }
+                                @foreach (var withdraw in Model)
+                                {
+                                    if (withdraw.Status == 0)
+                                    {
+                                        badgeClass = "badge-soft-warning";
+                                        badgeText = "Na čekanju";
+                                        icon = "fa-stream";
+                                    }
+                                    else if (withdraw.Status == 1)
+                                    {
+                                        badgeClass = "badge-soft-success";
+                                        badgeText = "Isplaćeno";
+                                        icon = "fa-check";
+                                    }
+                                    else
+                                    {
+                                        badgeClass = "badge-soft-secondary";
+                                        badgeText = "Nedefinisano";
+                                        icon = "fa-ban";
+                                    }
+                                    <tr>
+                                        <td class="py-2 align-middle white-space-nowrap pr-2 border-top-0 text-center">
+                                            @withdraw.FirstName @withdraw.LastName
+                                            <a href="javascript://"
+                                               class="form-group ml-2 no-tick"
+                                               data-toggle="popover"
+                                               data-placement="bottom"
+                                               title="Primalac"
+                                               data-content="<i class='fal fa-user text-primary mr-2'></i>@withdraw.FirstName @withdraw.LastName<br /><i class='fal fa-location-circle text-primary mr-2'></i>@withdraw.Street @withdraw.HouseNumber, @withdraw.City @withdraw.PostalCode, @withdraw.Country<br /><i class='fal fa-phone text-success mr-2'></i>@withdraw.PhoneNumber<br /><i class='fal fa-envelope text-info mr-2'></i>@withdraw.Email<br /><br /><strong>Broj računa:</strong><br />@withdraw.BankAccountNumber"
+                                               data-html="true">
+                                                <i class="far fa-address-card text-info ml-1"></i>
+                                            </a>
+                                        </td>
+                                        <td class="py-2 align-middle border-top-0 text-center">@withdraw.Amount</td>
+                                        <td class="py-2 align-middle border-top-0 text-center">
+                                            @dateHelper.ConvertDateTimeFromUtcToLocalString(withdraw.RequestDateTime)h
+                                        </td>
+                                        <td class="py-2 align-middle border-top-0 text-center">
+                                            <span class="badge @badgeClass"><i class="fas @icon mr-1"></i>@badgeText</span>
+                                        </td>
+                                        <td class="py-2 align-middle border-top-0 text-center">
+                                            @(withdraw.AcceptDateTime.HasValue ? $"{dateHelper.ConvertDateTimeFromUtcToLocalString(withdraw.AcceptDateTime.Value)}h" : "-")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-12 text-center px-4 mb-3 text-secondary">
+            Trenutno nemate nijedan zahtev za isplatu sredstava ili ste izabrali kriterijum pretrage koji nijedan zahtev ne ispunjava.
+            <br />
+            <strong>Isplata sredstava se može zahtevati na svakih nedelju dana</strong>.
+            <br />
+            Svi Vaši zahtevi za isplatu sredstava biće prikazani ovde.
+        </div>
+        <div class="col-12 text-center">
+            <a href='@Url.Action("Withdraw", "Withdrawals", new { Area = "Therapist" })'
+               class="btn btn-sm btn-success">
+                <i class="far fa-arrow-to-bottom mr-2"></i>Isplata sredstava
+            </a>
+        </div>
+    }
+</div>

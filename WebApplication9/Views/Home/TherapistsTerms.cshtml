@@ -1,0 +1,508 @@
+﻿@using Framework.Models
+@using Framework.Providers
+@using Framework.Helpers
+@using Framework.Helpers.ExtensionMethods
+@using System.ComponentModel.DataAnnotations;
+@using WebApplication9.SharedPartialViewModels;
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+    var appDomain = Configuration.GetSection("Application:AppDomain")?.Value;
+    var _therapistFee = Configuration.GetSection("TherapistFee").Get<TherapistFee>();
+
+    ViewData.SetTitle("Uslovi za terapeute");
+    ViewData.SetMetaDescription("Cenimo rad naših terapeuta i težimo stvaranju " +
+        "profesionalnog i prijatnog okruženja. Naši uslovi za terapeute definišu našu posvećenost " +
+        "pružanju najboljeg mogućeg iskustva terapeutima na platformi.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var sideMenuItems = new List<SideMenuItemPartialViewModel>()
+    {
+        new SideMenuItemPartialViewModel("", null, "Home", "About", "fal fa-address-card fa-fw text-info", "O nama"),
+        new SideMenuItemPartialViewModel("", null, "Consultations", "Index", "fal fa-comments-alt fa-fw text-primary", "Besplatne konsultacije"),
+        new SideMenuItemPartialViewModel("", null, "Guides", "BookingRoadmap", "fal fa-calendar-check fa-fw text-success", "Lako zakažite seansu"),
+        new SideMenuItemPartialViewModel("", null, "Therapists", "PsychotherapistsExperiences", "fal fa-star fa-fw text-warning", "Iskustva sa psihoterapije"),
+        //new SideMenuItemPartialViewModel("", null, "Home", "EasySiteNavigation", "fal fa-map-marked fa-fw text-info", "Easy site navigation"),
+        new SideMenuItemPartialViewModel("", null, "Home", "FAQ", "fal fa-question fa-fw text-info", "Česta pitanja")
+    };
+
+    var userRole = await User.GetRoleAsync();
+
+    if (userRole == UserRoles.None || userRole == UserRoles.Client || userRole == UserRoles.Admin)
+    {
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Guides", "All", "fal fa-book-open fa-fw text-primary", "Uputstva"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi korišćenja"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("active", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "Privacy", "fal fa-shield fa-fw text-primary", "Politika privatnosti"));
+        if (userRole == UserRoles.None || userRole == UserRoles.Client)
+            sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "CustomerSupport", "fal fa-user-headset fa-fw text-pink", "Korisnička podrška"));
+    }
+
+    else if (userRole == UserRoles.Therapist)
+    {
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Guides", "All", "fal fa-book-open fa-fw text-primary", "Uputstva za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi korišćenja"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("active", null, "Home", "TherapistsTerms", "fal fa-scroll fa-fw text-primary", "Uslovi za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "Privacy", "fal fa-shield fa-fw text-primary", "Politika privatnosti"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", "Therapist", "Account", "Support", "fal fa-headset fa-fw text-orange", "Podrška za terapeute"));
+    }
+
+    var addSession = new WebApplication9.Areas.Therapist.Models.ButtonAddSession();
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/notification-center/notification-center.css" />
+    <style>
+        .terms li {
+            padding-bottom: 0.5rem;
+        }
+
+            .terms li:last-child {
+                padding-bottom: 0;
+            }
+    </style>
+}
+
+<div class="row">
+    @await Html.TryPartialAsync("~/Views/Shared/Menues/_SideMenu.cshtml",
+        new SideMenuPartialViewModel("fal fa-info-circle", "Centar za pomoć", "text-info", sideMenuItems))
+    <div class="col-lg-9 terms">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card pt-1 mb-3">
+                    <div class="card-header pb-0">
+                        <h4 class="text-center mb-0 text-primary">Uslovi za terapeute</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            Dobrodošli na @appName, platformu koja pomaže klijentima u pronalasku odgovarajućeg psihoterapeuta.
+                        </p>
+                        <p>
+                            Napomena: Ovo su uslovi i odredbe za terapeute.
+                            Da biste dobili terapeutski nalog ("Terapeutski nalog" ili "Nalog"), neophodno je da pre toga aplicirate ("Apliciranje" ili "Aplikacija") na
+                            <a asp-controller="Account" asp-action="Apply" target="_blank">stranici za Apliciranje za nalog Terapeuta</a>
+                            i da budete prihvaćeni.
+                            Svi terapeuti ("Terapeut" ili "Psihoterapeut") koji rade u skladu sa ovim uslovima ("Uslovi") i odredbama smatraju
+                            se nezavisnim preduzetnicima ("NP").
+                            Ovi Uslovi upravljaju Vašim korišćenjem naše platforme ("Platforma" ili "@appName")
+                            i povezanih usluga ("Usluge") koje se nalaze na adresi
+                            <a href="@appDomain" target="_blank">@appDomain</a>.
+                            <br />
+                            Za uslove korišćenja za klijente,
+                            kliknite <a asp-controller="Home" asp-action="TermsOfService" target="_blank">ovde</a>.
+                        </p>
+                        <p class="mb-0">
+                            Korišćenjem Usluga, slažete se da ste obavezani ovim Uslovima. Ukoliko se ne slažete sa bilo kojom
+                            stavkom Uslova, molimo da ne koristite Platformu.
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="account">@*Korišćenje usluga*@1. Terapeutski nalog</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">@*1.1 Kvalifikacija za Apliciranje*@1.1 Kvalifikacija i Apliciranje</h6>
+                        <p>
+                            Da biste koristili funkcije Platforme koje omogućavamo Terapeutima,
+                            potrebno je da Aplicirate za dobijanje Naloga i da
+                            Aplikacija bude odobrena od strane administratora Platforme.
+                        </p>
+                        Da biste bili kvalifikovani za Apliciranje, morate ispunjavati sledeće zahteve:
+                        <ol>
+                            <li>
+                                Imate najmanje dvadeset tri (23) godine.
+                            </li>
+                            <li>
+                                Državljanin ste Republike Srbije.
+                            </li>
+                            <li>
+                                Trenutno ste na obuci ili ste završili obuku koja je po standardu sledećih organizacija:
+                                <a href="https://savezpsihoterapeuta.org/sdps/" target="_blank" rel="noreferrer, nofollow">Savez društava psihoterapeuta Srbije SDPS</a>,
+                                <a href="https://www.ukons.org.rs/sr/" target="_blank" rel="noreferrer, nofollow">Udruženje konstruktivista Srbije UKS</a>,
+                                <a href="https://www.europsyche.org/ecp/about-ecp/" target="_blank" rel="noreferrer, nofollow">Evropski sertifikat za psihoterapiju ESP</a>.
+                            </li>
+                            <li>
+                                Imate račun u banci unutar Republike Srbije na koji će Vam stizati isplate sa Platforme.
+                            </li>
+                            <li>
+                                Raspolažete bar jednom od navedenih psihoterapijskih tehnika: @ViewBag.techniques.
+                            </li>
+                            <li>
+                                Raspolažete bar jednom od navedenih psihoterapijskih specijalnosti: @ViewBag.specialties.
+                            </li>
+                            <li>
+                                Pristajete da Vaši lični podaci (ime, prezime, pol, godina rođenja, dosadašnje veštine i iskustva)
+                                budu prikazani javno, a Vaši ostali lični podaci (imejl, broj mobilnog telefona, adresa)
+                                budu prikazani klijentima koji žele da zakažu seansu sa Vama.
+                            </li>
+                        </ol>
+                        Za uspešno Apliciranje neophodno je da:
+                        <ol>
+                            <li>Odete na <a asp-controller="Account" asp-action="Apply" target="_blank">stranicu za Apliciranje</a>.</li>
+                            <li>
+                                Popunite sva obavezna polja <strong>tačnim podacima</strong>.
+                            </li>
+                            <li>
+                                Složite se sa ovim Uslovima za Terapeute,
+                                <a asp-controller="Home" asp-action="TermsOfService" target="_blank">uslovima za klijente</a>
+                                i <a asp-controller="Home" asp-action="Privacy" target="_blank">politikom privatnosti</a>.
+                            </li>
+                            @*<li><a asp-controller="Authorization" asp-action="ConfirmEmail" target="_blank">Potvrdite imejl adresu</a>.</li>*@
+                        </ol>
+                        <p>
+                            Ubrzo po apliciranju, bićete kontaktirani putem imejla da pošaljete svoj CV i dodatna dokumenta.
+                            Nakon toga, naš predstavnik će sa Vama zakazati video razgovor.
+                            Nakon video razgovora, biće doneta konačna odluka o prihvatanju Vaše Aplikacije.
+                            Odluka će Vam biti saopštena putem imejla.
+                            <br />
+                            Ukoliko Vaša Aplikacija bude prihvaćena, potrebno je da se ulogujete starim imejlom i lozinkom
+                            i podesite svoj novi Terapeutski nalog.
+                            <br />
+                            Za detaljnije informacije u vezi podešavanja Naloga,
+                            pročitajte sekciju 1 "Terapeutski nalog", stavku 3 "Podešavanje Terapeutskog naloga".
+                            <br />
+                            Za pomoć oko podešavanja Naloga, možete kontaktirati
+                            <a asp-area="Therapist" asp-controller="Account" asp-action="Support" target="_blank">podršku za Terapeute</a>
+                        </p>
+                        <p class="mb-0">
+                            Apliciranjem za Nalog na Platformi, garantujete da ispunjavate ove zahteve.
+                            <br />
+                            Platforma ima pravo da u bilo kom trenutku ugasi Nalog koji ne ispunjava ove zahteve.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">1.2 Prihvatanje ovih Uslova</h6>
+                        <p class="mb-0">
+                            Ovi Uslovi se primenjuju od trenutka kada Aplicirate. Klikom na dugme
+                            "Apliciraj" na stranici za Aplikaciju znači da ste zvanično
+                            "potpisali" Uslove i sklopili ugovor na osnovu Uslova ("Ugovor"). Ako Aplicirate
+                            u ime kompanije ili druge pravne osobe, garantujete da imate
+                            ovlašćenje da prihvatite ove Uslove u njihovo ime.
+                        </p>
+                        @*<hr class="my-4" />
+                <h6 class="text-primary">Apliciranje</h6>
+                <p class="mb-0 text-pink">
+                    Platforma Terapeutima nudi
+                    <a asp-area="Therapist" asp-controller="Account" asp-action="Support" target="_blank">podršku za Terapeute</a>
+                    koju možete kontaktirati ukoliko Vam treba bilo kakva pomoć.
+                    Možete zahtevati video razgovor sa našim tehničkim osobljem za pomoć oko podešavanja Terapeutskog naloga i
+                    uopštenog korišćenja Platforme.
+                </p>*@
+                        <hr class="my-4" />
+                        <h6 class="text-primary">1.3 Podešavanje Terapeutskog naloga</h6>
+                        <p class="mb-0">
+                            Da bi Vaš Nalog bio prikazan klijentima i da biste mogli da ga koristitie,
+                            potrebno je da ga podesite.
+                            <br />
+                            Podešavanje Naloga vršite na
+                            <a asp-area="Therapist" asp-controller="Account" asp-action="AccountSetup" target="_blank">
+                                stranici za podešavanje Naloga
+                            </a>,
+                            unosom zahtevanih informacija.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">1.4 Gašenje Vašeg Naloga</h6>
+                        <p>
+                            Vi ili mi možemo u svakom trenutku i iz bilo kog razloga okončati ovaj Ugovor
+                            slanjem imejl obaveštenja u pisanom obliku drugoj strani.
+                        </p>
+                        <p>
+                            Ukoliko mi okončavamo Ugovor sa Vama i na Nalogu imate neisplaćenih sredstava,
+                            pre gašenja Naloga, naš predstavnik će Vas kontaktirati putem imejla radi dogovora
+                            o isplati tih sredstava na Vaš poštanski ili bankovni račun u Srbiji.
+                        </p>
+                        Ukoliko Vi želite da okončate Ugovor sa nama neophodno je da ispunjavate sledeće uslove:
+                        <ul>
+                            <li>
+                                Nemate neisplaćenih sredstava. Zahtev za isplatu sredstava možete podneti na stranici za
+                                <a asp-area="Therapist" asp-controller="Withdrawals" asp-action="Withdraw" target="_blank">isplatu sredstava</a>.
+                            </li>
+                            <li>
+                                Nemate zakazane/nezakazane seanse. Sve nezakazane seanse morate ukloniti, a sve zakazane seanse
+                                morate održati u njihovim terminima. Seanse možete ukloniti na stranici za
+                                <a asp-area="Therapist" asp-controller="Sessions" asp-action="All" target="_blank">upravljanje seansama</a>.
+                            </li>
+                            <li>
+                                Nemate neisplaćene seanse. Možete pratiti koje Vaše seanse su isplaćene odlaskom na
+                                <a asp-area="Therapist" asp-controller="Sessions" asp-action="BookedSessions" target="_blank">stranicu sa zakazanim seansama</a>,
+                                zatim klikom na svaku pojedinačnu, prikazuje se stranica sa detaljima, gde možete videti da li je seansa isplaćena.
+                            </li>
+                        </ul>
+                        <p>
+                            <strong>Ukoliko ispunjavate navedene uslove</strong>, neophodno je da se ulogujete na Nalog
+                            koji želite da bude ugašen, zatim odete na stranicu za kontaktiranje
+                            <a asp-area="Therapist" asp-controller="Account" asp-action="Support" target="_blank">podrške za Terapeute</a>,
+                            kliknete na "Izaberite temu" i iz padajućeg menija izaberete opciju "Zahtev za gašenje naloga" i
+                            popunite polja zahtevanim podacima. Ubrzo nakon toga, naš predstavnik će Vas
+                            kontaktirati putem imejla povodom okončavanja procesa gašenja Naloga.
+                        </p>
+                        Nakon prestanka Ugovora, mi možemo trajno izbrisati Vaš Nalog i sve podatke koji
+                        su s njim povezani, uključujući sav Vaš sadržaj sa naše Platforme.
+                        <hr class="my-4" />
+                        <h6 class="text-primary">1.5 Nalog i lozinka</h6>
+                        <p>
+                            Samo ste Vi odgovorni za održavanje poverljivosti imejla i lozinke
+                            svog Naloga.
+                            Takođe ste odgovorni za bilo koje korišćenje Naloga,
+                            bez obzira da li ste ovlastili takvo korišćenje. Saglasni ste da nas
+                            odmah obavestite ukoliko posumnjate u neovlašćen pristup Vašem Nalogu.
+                            <br />
+                            Nismo odgovorni za bilo kakve gubitke usled ukradenih ili hakovanih lozinki.
+                            Nemamo pristup Vašoj trenutnoj lozinki i iz sigurnosnih razloga
+                            možemo je samo obnoviti (resetovati).
+                        </p>
+                        <p class="mb-0">
+                            Terapeut snosi troškove štete i nadoknade štete nastale usled neovlašćene upotrebe njegovog Naloga.
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="subscriptions">2. Seanse</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">2.1 Tipovi seansi</h6>
+                        <p class="mb-0">
+                            Seansa može biti individualna ili grupna (ovde spadaju partnerska i porodična seansa).
+                            Psihoterapeut određuje tip seanse, a na klijentu je da zakaže seansu koja mu odgovara.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">2.2 Načini održavanja seanse (kontakt metoda)</h6>
+                        <p class="mb-0">
+                            Seansa se može održati lično, na adresi Psihoterapeuta ili online, putem Google Meeta.
+                            Klijent bira način održavanja seanse prilikom njenog zakazivanja.
+                            Klijentu će za izbor biti ponuđene one kontakt metode koje je Terapeut unapred odredio.
+                            <br />
+                            Za više informacija o održavanju seansi, pročitajte sekciju 4 "Održavanje seanse".
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">2.3 Cene seansi</h6>
+                        <p>
+                            Terapeuti određuju cene za svoje seanse, pakete i ostale usluge.
+                            Cene su prikazane na njihovim profilima.
+                            Takođe, Psihoterapeuti za svaku svoju seansu mogu odrediti različitu cenu.
+                            <strong>Cena seanse ne zavisi od njenog načina održavanja</strong>.
+                            <br />
+                            Cena seanse može biti u opsegu od RSD
+                            @(addSession.GetAttributeFrom<RangeAttribute>(nameof(addSession.Price)).Minimum) do RSD
+                            @(addSession.GetAttributeFrom<RangeAttribute>(nameof(addSession.Price)).Maximum).
+                        </p>
+                        Napomena:
+                        <ul class="mb-0">
+                            <li>
+                                <strong>Ukoliko su seanse Psihoterapeuta iste cene</strong>, na primer 2500 RSD,
+                                na njegovom profilu će pisati
+                                <span class="badge badge-soft-success badge-pill">Cena seanse: 2500 RSD</span>.
+                            </li>
+                            <li>
+                                <strong>Ukoliko seanse psihoterapeuta nisu iste cene</strong>,
+                                na primer 3000, 1000, 2500 i 4000 RSD, na njegovom profilu će pisati
+                                <span class="badge badge-soft-success badge-pill">Cena seanse: 1000 RSD - 4000 RSD</span>,
+                                gde se na levoj strani nalazi cena njegove najjeftinije seanse, a na desnoj, cena najskuplje.
+                            </li>
+                            <li>
+                                <strong>Ukoliko psihoterapeut trenutno nema nijednu aktivnu seansu</strong>, na njegovom profilu neće pisati cena.
+                            </li>
+                        </ul>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">2.4 Dodavanje seanse</h6>
+                        <p>
+                            Seanse se dodaju na
+                            <a asp-area="Therapist" asp-controller="Sessions" asp-action="All" target="_blank">stranici za upravljanje seansama</a>,
+                            klikom na dugme "Dodajte seansu" ili klikom na polje kalendara i unosom zahtevanih podataka, seansa se dodaje u kalendar.
+                            Klijent u bilo kom trenutku može zakazati tu seansu ukoliko se ona ne obriše pre toga.
+                        </p>
+                        Da bi seansa bila dodata, moraju biti zadovoljeni sledeći uslovi:
+                        <ul>
+                            <li>
+                                Niste prethodno podneli zahtev za gašenje Naloga.
+                            </li>
+                            <li>
+                                Datum početka seanse je za bar @(WebApplication9.Areas.Therapist.Controllers.SessionsController.MIN_DAYS_ADD_SESSION_IN_ADVANCE)
+                                dan(a) (@(WebApplication9.Areas.Therapist.Controllers.SessionsController.MIN_DAYS_ADD_SESSION_IN_ADVANCE * 24) časa)
+                                ispred datuma dodavanja seanse.
+                            </li>
+                            <li>
+                                Vremena trajanja seanse koju dodajete se ne poklapa ni sa jednom već dodatom seansom.
+                            </li>
+                            <li>
+                                Vreme trajanja seanse je bar @(WebApplication9.Areas.Therapist.Controllers.SessionsController.MIN_HOURS_SESSION_DURATION) sat(a).
+                            </li>
+                            <li>
+                                Uneli ste sve ostale zahtevane podatke u ispravnom formatu.
+                            </li>
+                        </ul>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">2.5 Brisanje seanse</h6>
+                        <p class="mb-0">
+                            Brisanje seanse se vrši na
+                            <a asp-area="Therapist" asp-controller="Sessions" asp-action="All" target="_blank">stranici za upravljanje seansama</a>,
+                            klikom na seansu koju želite da obrišete.
+                            Terapeut može obrisati svoju seansu bilo kad, osim u slučaju da je ona zakazana.
+                            Zakazanu seansu nije moguće obrisati.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">2.6 Prikaz seansi</h6>
+                        <p class="mb-0">
+                            Na Platformi su prikazane seanse koje su ispred trenutnog datuma.
+                            Ne prikazuju se seanse koje su pre trenutnog datuma, niti one koje su obrisane.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">2.7 Otkazivanje seanse</h6>
+                        <p>
+                            Zakazanu seansu nije moguće odložiti, promeniti joj termin, zameniti je za drugu seansu niti je
+                            otkazati.
+                            <br />
+                            Zakazanu seansu Terapeut mora održati.
+                        </p>
+                        <p class="mb-0">
+                            U slučaju tehničkih problema, pročitati sekciju 4 "Održavanje seanse", stavku 4 "Tehnički problemi".
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="subscriptions">3. Održavanje seanse</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">3.1 Individualna seansa</h6>
+                        Ukoliko je klijent zakazao individualnu seansu da se održava:
+                        <ul>
+                            <li>
+                                <strong>Lično</strong> - Klijent će doći na Vašu adresu 5 minuta pre početka seanse.
+                            </li>
+                            <li>
+                                <strong>Online</strong> - Terapeut je dužan da najkasnije 4 sata pre početka seanse doda link za pristup seansi.
+                                Taj link se momentalno šalje klijentu.
+                                <br />
+                                Link za pristup mora odgovarati kontakt metodi koju je klijent izabrao u toku zakazivanja.
+                                <br />
+                                Na vreme početka seanse, klijent će pristupiti seansi putem linka.
+                            </li>
+                        </ul>
+                        <p class="mb-0">
+                            U slučaju održavanja online seanse Terapeut je dužan da blagovremeno instalira aplikaciju na kojoj je klijent izabrao
+                            da seansa bude održana. Platforma nije odgovorna niti dužna da na bilo koji način
+                            nadoknadi štetu koja je nastala usled toga što je Terapeut nespremno dočekao početak seanse.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">3.2 Grupna seansa</h6>
+                        <p class="mb-0">
+                            Ukoliko je klijent zakazao grupnu seansu da se održava:
+                            <ul>
+                                <li>
+                                    <strong>Lično</strong> - Klijenti će doći na Vašu adresu 5 minuta pre početka seanse.
+                                    Klijent koji je preko svog naloga zakazao grupnu seansu, dužan je da informiše sve ostale učesnike seanse.
+                                </li>
+                                <li>
+                                    <strong>Online</strong> - Terapeut je dužan da najkasnije 4 sata pre početka seanse doda link za pristup seansi.
+                                    Taj link se momentalno šalje klijentu koji je sam dužan da informiše sve ostale učesnike seanse.
+                                    <br />
+                                    Link za pristup mora odgovarati kontakt metodi koju je klijent izabrao u toku zakazivanja.
+                                    <br />
+                                    Na vreme početka seanse, svi klijenti će pristupiti seansi putem linka.
+                                </li>
+                            </ul>
+                        <p class="mb-0">
+                            U slučaju održavanja online seanse Terapeut je dužan da blagovremeno instalira aplikaciju na kojoj je klijent izabrao
+                            da seansa bude održana. Platforma nije odgovorna niti dužna da na bilo koji način
+                            nadoknadi štetu koja je nastala usled toga što je Terapeut nespremno dočekao početak seanse.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">3.3 Tehnički problemi</h6>
+                        <p class="mb-0">
+                            U slučaju da dođe do tehničkih problema u tolikoj meri da nije moguće nastaviti seansu,
+                            obavestite klijenta usmeno ili putem imejla u toku trajanja seanse.
+                            Nakon toga, neophodno je da se ulogujete na svoj Nalog i
+                            obavestite <a asp-area="Therapist" asp-controller="Account" asp-action="Support" target="_blank">podršku za Terapeute</a>
+                            o ovom problemu. Ubrzo nakon toga, pun iznos te seanse biće vraćen klijentu.
+                        </p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="subscriptions">4. Naplata</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">4.1 Naplata održane seanse</h6>
+                        <p>
+                            <strong>Manuelna naplata:</strong> Nakon završetka svake seanse, na
+                            <a asp-area="Therapist" asp-controller="Sessions" asp-action="BookedSessions" target="_blank">stranici sa zakazanim seansama</a>,
+                            klikom na
+                            <button class="btn btn-mini btn-info"
+                                    data-toggle="tooltip"
+                                    data-placement="bottom"
+                                    title=""
+                                    data-original-title="Detalji seanse">
+                                <i class="far fa-eye m-0"></i>
+                            </button>
+                            prelazite na stranicu sa detaljima te seanse, gde klikom na dugme Naplati, sredstva se istog trenutka
+                            šalju na Vaš Nalog na Platformi.
+                        </p>
+                        <p>
+                            <strong>Automatska naplata:</strong> U slučaju da je prošlo 24h od završetka, a Vi niste izvršili manuelnu naplatu seanse,
+                            sistem će automatski poslati sredstva na Vaš Nalog na Platformi.
+                        </p>
+                        <p>
+                            Kada naplatite seansu, sredstva se šalju na Vaš Nalog i čuvaju se do kada ne odlučite da
+                            se ta sredstva isplate na račun. Stanje svojih sredstava možete saznati na
+                            <a asp-area="Therapist" asp-controller="Account" asp-action="Profile" target="_blank">svojoj profilnoj stranici</a>,
+                            ispod stavke "Sredstva / zarada".
+                            <br />
+                            Za više informacija o isplati sredstava na račun,
+                            pročitajte sekciju 4 "Naplata", stavku 2 "Isplata sredstava sa Naloga na račun".
+                        </p>
+                        <p class="mb-0">
+                            Platforma uzima @_therapistFee.PercentageAmount% provizije na cenu seanse po svakoj naplati završene seanse od strane terapeuta.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">4.2 Isplata sredstava sa Naloga na račun</h6>
+                        <p>
+                            Isplata sredstava sa Naloga se može zahtevati na
+                            <a asp-area="Therapist" asp-controller="Withdrawals" asp-action="Withdraw" target="_blank">stranici za isplatu sredstava</a>.
+                            Popunjavanjem zahtevanih podataka i potvrđivanjem, šaljete zahtev za isplatu.
+                            <br />
+                            Zahtev za isplatu biće prihvaćen i sredstva isplaćena u roku od 1 do 3 radnih dana.
+                        </p>
+                        <p class="mb-0">
+                            Isplata sredstava sa Naloga se može zahtevati na svakih nedelju dana.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">4.3 Načini isplate sredstava</h6>
+                        <p class="mb-0">
+                            Platforma trenutno nudi isplatu sredstava putem pošte.
+                            Ubuduće, biće omogućene dopune i preko servisa PayPal, Banca Intesa, Visa i Mastercard.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">4.4 Čuvanje sredstava</h6>
+                        <p class="mb-0">
+                            Kada naplatite seansu, sredstva se šalju na Vaš Nalog i čuvaju se do kada ne odlučite da
+                            se ta sredstva isplate na račun. Stanje svojih sredstava možete saznati na
+                            <a asp-area="Therapist" asp-controller="Account" asp-action="Profile" target="_blank">svojoj profilnoj stranici</a>,
+                            ispod stavke "Sredstva / zarada".
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="subscriptions">5. Ocenjivanje seansi</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">5.1 Prikaz ocena klijenata</h6>
+                        <p class="mb-0">
+                            Zadržavamo pravo da prikažemo sve ocene i iskustva klijenata na Platformi.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">5.2 Ocenjivanje samog sebe</h6>
+                        <p class="mb-0">
+                            Zabranjeno je kreiranje klijentskog naloga od strane Terapeuta radi
+                            zakazivanja seansi sa samim sobom i davanja neosnovanih ocena.
+                            Zadržavamo pravo da uklonimo ocenu ili trajno suspendujemo Nalog Terapeutu koji krši ovo pravilo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

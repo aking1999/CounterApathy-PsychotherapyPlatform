@@ -1,0 +1,117 @@
+﻿.wpwl-form {
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+}
+
+.wpwl-group {
+    margin-bottom: 0;
+}
+
+iframe.wpwl-control.wpwl-control-iframe.wpwl-control-cardNumber {
+    border-right: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    -webkit-box-flex: 0;
+    flex: 0 0 58.33333%;
+    max-width: 58.33333%;
+    display: inline-block !important;
+    margin-bottom: -0.57rem;
+}
+
+#ca-card-brands {
+    -webkit-box-flex: 0;
+    flex: 0 0 41.66667%;
+    max-width: 41.66667%;
+    border-left: 0 !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    height: calc(1.5em + 0.75rem + 2px) !important;
+}
+
+    #ca-card-brands:disabled {
+        background-color: white;
+    }
+
+.wpwl-group-cardNumber,
+.wpwl-group-expiry,
+.wpwl-group-cvv {
+    margin-bottom: 0.75rem !important;
+}
+
+.wpwl-wrapper-cardNumber {
+    width: 100% !important;
+}
+
+.wpwl-wrapper-expiry {
+    width: 100% !important;
+}
+
+.wpwl-wrapper-cvv {
+    width: 100% !important;
+}
+
+.wpwl-hint {
+    margin-top: -0.35rem !important;
+}
+
+.wpwl-hint-cardNumberError {
+    color: var(--danger) !important;
+    -webkit-box-flex: 0;
+    flex: 0 0 66.66667%;
+    max-width: 66.66667%;
+    display: none;
+}
+
+.wpwl-hint-expiryMonthError,
+.wpwl-hint-expiryYearError,
+.wpwl-hint-cvvError {
+    display: none;
+}
+
+.wpwl-has-error {
+    color: var(--danger) !important;
+    border: 2px solid var(--danger) !important;
+}
+
+    .wpwl-has-error ~ .wpwl-hint {
+        color: var(--danger) !important;
+    }
+
+.wpwl-control.wpwl-control-expiry::placeholder {
+    color: #748194;
+    font-family: 'Poppins' !important;
+}
+
+.wpwl-control {
+    height: calc(1.5em + 0.75rem + 2px) !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    border-radius: 0.5rem !important;
+    border: 2px solid var(--border);
+}
+
+    .wpwl-control:focus {
+        color: #344050;
+        background-color: var(--white);
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: none;
+    }
+
+.btn-primary:hover {
+    color: var(--white) !important;
+    background-color: #0069d9 !important;
+    border-color: #0062cc !important;
+}
+
+.wpwl-control-cardNumber.wpwl-has-error ~ #ca-card-brands {
+    border-top-color: var(--danger) !important;
+    border-bottom-color: var(--danger) !important;
+    border-right-color: var(--danger) !important;
+}
+
+#ca-card-brands:focus {
+    box-shadow: none !important;
+}

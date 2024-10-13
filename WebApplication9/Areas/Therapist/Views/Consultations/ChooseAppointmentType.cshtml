@@ -1,0 +1,34 @@
+﻿@using Framework.Helpers.ExtensionMethods
+@{
+    ViewData.SetTitle("Izaberite tip termina");
+    ViewData.SetMetaDescription("Izaberite tip termina: besplatne konsultacije ili seansa.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <style>
+        .hover-border-primary:hover {
+            border: 1px solid var(--primary) !important;
+        }
+    </style>
+}
+
+<h2 class="text-center text-800 mb-4">Izaberite tip termina</h2>
+
+<div class="d-flex justify-content-center align-items-center mb-3">
+    <a asp-area="Therapist"
+       asp-controller="Consultations"
+       asp-action="All"
+       class="btn btn-sm btn-falcon-default hover-border-primary text-left w-50 w-sm-30 w-md-26 w-lg-20 py-2 mr-2">
+        <i class="fal fa-comments-alt fs-2 mb-2 text-primary"></i>
+        <div>Besplatna konsultacija</div>
+    </a>
+    <a asp-area="Therapist"
+       asp-controller="Sessions"
+       asp-action="All"
+       class="btn btn-sm btn-falcon-default hover-border-primary text-left w-50 w-sm-30 w-md-26 w-lg-20 py-2">
+        <i class="fal fa-calendar-alt fs-2 mb-2 text-success"></i>
+        <div>Seansa</div>
+    </a>
+</div>
+

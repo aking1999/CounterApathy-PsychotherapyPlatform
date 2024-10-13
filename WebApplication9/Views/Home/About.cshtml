@@ -1,0 +1,55 @@
+﻿@using Framework.Providers
+@using Framework.Helpers.ExtensionMethods
+@using WebApplication9.SharedPartialViewModels;
+
+@{
+    ViewData.SetTitle("O nama");
+    ViewData.SetMetaDescription("Personalizovana, privatna i pristupačna psihoterapija za tebe.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var sideMenuItems = new List<SideMenuItemPartialViewModel>()
+{
+        new SideMenuItemPartialViewModel("active", null, "Home", "About", "fal fa-address-card fa-fw text-info", "O nama"),
+        new SideMenuItemPartialViewModel("", null, "Consultations", "Index", "fal fa-comments-alt fa-fw text-primary", "Besplatne konsultacije"),
+        new SideMenuItemPartialViewModel("", null, "Guides", "BookingRoadmap", "fal fa-calendar-check fa-fw text-success", "Lako zakažite seansu"),
+        new SideMenuItemPartialViewModel("", null, "Therapists", "PsychotherapistsExperiences", "fal fa-star fa-fw text-warning", "Iskustva sa psihoterapije"),
+        //new SideMenuItemPartialViewModel("", null, "Home", "EasySiteNavigation", "fal fa-map-marked fa-fw text-info", "Easy site navigation"),
+        new SideMenuItemPartialViewModel("", null, "Home", "FAQ", "fal fa-question fa-fw text-info", "Česta pitanja"),
+    };
+
+    var userRole = await User.GetRoleAsync();
+
+    if (userRole == UserRoles.None || userRole == UserRoles.Client || userRole == UserRoles.Admin)
+    {
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Guides", "All", "fal fa-book-open fa-fw text-primary", "Uputstva"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi korišćenja"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TherapistsTerms", "fal fa-scroll fa-fw text-primary", "Uslovi za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "Privacy", "fal fa-shield fa-fw text-primary", "Politika privatnosti"));
+        if (userRole == UserRoles.None || userRole == UserRoles.Client)
+            sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "CustomerSupport", "fal fa-user-headset fa-fw text-pink", "Korisnička podrška"));
+    }
+    else if (userRole == UserRoles.Therapist)
+    {
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Guides", "All", "fal fa-book-open fa-fw text-primary", "Uputstva za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi korišćenja"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TherapistsTerms", "fal fa-scroll fa-fw text-primary", "Uslovi za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "Privacy", "fal fa-shield fa-fw text-primary", "Politika privatnosti"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", "Therapist", "Account", "Support", "fal fa-headset fa-fw text-orange", "Podrška za terapeute"));
+    }
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/notification-center/notification-center.css" />
+}
+
+<div class="row">
+    @await Html.TryPartialAsync("~/Views/Shared/Menues/_SideMenu.cshtml",
+        new SideMenuPartialViewModel("fal fa-info-circle", "Centar za pomoć", "text-info", sideMenuItems))
+    <div class="col-lg-9">
+        @await Html.TryPartialAsync("~/Views/Shared/FAQs/ClientAndAnonymous/_IndexFAQ.cshtml")
+    </div>
+</div>
+
+@section Scripts {
+    <script async src="~/js/accordion-setup.js"></script>
+}

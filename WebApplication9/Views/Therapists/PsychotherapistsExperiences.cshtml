@@ -1,0 +1,195 @@
+﻿@model List<WebApplication9.ViewModels.PsychotherapistExperienceViewModel>
+
+@using Framework.Helpers.ExtensionMethods
+
+@{
+    ViewData.SetTitle("Iskustva sa psihoterapije");
+    ViewData.SetMetaDescription("Pročitajte iskustva dosadašnjih klijenata sa našim psihoterapeutima.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <style>
+        .table th, .table td {
+            padding: 0.75rem 0.5rem;
+        }
+    </style>
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel(
+        "far fa-star fa-sm",
+        "text-warning",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription(),
+        "col-12"))
+
+@if (Model != null && Model.Any())
+{
+    <div id="all-therapists" class="row">
+        @foreach (var therapist in Model)
+        {
+            var profileUrl = Url.PsychotherapistPublicProfileUrlWithName(therapist.TherapistId, therapist.TherapistFirstName, therapist.TherapistLastName);
+
+            <div class="col-12">
+                <div class="card mb-3">
+                    <div class="card-body pl-sm-2">
+                        <div class="row">
+                            <div class="col-12 col-sm-4 text-center">
+                                <div class="avatar avatar-5xl">
+                                    <a href="@profileUrl">
+                                        <img class="d-inline-block rounded-circle img-thumbnail"
+                                             src="@therapist.TherapistProfilePhotoPath"
+                                             alt="Psihoterapeut @therapist.TherapistFirstName @therapist.TherapistLastName"
+                                             loading="lazy" />
+                                    </a>
+                                </div>
+                                <a href="@profileUrl" class="text-1000">
+                                    <h4 class="fs-0 mb-1 mt-3">
+                                        @therapist.TherapistFirstName @therapist.TherapistLastName<small class="fas fa-badge-check text-primary ml-1 no-tick" data-toggle="tooltip" data-placement="bottom" title="Psihoterapeut verifikovan" data-fa-transform="shrink-4 down-2"></small>
+                                    </h4>
+                                </a>
+                                @if (therapist.UnderSupervision)
+                                {
+                                    <h5 class="fs-0 font-weight-normal text-500 mb-0">Psihoterapeut pod supervizijom</h5>
+                                }
+                                else
+                                {
+                                    <h5 class="fs-0 font-weight-normal text-500 mb-0">Psihoterapeut</h5>
+                                }
+                                <button class="btn btn-soft-warning border-warning mt-3 btn-show-reviews-primary btn-intro-collapse"
+                                        type="button"
+                                        data-therapist-id="@therapist.TherapistId"
+                                        data-toggle="collapse"
+                                        data-target="#therapist-ratings-@therapist.TherapistId"
+                                        aria-expanded="false"
+                                        aria-controls="therapist-ratings-@therapist.TherapistId">
+                                    <span class="less">Sakrij iskustva klijenata</span>
+                                    <span class="full"><i class="far fa-star mr-2"></i>Prikaži iskustva klijenata</span>
+                                </button>
+                                <div class="border-dotted-bottom-4 d-block d-sm-none my-3"></div>
+                            </div>
+                            <div class="border-dotted-left-4 d-none d-sm-block"></div>
+                            <div class="col-12 col-sm-7 d-flex flex-column">
+                                <div class="table-responsive mb-3">
+                                    <table class="table table-sm table-borderless fs--1 mb-0">
+                                        <tbody class="text-secondary">
+                                            <tr>
+                                                <th class="text-sm-left text-secondary text-nowrap pl-0 pl-sm-2">Prosečna ocena:</th>
+                                                <td class="text-sm-left text-secondary">
+                                                    @if (therapist.ClientReviews != null && therapist.ClientReviews.Any())
+                                                    {
+                                                        @await Html.TryPartialAsync("~/Views/Shared/_RenderStars.cshtml", therapist.Rating)
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-soft-secondary"><i class="far fa-times mr-2"></i>Psihoterapeut dosad nije ocenjivan</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-sm-left text-secondary text-nowrap pl-0 pl-sm-2">Psihoterapijske tehnike:</th>
+                                                <td class="text-sm-left text-secondary">
+                                                    @if (!string.IsNullOrWhiteSpace(therapist.PsychotherapyTechniqueNamesForDisplay))
+                                                    {
+                                                        @therapist.PsychotherapyTechniqueNamesForDisplay
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-soft-secondary"><i class="far fa-times mr-2"></i>Nema psihoterapijsku tehniku</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-sm-left text-secondary text-nowrap pl-0 pl-sm-2">Specijalnosti:</th>
+                                                <td class="text-sm-left text-secondary text-break">
+                                                    @if (!string.IsNullOrWhiteSpace(therapist.SpecialtyNamesForDisplay))
+                                                    {
+                                                        @therapist.SpecialtyNamesForDisplay
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-soft-secondary"><i class="far fa-times mr-2"></i>Nema specijalnost</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-auto pl-0 pl-sm-2 text-center text-sm-left">
+                                    <a onclick="sessionStorage.setItem('showCalendarTab', 'true')"
+                                       href='@profileUrl'
+                                       class="btn btn-sm btn-soft-success">
+                                        <i class="far fa-calendar-plus mr-2"></i>Zakaži seansu
+                                    </a>
+                                    @if (therapist.HasUpcomingConsultation)
+                                    { 
+                                        <button data-therapist-id="@therapist.TherapistId"
+                                                class="btn-therapist-free-consultations btn btn-sm btn-soft-primary"
+                                                type="button"
+                                                style="opacity: 1 !important;">
+                                            <span class="btn-therapist-free-consultations-text">Besplatne konsultacije</span>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="btn-show-reviews-secondary-@therapist.TherapistId"
+                        class="btn btn-soft-warning btn-block btn-intro-collapse mb-3"
+                        type="button"
+                        data-toggle="collapse"
+                        data-target="#therapist-ratings-@therapist.TherapistId"
+                        aria-expanded="false"
+                        aria-controls="therapist-ratings-@therapist.TherapistId">
+                    <span class="less">Sakrij iskustva klijenata<i class="fas fa-chevron-up ml-2 fs--2"></i></span>
+                    <span class="full"><i class="far fa-star mr-1"></i>Prikaži iskustva klijenata sa @therapist.TherapistFirstName @therapist.TherapistLastName<i class="fas fa-chevron-down ml-2 fs--2"></i></span>
+                </button>
+                <div class="collapse" id="therapist-ratings-@therapist.TherapistId">
+                    <div class="card-body text-justify pt-0">
+                        @await Html.TryPartialAsync("~/Views/Shared/_ClientsReviews.cshtml", therapist.ClientReviews)
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @section Scripts {
+        @if (Model != null && Model.Any(c => c.HasUpcomingConsultation))
+        { 
+            <script async>
+                var getConsultationsUrl = '@Url.Action("GetConsultations", "Consultations", new { Area = "" })';
+            </script>
+            <script async src="~/js/free-consultations-setup.js"></script>
+        }
+        <script async>
+            $(document).ready(function () {
+                $('#all-therapists button.btn-show-reviews-primary').click(function () {
+                    let therapistId = $(this).attr('data-therapist-id');
+
+                    if (!$(`#therapist-ratings-${therapistId}`).hasClass('show'))
+                        $('html, body').animate({
+                            scrollTop: $(`#btn-show-reviews-secondary-${therapistId}`).offset().top
+                        }, 1000);
+                })
+            })
+        </script>
+    }
+}
+else
+{
+    @await Html.TryPartialAsync("~/Views/Shared/ErrorPages/PartialViews/_NotFound404.cshtml", new DataTransferObjects.PartialViewModels.NotFoundPartialViewModel
+    {
+        HolderClasses = "mt-3",
+        Title = "Iskustva klijenata nisu trenutno dostupna",
+        Body = null,
+        IncludeSupportInfo = true,
+        PrimaryButtonText = "<i class='far fa-users mr-2'></i>Pogledajte terapeute",
+        PrimaryButtonClasses = "btn btn-primary btn-block mt-3",
+        PrimaryButtonUrl = Url.AllPsychotherapistsUrl(),
+        SecondaryButtonText = "<i class='far fa-home mr-2'></i>Početna",
+        SecondaryButtonClasses = "btn btn-outline-primary btn-block mt-3",
+        SecondaryButtonUrl = Url.Action("Index", "Home")
+    })
+}

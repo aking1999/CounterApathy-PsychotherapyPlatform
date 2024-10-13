@@ -1,0 +1,142 @@
+﻿@model List<DataTransferObjects.ViewModels.Therapist.BookedConsultationViewModel>
+@using Framework.Helpers.ExtensionMethods
+@inject Framework.Interfaces.IDateTimeHelper DateHelper
+@{
+    ViewData.SetTitle("Zakazane besplatne konsultacije");
+    ViewData.SetMetaDescription("Vaše besplatne konsultacije koje su klijenti zakazali.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-comments-alt fa-sm",
+        "text-primary",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavFilter.cshtml",
+    new WebApplication9.WidgetViewModels.NavFilterWithClearWidgetViewModel("Therapist",
+        "Consultations",
+        "BookedConsultations",
+        new List<WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel>()
+        {
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("bydate", false, "far fa-calendar", "text-success", "Datum", "date-dropdown", "bydate", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>()
+            {
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Consultations", "BookedConsultations", "datum", "danas", "Danas"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Consultations", "BookedConsultations", "datum", "ova-nedelja", "Ova nedelja"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Consultations", "BookedConsultations", "datum", "ovaj-mesec", "Ovaj mesec"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Consultations", "BookedConsultations", "datum", "ova-godina", "Ova godina")
+            }),
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("bystatus", false, "far fa-analytics", "text-danger", "Status", "status-dropdown", "bystatus", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>()
+            {
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-warning", "Therapist", "Consultations", "BookedConsultations", "status", "na-čekanju", "Na čekanju"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-success", "Therapist", "Consultations", "BookedConsultations", "status", "završeno", "Završeno")
+            })
+        }))
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        foreach(var bookedConsultation in Model)
+        { 
+            <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 pb-3">
+                <div class="card card-border-top-info h-100 card-span">
+                    <div class="card-header border-0 d-flex align-items-center">
+                        <div class="avatar avatar-3xl">
+                            <img src="@bookedConsultation.ProfilePhoto"
+                                 class="rounded-circle"
+                                 alt="Klijent @bookedConsultation.ClientFirstName @bookedConsultation.ClientLastName"
+                                 style="min-width: 3.5rem !important;" />
+                        </div>
+                        <h5 class="text-secondary fs-0 mr-auto mb-0 pl-3">
+                            @bookedConsultation.ClientFirstName @bookedConsultation.ClientLastName
+                        </h5>
+                        <div class="justify-content-end ml-auto">
+                            <span id="status-@bookedConsultation.BookingId" class="badge badge-soft-warning">
+                                <i class="fas fa-stream mr-1"></i>Na čekanju
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <ul class="list list-unstyled">
+                                    <li>
+                                        <i class="fal fa-users fa-fw text-info mr-2"></i>@bookedConsultation.TherapistFirstName @bookedConsultation.TherapistLastName
+                                    </li>
+                                    @if (bookedConsultation.EndDateTime.Day > bookedConsultation.StartDateTime.Day)
+                                    {
+                                        <li>
+                                            <i class="fal fa-calendar fa-fw text-success mr-2"></i>@DateHelper.DateTimeStringFromDateTime(bookedConsultation.StartDateTime)h &minus; @DateHelper.DateTimeStringFromDateTime(bookedConsultation.EndDateTime)h
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li><i class="fal fa-calendar fa-fw text-success mr-2"></i>@DateHelper.DateStringFromDateTime(bookedConsultation.StartDateTime)</li>
+                                        <li><i class="fal fa-clock fa-fw text-success mr-2"></i>@DateHelper.TimeStringFromDateTime(bookedConsultation.StartDateTime)h &minus; @DateHelper.TimeStringFromDateTime(bookedConsultation.EndDateTime)h</li>
+                                    }
+                                </ul>
+                            </div>
+                            <div class="col-sm-6">
+                                <ul class="list list-unstyled text-right">
+                                    <li>Metoda:<i class="@bookedConsultation.ContactMethod.Icon ml-2 mr-1" style="color: @bookedConsultation.ContactMethod.Color"></i>@bookedConsultation.ContactMethod.Name</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <div class="d-inline-block">
+                            @await Html.TryPartialAsync("~/Views/Shared/_RenderConsultationCountdown.cshtml", new WebApplication9.PartialViewModels.CountdownPartialViewModel()
+                            {
+                                CountdownId = bookedConsultation.BookingId,
+                                StartTime = DateHelper.ConvertDateTimeToDateTimeStringISO(bookedConsultation.StartDateTime),
+                                EndTime = DateHelper.ConvertDateTimeToDateTimeStringISO(bookedConsultation.EndDateTime)
+                            })
+                            @await Html.TryPartialAsync("~/Views/Shared/_RenderConsultationStatus.cshtml", new WebApplication9.PartialViewModels.CountdownPartialViewModel()
+                            {
+                                CountdownId = bookedConsultation.BookingId,
+                                StartTime = DateHelper.ConvertDateTimeToDateTimeStringISO(bookedConsultation.StartDateTime),
+                                EndTime = DateHelper.ConvertDateTimeToDateTimeStringISO(bookedConsultation.EndDateTime)
+                            })
+                        </div>
+                        <div>
+                            <a href='@Url.Action("Details", "Consultations", new { Area = "Therapist", bookingId = bookedConsultation.BookingId })'
+                               class="btn btn-mini btn-info"
+                               data-toggle="tooltip"
+                               data-placement="bottom"
+                               title="Detalji termina"
+                               target="_blank">
+                                <i class="far fa-eye m-0"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center px-4 mb-3 text-secondary">
+            Trenutno nijedan klijent nije zakazao besplatne konsultacije sa Vama ili ste izabrali kriterijum pretrage koji nijedan termin besplatnih konsultacija ne ispunjava.
+            <br />
+            <strong>Sve Vaši termini besplatnih konsultacija koje klijenti zakažu biće prikazane ovde.</strong>
+            <br />
+            Kliknite na dugme ispod kako biste pregledali sve svoje trenutne dodate termine besplatnih konsultacija.
+        </div>
+        <div class="col-12 text-center mb-3">
+            <a href='@Url.Action("All", "Consultations", new { Area = "Therapist" })'
+               class="btn btn-sm btn-primary text-decoration-none">
+                <i class="far fa-calendar mr-2"></i>Pregledajte besplatne konsultacije
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/year-picker/moment.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#container-main main').removeClass('pb-3');
+        })
+    </script>
+    <script async src="~/js/accordion-setup.js"></script>
+}

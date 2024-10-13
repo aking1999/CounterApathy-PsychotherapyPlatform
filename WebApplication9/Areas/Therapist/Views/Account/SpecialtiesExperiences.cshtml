@@ -1,0 +1,433 @@
+﻿@model List<WebApplication9.Areas.Therapist.ViewModels.SpecialtyExperienceViewModel>
+
+@using Framework.Helpers.ExtensionMethods
+
+@{
+    ViewData.SetTitle("Iskustva sa specijalnostima");
+    ViewData.SetMetaDescription("Dodajte uže informacije o Vašem iskustvu sa svakom specijalnošću.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/flatpickr/flatpickr.min.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("far fa-book fa-sm",
+        "text-primary",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription(),
+       "col-12",
+       "<i class='far fa-star text-warning mr-1'></i>Ove informacije biće prikazane na " +
+       $"<a onclick='sessionStorage.setItem(`showSkillsTab`, `true`)' href='{await Url.AuthenticatedPsychotherapistPublicProfileUrlAsync()}'>Vašoj javnoj profilnoj stranici</a>, " +
+       "u odeljku \"Struka i veštine\"."))
+
+<div class="row" id="all-spec">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var specialty in Model)
+        {
+            <div id="specialty-holder-@specialty.Id" class="col-12 col-lg-6">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <a class="d-block d-flex align-items-center no-tick text-decoration-none"
+                           href="#experience-form-@specialty.Id"
+                           data-toggle="collapse"
+                           aria-expanded="false"
+                           aria-controls="experience-form-@specialty.Id">
+                            <i class="@specialty.Icon fa-lg fa-fw" style="color: @specialty.Color !important"></i>
+                            <span class="text-secondary ml-3">@specialty.Name</span>
+                            <span class="btn btn-mini btn-soft-success rounded-pill border-0 ml-auto">
+                                <i class="far fa-plus mr-1"></i>Dodajte iskustvo
+                            </span>
+                        </a>
+                        <div class="collapse" id="experience-form-@specialty.Id">
+                            <form id="@specialty.Id" class="mt-4" autocomplete="off">
+                                @Html.AntiForgeryToken()
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-lg-4 text-lg-right">
+                                            <label class="fs--1" asp-for="@specialty.FromDate"></label>
+                                        </div>
+                                        <div class="col-lg-7">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fal fa-calendar fa-fw fa-sm"></i></span>
+                                                </div>
+                                                <input asp-for="@specialty.FromDate"
+                                                       class="form-control form-control-sm datetimepicker flatpickr-input"
+                                                       placeholder="Datum početka prakse"
+                                                       readonly="readonly">
+                                            </div>
+                                            <span>
+                                                <span asp-validation-for="@specialty.FromDate" class="invalid-feedback"></span>
+                                                <br />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-lg-4 text-lg-right">
+                                            <label class="fs--1" asp-for="@specialty.ToDate"></label>
+                                        </div>
+                                        <div class="col-lg-7">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fal fa-calendar fa-fw fa-sm"></i></span>
+                                                </div>
+                                                <input asp-for="@specialty.ToDate"
+                                                       id="specialty_ToDate-@specialty.Id"
+                                                       class="form-control form-control-sm datetimepicker flatpickr-input"
+                                                       placeholder="Datum završetka prakse"
+                                                       readonly="readonly">
+                                            </div>
+                                            <span>
+                                                <span asp-validation-for="@specialty.ToDate" class="invalid-feedback"></span>
+                                                <br />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-lg-7 offset-lg-4">
+                                            <div class="custom-checkbox custom-control custom-control-inline">
+                                                @Html.CheckBoxFor(spec => specialty.Present, new { @class = "custom-control-input", id = "specialty_Present-" + specialty.Id })
+                                                <label asp-for="@specialty.Present"
+                                                       for="specialty_Present-@specialty.Id"
+                                                       class="custom-control-label fs--1"
+                                                       style="padding-top:0.15rem"></label>
+                                                <a href="javascript://"
+                                                   class="form-group ml-2 no-tick"
+                                                   data-toggle="popover"
+                                                   data-placement="bottom"
+                                                   data-content="Ukoliko i dalje praktikujete navedenu oblast, <strong>polje za datum završetka prakse ostavite prazno.</strong>"
+                                                   data-html="true">
+                                                    <i class="fas fa-question-circle fa-sm text-info"></i>
+                                                </a>
+                                            </div>
+                                            <span>
+                                                <span asp-validation-for="@specialty.Present" class="invalid-feedback"></span>
+                                                <br />
+                                                <br />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-lg-4 text-lg-right">
+                                            <label class="fs--1" asp-for="@specialty.City"></label>
+                                        </div>
+                                        <div class="col-lg-7">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fal fa-city fa-fw fa-sm"></i></span>
+                                                </div>
+                                                <input asp-for="@specialty.City" class="form-control form-control-sm">
+                                            </div>
+                                            <span>
+                                                <span asp-validation-for="@specialty.City" class="invalid-feedback"></span>
+                                                <br />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-lg-4 text-lg-right">
+                                            <label class="fs--1" asp-for="@specialty.Country"></label>
+                                        </div>
+                                        <div class="col-lg-7">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fal fa-globe-europe fa-fw fa-sm"></i></span>
+                                                </div>
+                                                <input asp-for="@specialty.Country" class="form-control form-control-sm">
+                                            </div>
+                                            <span>
+                                                <span asp-validation-for="@specialty.Country" class="invalid-feedback"></span>
+                                                <br />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-lg-4 text-lg-right">
+                                            <label class="fs--1" asp-for="@specialty.Description"></label>
+                                        </div>
+                                        <div class="col-lg-7">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fal fa-align-left fa-fw fa-sm"></i></span>
+                                                </div>
+                                                <textarea asp-for="@specialty.Description"
+                                                          class="form-control form-control-sm"
+                                                          rows="5"></textarea>
+                                            </div>
+                                            <span>
+                                                <span asp-validation-for="@specialty.Description" class="invalid-feedback"></span>
+                                                <br />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-0">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button data-model-id="@specialty.Id"
+                                                    class="btn-save-spec btn btn-sm btn-block btn-primary"
+                                                    type="button">
+                                                <span id="save-text">&nbsp;Sačuvaj&nbsp;</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center px-4 mb-3 text-danger fs-0">
+            Trenutno nemate nijednu specijalnost dodatu na Vaš nalog.
+            <br />
+            <strong>Ovo je greška jer one moraju biti dodate.</strong>
+            <br />
+            Molimo kontaktirajte podršku za terapeute i obavestite ih o ovoj grešci.
+        </div>
+        <div class="col-12 text-center mb-3">
+            <a href='@Url.Action("Support", "Account", new { Area = "Therapist" })' class="btn btn-primary">
+                <i class="fas fa-headset mr-2"></i>Podrška za terapeute
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/flatpickr/flatpickr.min.js"></script>
+    <script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#container-main main.pb-3').removeClass('pb-3');
+
+            let container = $('#all-spec');
+            let save = container.find('.btn-save-spec');
+
+            let specialtyId = sessionStorage.getItem('AddSpecialtyExperience');
+            if (specialtyId != null) {
+                sessionStorage.removeItem('AddSpecialtyExperience');
+                let scrollToElement = $(`#specialty-holder-${specialtyId}`);
+                if (scrollToElement.length) {
+                    $(`#experience-form-${specialtyId}`).addClass('show');
+                    $('html, body').animate({
+                        scrollTop: scrollToElement.offset().top
+                    }, 1000);
+                }
+            }
+
+            $('.datetimepicker').flatpickr({
+                dateFormat: "Y-m-d",
+                enableTime: false,
+                disableMobile: true,
+                onReady: function () {
+                    var flatPickrInstance = this;
+                    var $flatPickrInput = $(flatPickrInstance.element);
+                    $flatPickrInput.siblings("span").click(function () {
+                        flatPickrInstance.toggle();
+                    });
+                }
+            });
+
+            save.click(function () {
+                let height = $(this).height();
+                let modelId = $(this).data('model-id');
+                let experienceForm = container.find(`form#${modelId}`);
+
+                DisableInputsInForm(experienceForm, modelId);
+
+                let fromDate = experienceForm.find('#specialty_FromDate');
+                let toDate = experienceForm.find(`#specialty_ToDate-${modelId}`);
+                let present = experienceForm.find(`#specialty_Present-${modelId}`);
+                let city = experienceForm.find('#specialty_City');
+                let country = experienceForm.find('#specialty_Country');
+                let description = experienceForm.find('#specialty_Description');
+                let saveText = experienceForm.find('#save-text');
+                let saveTextUnchanged = saveText.html();
+
+                if (present.is(':checked')) {
+                    toDate.rules('remove', 'required');
+                    let flatpickrToDate = toDate.flatpickr({
+                        dateFormat: "Y-m-d",
+                        enableTime: false,
+                        disableMobile: true,
+                    });
+                    flatpickrToDate.clear();
+                } else {
+                    toDate.rules('add', {
+                        required: true
+                    });
+                }
+
+                saveText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                    save.height(height);
+                })
+
+                setTimeout(function () {
+                    if (FormIsValid(experienceForm, modelId)) {
+                        let formData = new FormData(experienceForm.get(0));
+                        formData.append('exp.Id', modelId);
+                        formData.append('exp.FromDate', fromDate.val());
+                        formData.append('exp.ToDate', toDate.val());
+                        formData.append('exp.Present', present.is(':checked'));
+                        formData.append('exp.City', city.val());
+                        formData.append('exp.Country', country.val());
+                        formData.append('exp.Description', description.val());
+
+                        $.ajax({
+                            url: '@Url.Action("EditSpecialtiesExperience", "Account", new { Area = "Therapist" })',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            headers: {
+                                'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                            },
+                            success: function (response) {
+                                if (response.success === true) {
+                                    saveText.fadeOut('fast', function () {
+                                        $(this).html('<i class="ca-lightgreen fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                Swal.fire(
+                                                    response.title,
+                                                    response.body,
+                                                    response.severity
+                                                ).then(() => {
+                                                    $('a[href="#experience-form-' + modelId + '"]').click();
+                                                });
+
+                                                saveText.fadeOut('fast', function () {
+                                                    $(this).html(saveTextUnchanged).fadeIn('slow');
+                                                    EnableInputsInForm(experienceForm, modelId);
+                                                })
+
+                                                if (response.spec.present === true) {
+                                                    present.prop('checked', true);
+                                                    let flatpickrToDate = toDate.flatpickr({
+                                                        dateFormat: "Y-m-d",
+                                                        enableTime: false,
+                                                        disableMobile: true,
+                                                    });
+                                                    flatpickrToDate.clear();
+                                                } else {
+                                                    present.prop('checked', false);
+                                                }
+
+                                                city.val(response.spec.city);
+                                                country.val(response.spec.country);
+                                                description.val(response.spec.description);
+                                            }, 800)
+                                        })
+                                    })
+                                } else {
+                                    if (response.redirectUrl) window.location.href = response.redirectUrl;
+                                    else {
+                                        saveText.fadeOut('fast', function () {
+                                            $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                                            if (response.showToast) toastr[response.severity](response.body, response.title);
+                                            else
+                                                Swal.fire(
+                                                    response.title,
+                                                    response.body,
+                                                    response.severity
+                                                );
+                                        })
+                                        .promise()
+                                        .done(function () {
+                                            setTimeout(function () {
+                                                saveText.fadeOut('fast', function () {
+                                                    $(this).html(saveTextUnchanged).fadeIn('slow');
+                                                    EnableInputsInForm(experienceForm, modelId);
+                                                });
+                                            }, 1300)
+                                        })
+                                    }
+                                }
+                            },
+                            error: function (response) {
+                                saveText.fadeOut('fast', function () {
+                                    $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                                    toastr['error']('Molimo osvežite stranicu i pokušajte ponovo ili kontaktirajte korisničku podršku.', 'Došlo je do greške');
+                                })
+                                .promise()
+                                .done(function () {
+                                    setTimeout(function () {
+                                        saveText.fadeOut('fast', function () {
+                                            $(this).html(saveTextUnchanged).fadeIn('slow');
+                                            EnableInputsInForm(experienceForm, modelId);
+                                        });
+                                    }, 1300)
+                                })
+                            }
+                        })
+                    } else {
+                        saveText.fadeOut('fast', function () {
+                            $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                            toastr['info'](null, 'Popunite sva obavezna polja');
+                        })
+                        .promise()
+                        .done(function () {
+                            setTimeout(function () {
+                                saveText.fadeOut('fast', function () {
+                                    $(this).html(saveTextUnchanged).fadeIn('slow');
+                                    EnableInputsInForm(experienceForm, modelId);
+                                });
+                            }, 1300)
+                        })
+                    }
+                }, 1200)
+            })
+
+            function ElementInFormIsValid(form, element) {
+                return form.validate().element($(element));
+            }
+
+            function FormIsValid(form, modelId) {
+                let fromDateIsValid = ElementInFormIsValid(form, form.find('#specialty_FromDate'));
+                let toDateIsValid = ElementInFormIsValid(form, form.find(`#specialty_ToDate-${modelId}`));
+                let presentIsValid = ElementInFormIsValid(form, form.find(`#specialty_Present-${modelId}`));
+                let cityIsValid = ElementInFormIsValid(form, form.find('#specialty_City'));
+                let countryIsValid = ElementInFormIsValid(form, form.find('#specialty_Country'));
+                let descriptionIsValid = ElementInFormIsValid(form, form.find('#specialty_Description'));
+
+                return (fromDateIsValid && toDateIsValid &&
+                    presentIsValid && cityIsValid &&
+                    countryIsValid && descriptionIsValid);
+            }
+
+            function EnableInputsInForm(form, modelId) {
+                save.prop('disabled', false);
+                form.find(`#specialty_Present-${modelId}`).prop('readonly', false);
+                form.find('#specialty_City').prop('readonly', false);
+                form.find('#specialty_Country').prop('readonly', false);
+                form.find('#specialty_Description').prop('readonly', false);
+            }
+
+            function DisableInputsInForm(form, modelId) {
+                save.prop('disabled', true);
+                form.find(`#specialty_Present-${modelId}`).prop('readonly', true);
+                form.find('#specialty_City').prop('readonly', true);
+                form.find('#specialty_Country').prop('readonly', true);
+                form.find('#specialty_Description').prop('readonly', true);
+            }
+        });
+    </script>
+}

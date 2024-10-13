@@ -1,0 +1,524 @@
+﻿@using Framework.Providers
+@using Framework.Helpers.ExtensionMethods
+@using WebApplication9.SharedPartialViewModels;
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    ViewData.SetTitle("Politika privatnosti");
+    ViewData.SetMetaDescription("Ovo politikom privatnosti objašnjavamo kako prikupljamo, koristimo " +
+        "i štitimo lične informacije naših klijenata. Vašu privatnost shvatamo ozbiljno i posvećeni " +
+        "smo očuvanju sigurnosti Vaših podataka. Pročitajte našu politiku privatnosti da biste " +
+        "saznali više o našim praksama.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var sideMenuItems = new List<SideMenuItemPartialViewModel>()
+{
+        new SideMenuItemPartialViewModel("", null, "Home", "About", "fal fa-address-card fa-fw text-info", "O nama"),
+        new SideMenuItemPartialViewModel("", null, "Consultations", "Index", "fal fa-comments-alt fa-fw text-primary", "Besplatne konsultacije"),
+        new SideMenuItemPartialViewModel("", null, "Guides", "BookingRoadmap", "fal fa-calendar-check fa-fw text-success", "Lako zakažite seansu"),
+        new SideMenuItemPartialViewModel("", null, "Therapists", "PsychotherapistsExperiences", "fal fa-star fa-fw text-warning", "Iskustva sa psihoterapije"),
+        //new SideMenuItemPartialViewModel("", null, "Home", "EasySiteNavigation", "fal fa-map-marked fa-fw text-info", "Easy site navigation"),
+        new SideMenuItemPartialViewModel("", null, "Home", "FAQ", "fal fa-question fa-fw text-info", "Česta pitanja")
+    };
+
+    var userRole = await User.GetRoleAsync();
+
+    if (userRole == UserRoles.None || userRole == UserRoles.Client || userRole == UserRoles.Admin)
+    {
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Guides", "All", "fal fa-book-open fa-fw text-primary", "Uputstva"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi korišćenja"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TherapistsTerms", "fal fa-scroll fa-fw text-primary", "Uslovi za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("active", null, "Home", "Privacy", "fal fa-shield fa-fw text-primary", "Politika privatnosti"));
+        if (userRole == UserRoles.None || userRole == UserRoles.Client)
+            sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "CustomerSupport", "fal fa-user-headset fa-fw text-pink", "Korisnička podrška"));
+    }
+    else if (userRole == UserRoles.Therapist)
+    {
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Guides", "All", "fal fa-book-open fa-fw text-primary", "Uputstva za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi korišćenja"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TherapistsTerms", "fal fa-scroll fa-fw text-primary", "Uslovi za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("active", null, "Home", "Privacy", "fal fa-shield fa-fw text-primary", "Politika privatnosti"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", "Therapist", "Account", "Support", "fal fa-headset fa-fw text-orange", "Podrška za terapeute"));
+    }
+
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/notification-center/notification-center.css" />
+    <style>
+        .accordion li {
+            padding-bottom: 0.5rem;
+        }
+
+            .accordion li:last-child {
+                padding-bottom: 0;
+            }
+    </style>
+}
+
+<div class="row">
+    @await Html.TryPartialAsync("~/Views/Shared/Menues/_SideMenu.cshtml",
+        new SideMenuPartialViewModel("fal fa-info-circle", "Centar za pomoć", "text-info", sideMenuItems))
+    <div class="col-lg-9">
+        <div class="card pt-1">
+            <div class="card-header pb-0">
+                <h4 class="text-center mb-0 text-primary">Politika privatnosti</h4>
+            </div>
+            <div class="card-body pb-0">
+                <div class="accordion">
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Šta se opisuje ovom politikom privatnosti?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    <p>
+                                        Ova politika ima za cilj da Vam pomogne da razumete koje podatke prikupljamo, kako ih koristimo i koja su
+                                        Vaša prava u vezi sa tim. U svrhu ove politike i osim ako nije drugačije navedeno, "podaci" uključuju podatke
+                                        koji su povezani sa jednom osobom, uključujući stvari poput imena i prezimena, imejl adrese, broja telefona,
+                                        modela i operativnog sistema uređaja, IP adrese i komunikaciju sa terapeutima koji koriste
+                                        našu digitalnu platformu kako bi pružili usluge (u daljem tekstu "terapeuti" i "psihoterapeuti").
+                                        Kada koristite našu platformu, prihvatate i slažete se sa <a asp-controller="Home" asp-action="TermsOfService" target="_blank">Uslovima korišćenja</a>
+                                        i ovom Politikom privatnosti, uključujući to da ćemo deliti
+                                        određene podatke sa terapeutima i psihoterapeutima.
+                                    </p>
+                                    <p>
+                                        Svrha ove politike je da jednostavno i jasno objasni tehničke aspekte obrade podataka.
+                                    </p>
+                                    <span class="fa-stack">
+                                        <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                        <i class="far fa-star fa-stack-1x text-warning"></i>
+                                    </span>
+                                    Slobodno nam pišite na <a href="mailto:@($"podrska@{appName}.com")">@($"podrska@{appName}.com")</a> ako imate bilo kakvih pitanja u vezi sa
+                                    ovom politikom ili bilo kakvih predloga za poboljšanje.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Na koga se odnosi ova politika privatnosti?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    Ova politika privatnosti se odnosi na sve posetioce naše digitalne platforme,
+                                    korisnike naše platforme i nezavisne terapeute koji koriste platformu za pružanje usluga.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Koje informacije prikupljamo i kada?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    <p>
+                                        Posetom @appName platforme, prikupljamo, obrađujemo i skladištimo informacije
+                                        koje Vaš pretraživač šalje nama. Sa tehničkog aspekta, ovi podaci su neophodni
+                                        kako bismo Vam prikazali ovu veb stranicu i kako bismo osigurali funkcionalnost,
+                                        stabilnost i sigurnost.
+                                    </p>
+                                    U informacije koje prikupljamo spadaju:
+                                    <ol>
+                                        <li>
+                                            IP adrese, sesije i kolačići za analiziranje trendova i poboljšanje Vašeg
+                                            iskustva na našoj platformi.
+                                            Molimo pogledajte sekciju "Da li koristite kolačiće?" za informacije o kolačićima i kako ih koristimo.
+                                        </li>
+                                        <li>
+                                            Prilikom registracije za korišćenje platforme, možemo zatražiti Vaše ime i prezime,
+                                            imejl adresu, broj telefona ili druge informacije. Međutim, određene delove platforme
+                                            možete posetiti bez pružanja ovih informacija.
+                                        </li>
+                                        <li>Prilikom dopune Veb kredita na Vašem nalogu, čuvamo informacije o izabranom načinu plaćanja.</li>
+                                        <li>Prilikom zakazivanja seanse sa psihoterapeutom, koristimo informacije koje ste uneli tokom registracije kao i podatak o kontakt metodi.</li>
+                                        <li>
+                                            Prilikom ocenjivanja seanse sa psihoterapeutom,
+                                            <strong>
+                                                ne čuvamo Vaše lične informacije, već samo informacije o oceni, komentar i datum ocenjivanja. Ocenjivanje terapeuta je anonimno.
+                                            </strong>
+                                        </li>
+                                    </ol>
+                                    <span class="fa-stack">
+                                        <i class="far fa-circle fa-stack-2x" style="color: #ffdbe2 !important;"></i>
+                                        <i class="far fa-exclamation-circle fa-stack-1x text-danger"></i>
+                                    </span>
+                                    @appName platforma
+                                    <strong>
+                                        nema pristup informacijama Vašeg PayPala ili kreditne kartice u toku ili nakon uplate dopune Veb kredita na Vašem nalogu.
+                                    </strong>
+                                    PayPal i ostali servisi za plaćanje nas samo obaveštavaju ukoliko je plaćanje od strane korisnika uspešno/neuspešno izvršeno i o uplaćenoj sumi.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Kako koristimo Vaše informacije?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    Možemo koristiti informacije koje prikupljamo od Vas prilikom registracije na sajtu,
+                                    zakazivanja seanse sa psihoterapeutom, pregledanja sajta ili korišćenja određenih funkcija sajta na sledeće načine:
+                                    <ol class="mb-0">
+                                        <li>Da bismo dodali novu ili unapredili postojeću funkcionalnost platforme.</li>
+                                        <li>Da bismo Vam bolje pomogli u odgovoru na Vaše zahteve za korisničku podršku.</li>
+                                        <li>Da bismo sproveli promociju, anketu ili istraživanje.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Ko ima pristup seansi koju imam sa svojim terapeutom?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    <p>
+                                        Ukoliko je seansa individualna, samo Vi i Vaš terapeut imate pristup seansi.
+                                        Ukoliko je seansa grupna, pristup imate Vi, Vaš terapeut i svi ostali članovi seanse.
+                                    </p>
+                                    <span class="fa-stack">
+                                        <i class="far fa-circle fa-stack-2x" style="color: #ffdbe2 !important;"></i>
+                                        <i class="far fa-exclamation-circle fa-stack-1x text-danger"></i>
+                                    </span>
+                                    @appName platforma nema pristup seansi između Vas i Vašeg terapeuta,
+                                    niti terapeut otkriva bilo kakve dodatne informacije o Vama.
+                                    Sve informacije koje podelite sa terapeutom, on je dužan da tretira kao poverljive.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Kad ocenim seansu, da li će moji lični podaci biti anonimni?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    <p>
+                                        Vaši lični podaci ostaju anonimni i neće ni u kom trenutku biti prikazani
+                                        na profilnoj stranici terapeuta.
+                                    </p>
+                                    <span class="fa-stack">
+                                        <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                        <i class="far fa-star fa-stack-1x text-warning"></i>
+                                    </span>
+                                    Podaci koji će biti prikazani su: visina ocene,
+                                    Vaš komentar o seansi koji ne sadrži lične podatke, datum davanja ocene i difoltna slika.
+                                    U nastavku je dat primer kako izgleda ocena koju date terapeutu:
+                                    <div class="mt-3 pt-2">
+                                        @await Html.TryPartialAsync("~/Views/Shared/_ClientsReviews.cshtml",
+                                            new List<WebApplication9.PartialViewModels.ClientReviewPartialViewModel>
+                                            {
+                                                new WebApplication9.PartialViewModels.ClientReviewPartialViewModel
+                                                {
+                                                    RatingDate = "01/01/2023",
+                                                    Comment = "[Vaš komentar]",
+                                                    StarsRating = 5d
+                                                },
+                                                new WebApplication9.PartialViewModels.ClientReviewPartialViewModel
+                                                {
+                                                    RatingDate = "04/01/2023",
+                                                    Comment = "[Komentar drugog klijenta]",
+                                                    StarsRating = 4d
+                                                }
+                                            })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Da li prodajete moje podatke?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    Ne prodajemo i ne trgujemo Vašim ličnim podacima sa trećim licima.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Da li prikupljate informacije o mojoj lokaciji?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    Ne prikupljamo, ne obrađujmo i ne skladištimo informacije o lokaciji naših klijenata.
+                                    <br />
+                                    Od terapeuta zahtevamo unos informacija o lokaciji i skladištimo ih. Te informacije se
+                                    kasnije prikazuju klijentu u slučaju zakazivanja lične seanse.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Da li mogu da se registrujem na @appName i da ostanem anoniman?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    <p class="mb-0">
+                                        Kada registrujete nalog na @appName platformi, ne tražimo od Vas Vaše puno <strong>legalno</strong> ime.
+                                        Možete odabrati bilo koje ime ili nadimak koji će Vas identifikovati u sistemu; u slučaju zakazivanja seanse
+                                        terapeut će Vas znati po tom imenu.
+                                        <br />
+                                        Takođe, morate uneti i validnu imejl adresu kako bismo Vas verifikovali, održali sigurnost Vašeg naloga
+                                        i kako bismo mogli da komuniciramo s Vama. <strong>Možete odabrati imejl adresu koja ne sadrži Vaše ime.</strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Kada se registrujem na platformu, da li se moj nalog prikazuje javno?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    Vaš nalog se nigde javno ne prikazuje. Niko osim administratora platforme i psihoterapeuta sa kim ste zakazali seansu
+                                    nema evidenciju o postojanju Vašeg naloga na platformi.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Da li koristite kolačiće?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    Da. Kolačići su male datoteke koje veb sajt prenosi na hard disk Vašeg računara preko pretraživača,
+                                    što omogućava sistemu veb sajta da prepozna Vaš pretraživač i da prikuplja
+                                    i pamti određene informacije. Kolačići ne mogu izvršavati programe ili prenositi viruse na Vaš računar.
+                                    Oni imaju funkciju da učine ponudu na internetu korisnijom i efikasnijom.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Kako čuvate bezbednost mojih podataka?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    <p>
+                                        Primenjujemo industrijske standarde i nastojimo implementirati najbolje prakse kako bismo
+                                        sprečili neovlašćeni pristup Vašim podacima. Internet usluge uvek u sebi nose sigurnosne rizike,
+                                        ali naša infrastruktura sistema, tehnologija heširanja, operacije i procesi su dizajnirani,
+                                        izgrađeni i održavani s Vašom sigurnošću i privatnošću na umu.
+                                    </p>
+                                    Imamo nekoliko sigurnosnih praksi, kao što su:
+                                    <ol class="mb-0">
+                                        <li>
+                                            Koristimo HTTPS <i>(eng. Hypertext Transfer Protocol Secure)</i> protokol. On osigurava
+                                            bezbednu komunikaciju i prenos podataka između veb pretraživača korisnika i veb sajta.
+                                            HTTPS je sigurna verzija HTTP protokola.
+                                        </li>
+                                        @*<li>Naš sistem enkripcije (SSL) sledi moderne najbolje prakse</li>*@
+                                        <li>Šifarni podaci u našoj bazi podataka su heširani, što ih čini beskorisnim u slučaju krađe podataka.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Da li koristite Google tag menadžer?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    Da. Google tag menadžer je sistem za upravljanje tagovima koji se koriste za istraživanje i
+                                    analitiku na veb sajtovima. Tagovi su mali elementi u kodu koji se, između ostalog, koriste
+                                    za računanje saobraćaja i postupaka posetilaca. To pomaže u razumevanju efekta online oglašavanja,
+                                    postavljanju remarketinga i orijentaciji ka ciljnoj grupi, kao i
+                                    testiranju i optimizaciji veb sajtova. Google tag menadžer ne prikuplja lične podatke.
+                                    @*Google tag menadžer samo upravlja tagovima koji sami mogu prikupljati
+                        podatke za analitiku. Google tag menadžer ne pristupa ovim podacima.*@
+                                    <br />
+                                    Za više informacija o načinu rada Google tag menadžera, pročitajte
+                                    <a href="https://marketingplatform.google.com/about/analytics/tag-manager/use-policy/" target="_blank" rel="nofollow, noreferrer">uslove korišćenja</a>.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Da li koristite Google analitiku?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    Da. Google analitika je servis za analizu veb sajtova koji pruža Google Inc. ("Google").
+                                    Google analitika koristi tzv. "kolačiće", tekstualne datoteke koje se čuvaju na računaru
+                                    i omogućavaju analizu upotrebe sajta.
+                                    <br />
+                                    Za više informacija o načinu rada Google analitike, pročitajte
+                                    <a href="https://policies.google.com/privacy?hl=en" target="_blank" rel="nofollow, noreferrer">politiku privatnosti kompanije Google</a>.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none border-bottom accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Da li ćete menjati ovu politiku privatnosti?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    Možemo ažurirati ovu politiku privatnosti. Kada napravimo značajne promene u ovoj politici,
+                                    obavestićemo Vas putem imejla ili naše platforme kada se ulogujete na svoj nalog.
+                                    Podstičemo Vas da povremeno pregledate ovu stranicu radi najnovijih informacija.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-none accordion-item">
+                        <div class="card-header py-0">
+                            <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" data-toggle="collapse">
+                                <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                                <span class="font-weight-medium text-sans-serif text-900">
+                                    Kako mogu obrisati svoje podatke?
+                                </span>
+                            </button>
+                        </div>
+                        <div class="collapse">
+                            <div class="card-body pt-2">
+                                <div class="pl-4">
+                                    <p>
+                                        <span class="badge badge-soft-primary p-2 mb-2"><i class="far fa-user fa-lg fa-fw mr-2"></i>Za klijente</span>
+                                        <br />
+                                        Ulogujte se na svoj nalog i idite na <a href="@Url.Action("Profile", "Account", new { Area = "" })">profilnu stranicu</a>,
+                                        zatim kliknite na dugme "Podešavanja" i iz padajućeg menija izaberite opciju za brisanje naloga.
+                                    </p>
+                                    <p class="mb-0">
+                                        <span class="badge badge-soft-info p-2 mb-2"><i class="far fa-users fa-lg fa-fw mr-2"></i>Za terapeute</span>
+                                        <br />
+                                        Ulogujte se na svoj nalog terapeuta i idite na
+                                        <a href="@Url.Action("Support", "Account", new { Area = "Therapist" })">stranicu za kontaktiranje podrške za terapeute</a>,
+                                        zatim kliknite na "Izaberite temu" i iz padajućeg menija izaberite opciju za slanje zahteva za brisanje naloga.
+                                        Ubrzo nakon toga, naš predstavnik će Vas kontaktirati putem imejla u vezi nastavka procesa brisanja Vašeg naloga.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <small>
+                    <i class="far fa-info-circle text-info mr-2"></i>Niste pronašli odgovor na pitanje koje ste imali? Pogledajte
+                    @if (userRole == UserRoles.None || userRole == UserRoles.Client)
+                    {
+                        <a asp-controller="Home" asp-action="TermsOfService">uslove korišćenja</a>
+                        if (User.HasSupportAvailable())
+                        {
+                            <span>ili <a href="@await User.GetSupportUrlAsync()">kontaktirajte korisničku podršku</a>.</span>
+                        }
+                    }
+                    else if (userRole == UserRoles.Therapist)
+                    {
+                        <a asp-controller="Home" asp-action="TherapistsTerms">uslove za terapeute</a>
+                        <span>ili <a href="@await User.GetSupportUrlAsync()">kontaktirajte podršku za terapeute</a>.</span>
+                    }
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script async src="~/js/accordion-setup.js"></script>
+}

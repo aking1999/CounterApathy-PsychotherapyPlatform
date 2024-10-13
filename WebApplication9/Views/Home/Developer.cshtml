@@ -1,0 +1,169 @@
+﻿@using Framework.Helpers.ExtensionMethods
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    ViewData.SetTitle("Meet our developer, Aleksa");
+    ViewData.SetMetaDescription($"Developer of the {Configuration.GetSection("Application:AppName")?.Value} platform.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/css/developer.css" />
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-code text fa-sm",
+        "text-primary",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+<div class="card usercard developer-card" style="max-width: 340px;" data-state="#about">
+    <div class="card-head" style="height: 175px;">
+        <div class="card-cover" style="background-image: linear-gradient(to right, #57ff9a, #55a9fc) "></div>
+        <img class="card-avatar" src="~/images/content-images/aleksa.jpeg" alt="photo of our developer, Aleksa" />
+        <h3 class="card-fullname mb-3">Aleksa Shahgoli</h3>
+        <h4 class="card-jobtitle">Full-Stack Developer</h4>
+    </div>
+    <div class="card-main">
+        <div class="card-section is-active" id="about">
+            <div class="card-content">
+                <div class="card-subtitle">ABOUT</div>
+                <p class="card-desc">
+                    Developed the <span class="text-primary">@Configuration.GetSection("Application:AppName")?.Value</span> platform.
+                    <br />
+                    Was responsible for:
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap border-0 py-1">
+                            <h6 class="mb-0">
+                                <i class="fal fa-lightbulb-on text-warning fa-fw mr-2" style="font-size:1rem;"></i>UI/UX Design
+                            </h6>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap border-0 py-1">
+                            <h6 class="mb-0">
+                                <i class="fal fa-code text-primary fa-fw mr-2" style="font-size:1rem;"></i>Front End & Back End
+                            </h6>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap border-0 py-1">
+                            <h6 class="mb-0">
+                                <i class="fal fa-database text-success fa-fw mr-2" style="font-size:1rem;"></i>Database Administration
+                            </h6>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap border-0 py-1">
+                            <h6 class="mb-0">
+                                <i class="fal fa-bolt text-warning fa-fw mr-2" style="font-size:1rem;"></i>Managing Background Services
+                            </h6>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap border-0 py-1">
+                            <h6 class="mb-0">
+                                <i class="fal fa-server text-primary fa-fw mr-2" style="font-size:1rem;"></i>Server Configuration
+                            </h6>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap border-0 py-1">
+                            <h6 class="mb-0">
+                                <i class="fal fa-cog text-success fa-fw mr-2" style="font-size:1rem;"></i>SEO & Copywriting
+                            </h6>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap border-0 py-1">
+                            <h6 class="mb-0">
+                                <i class="fal fa-users text-info fa-fw mr-2" style="font-size:1rem;"></i>Finding Therapists
+                            </h6>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap border-0 py-1">
+                            <h6 class="mb-0">
+                                <i class="fal fa-ad text-primary fa-fw mr-2" style="font-size:1rem;"></i>Marketing
+                            </h6>
+                        </li>
+                    </ul>
+                </p>
+            </div>
+        </div>
+        <div class="card-section" id="experience">
+            <div class="card-content">
+                <div class="card-subtitle">EDUCATION</div>
+                <div class="card-timeline">
+                    <div class="card-item" data-year="2012">
+                        <div class="card-item-title">Student at <span>ITHS</span></div>
+                        <div class="card-item-desc">Attended high school at Information Technology High School.</div>
+                    </div>
+                    <div class="card-item" data-year="2018">
+                        <div class="card-item-title">Student at <span>ITS</span></div>
+                        <div class="card-item-desc">Attended university at Information Technology School.</div>
+                    </div>
+                    <div class="card-item" data-year="2021">
+                        <div class="card-item-title">Master's degree at <span>ITS</span></div>
+                        <div class="card-item-desc">Started master degree in Information Technology at Information Technology School. Finished it in 2023.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-section" id="contact">
+            <div class="card-content">
+                <div class="card-subtitle">CONTACT</div>
+                <div class="card-contact-wrapper">
+                    <div class="card-contact">
+                        <i class="fal fa-location-circle text-info d-flex align-items-center"></i>
+                        Zorina 5, Belgrade 11147, Serbia
+                    </div>
+                    <div class="card-contact">
+                        <i class="fal fa-phone text-success d-flex align-items-center"></i>
+                        (+381) 63-1731222
+                    </div>
+                    <div class="card-contact">
+                        <i class="fal fa-envelope text-info d-flex align-items-center"></i>
+                        aleksa.aking.1999@gmail.com
+                    </div>
+                    <div class="card-social">
+                        <a href="https://www.instagram.com/aleksa.q_q/">
+                            <i class="fab fa-instagram text-pink"></i>
+                        </a>
+                        <a href="#">
+                            <i class="fab fa-facebook-f text-facebook"></i>
+                        </a>
+                        <a href="#">
+                            <i class="fab fa-twitter text-twitter"></i>
+                        </a>
+                        <a href="#">
+                            <i class="fab fa-linkedin-in text-linkedin"></i>
+                        </a>
+                    </div>
+                    <a href="mailto:aleksa.aking.1999@gmail.com" class="btn btn-primary btn-lg btn-block fs--1" style="padding:0.8rem 1rem;">
+                        Contact me
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-buttons">
+            <button data-section="#about" class="is-active">ABOUT</button>
+            <button data-section="#experience">EDUCATION</button>
+            <button data-section="#contact">CONTACT</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const buttons = document.querySelectorAll(".card-buttons button");
+            const sections = document.querySelectorAll(".card-section");
+            const card = document.querySelector(".developer-card");
+
+            const handleButtonClick = (e) => {
+                const targetSection = e.target.getAttribute("data-section");
+                const section = document.querySelector(targetSection);
+                targetSection !== "#about"
+                    ? card.classList.add("is-active")
+                    : card.classList.remove("is-active");
+                card.setAttribute("data-state", targetSection);
+                sections.forEach((s) => s.classList.remove("is-active"));
+                buttons.forEach((b) => b.classList.remove("is-active"));
+                e.target.classList.add("is-active");
+                section.classList.add("is-active");
+            };
+
+            buttons.forEach((btn) => {
+                btn.addEventListener("click", handleButtonClick);
+            });
+        })
+    </script>
+}
+

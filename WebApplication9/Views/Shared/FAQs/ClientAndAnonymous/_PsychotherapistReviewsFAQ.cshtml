@@ -1,0 +1,168 @@
+﻿@using Framework.Helpers.ExtensionMethods
+
+<div class="card pt-1 mb-3">
+    <div class="card-header pb-0">
+        <h4 class="text-center mb-0 text-primary">Česta pitanja o ocenjivanju seansi sa psihoterapeutima</h4>
+    </div>
+    <div class="card-body">
+        <div class="accordion">
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kada mogu da ocenim seansu?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Možete oceniti seansu odmah po završetku.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako mogu da ocenim seansu?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p class="mb-0">
+                                <strong>Ukoliko ste seansu zakazali neulogovani:</strong>
+                                uđite u imejl koji Vam je stigao kad ste zakazali seansu i kliknite na link za ocenjivanje seanse.
+                                <br />
+                                <br />
+                                <strong>Ukoliko ste seansu zakazali ulogovani:</strong>
+                                idite na
+                                <a asp-area="" asp-controller="Sessions" asp-action="BookedSessions" target="_blank">stranicu za pregled zakazanih seansi</a>,
+                                zatim pronađite seansu koju želite oceniti i u donjem desnom uglu kliknete na dugme za ocenjivanje seanse
+                                (dugme izgleda ovako: <span class="btn btn-sm btn-soft-warning pointer-event-none"><i class="far fa-star"></i></span>).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Zašto je bitno da ocenim seansu?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p class="mb-0">
+                                Vaše mišljenje drugima pruža korisne informacije pri izboru psihoterapeuta.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Da li ima rok u kom moram oceniti seansu?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Završenu seansu možete oceniti bilo kad.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kad ocenim seansu, da li će moji lični podaci biti anonimni?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                Vaši lični podaci ostaju anonimni i neće ni u kom trenutku biti prikazani
+                                na profilnoj stranici terapeuta.
+                            </p>
+                            <span class="fa-stack">
+                                <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                <i class="far fa-star fa-stack-1x text-warning"></i>
+                            </span>
+                            Podaci koji će biti prikazani su: visina ocene,
+                            Vaš komentar o seansi koji ne sadrži lične podatke, datum davanja ocene i difoltna slika.
+                            U nastavku je dat primer kako izgleda ocena koju date terapeutu:
+                            <div class="mt-3 pt-2">
+                                @await Html.TryPartialAsync("~/Views/Shared/_ClientsReviews.cshtml",
+                                    new List<WebApplication9.PartialViewModels.ClientReviewPartialViewModel>
+                                    {
+                                        new WebApplication9.PartialViewModels.ClientReviewPartialViewModel
+                                        {
+                                            RatingDate = "01/01/2023",
+                                            Comment = "[Vaš komentar]",
+                                            StarsRating = 5d
+                                        },
+                                        new WebApplication9.PartialViewModels.ClientReviewPartialViewModel
+                                        {
+                                            RatingDate = "04/01/2023",
+                                            Comment = "[Komentar drugog klijenta]",
+                                            StarsRating = 4d
+                                        }
+                                    })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Ocenio sam seansu, ali se moja ocena ne prikazuje na profilu psihoterapeuta, zašto?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                Sve date ocene prolaze reviziju od strane sistema kako bi se osiguralo da
+                                one ne sadrže pogrdne reči i lične podatke klijenta, terapeuta ili bilo koga drugog.
+                                <br />
+                                Ocene koje su u skladu sa <a asp-controller="Home" asp-action="TermsOfService" target="_blank">pravilima platforme</a>
+                                će biti odobrene.
+                            </p>
+                            <p class="mb-0">
+                                <span class="fa-stack">
+                                    <i class="far fa-circle fa-stack-2x" style="color: #ffdbe2 !important;"></i>
+                                    <i class="far fa-exclamation-circle fa-stack-1x text-danger"></i>
+                                </span>
+                                Ocene od tri zvezdice i niže, moraju imati jasan propratni komentar koji detaljno opisuje šta je dovelo do toga da klijent da nisku ocenu.
+                                Odnosno šta je u toku seanse klijentu odgovaralo, a šta nije.
+                                Ocene od tri zvezdice i niže, koje ne sadrže jasan propratni komentar neće biti prikazane.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

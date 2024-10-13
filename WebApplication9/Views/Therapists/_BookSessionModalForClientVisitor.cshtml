@@ -1,0 +1,758 @@
+﻿@model WebApplication9.ViewModels.TherapistPublicProfileForClientVisitorViewModel
+@using Framework.Helpers
+@using Framework.Helpers.ExtensionMethods
+@using static Framework.Providers.ContactMethodsProvider
+
+<div id="book-session-modal"
+     data-backdrop="static"
+     data-keyboard="false"
+     data-toggle="modal"
+     class="modal theme-modal fade p-0 pr-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title text-center mx-auto"><span class="mb-0" id="type"></span></h5>
+                <button id="dismiss-modal-times" type="button" class="close m-0 p-0" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="book-form" autocomplete="off">
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.UserId)
+                <input type="hidden" id="session-id" name="sessionId" />
+                <div class="modal-body">
+                    <div class="modal-body pt-1 pb-0 fs--1">
+                        <div class="media mt-2">
+                            <i class="fal fa-calendar text-success fa-fw fa-lg mr-4 no-tick"></i>
+                            <div class="media-body">
+                                <h6>Datum</h6>
+                                <p class="mb-0" id="date"></p>
+                            </div>
+                        </div>
+                        <div class="media mt-3">
+                            <i class="fal fa-usd-circle text-success fa-lg fa-fw mr-4 no-tick"></i>
+                            <div class="media-body">
+                                <h6>Cena</h6>
+                                <p class="mb-0" id="price"></p>
+                            </div>
+                        </div>
+                        <div class="alert alert-info my-3" role="alert">
+                            <center>
+                                <i class="far fa-shield-alt mr-2 fs-0"></i>Privatnost zaštićena
+                                <a href="javascript://"
+                                   class="col-form-label ml-2"
+                                   data-toggle="popover"
+                                   data-placement="bottom"
+                                   title="Vaša privatnost je sve vreme zaštićena"
+                                   data-content="Kada zakažete seansu, platforma garantuje da ni u kom trenutku neće Vaše lične podatke prikazati javno. Terapeutu sa kojim zakazujete seansu biće prikazani samo ime (ili alijas), prezime (ili alijas), telefon (ukoliko je dodat) i imejl.">
+                                    <i class="fas fa-question-circle text-info"></i>
+                                </a>
+                            </center>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <label asp-for="Chosen_ContactMethodId"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-address-book fa-fw"></i></span>
+                                    </div>
+                                    <select asp-for="Chosen_ContactMethodId"
+                                        class="selectpicker form-control"
+                                        title="Kontakt metoda"
+                                        data-size="3"
+                                        style="border: 2px solid #d8e2ef !important">
+                                        @if (Model.ToChooseFrom_ContactMethods != null && Model.ToChooseFrom_ContactMethods.Any())
+                                        {
+                                            foreach (var contactMethod in Model.ToChooseFrom_ContactMethods)
+                                            {
+                                                var concat = Helper.GetObjectIconAndNameAndColorAndDataOption(contactMethod.Text);
+
+                                                <option value="@contactMethod.Value" data-option="@concat[3]" data-icon="<i class='@concat[0] fa-lg fa-fw mr-4 no-tick' style='color:@concat[2]'></i>" data-content="<i class='@concat[0] fa-fw' style='color:@concat[2];'></i><span class='ml-2'>@concat[1]</span>">
+                                                    @concat[1]
+                                                </option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="" disabled>
+                                                Kontakt metode nedostupne.
+                                                Kontaktirajte korisničku podršku.
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Chosen_ContactMethodId" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+                        @if (Model.HasInPersonContactMethod)
+                        {
+                            <div class="media mt-3 d-none" id="div-in-person">
+                                <i class="fal fa-location-circle text-primary fa-lg fa-fw mr-4 no-tick"></i>
+                                <div class="media-body">
+                                    <h6><label for="input-in-person">Adresa</label></h6>
+                                    <div id="input-in-person" class="alert alert-primary text-dark-primary mb-0" role="alert">
+                                        @Model.Address
+                                    </div>
+                                </div>
+                            </div>
+                         }
+                        <div id="contact-method-message-holder"></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" id="book-session-authorized" class="btn btn-sm btn-success"><span id="submit-text">&nbsp;Zakaži&nbsp;</span></button>
+                    <button type="button" id="cancel" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Odustani</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="unreviewed-sessions-modal"
+     data-backdrop="static"
+     data-keyboard="false"
+     data-toggle="modal"
+     class="modal fade p-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title text-center mx-auto" id="unreviewed-sessions-modal-title"></h5>
+                <button type="button" class="close m-0 p-0" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body pb-0">
+                <p id="unreviewed-sessions-modal-body" class="text-center"></p>
+                <div id="unreviewed-sessions-modal-sessions-holder">
+
+                </div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button id="btn-unreviewed-sessions-done" type="button" class="btn btn-sm btn-falcon-primary"><i class="fas fa-check-circle text-success mr-2"></i>Gotovo</button>
+                <button type="button" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Zatvori</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.PartialSectionScripts(
+    @<script>
+        $(document).ready(async function () {
+            let calendar = $('#calendar');
+            let sessions = GetSessions();
+            let contactMethods = $('#Chosen_ContactMethodId');
+            let submit = $('#book-session-authorized');
+            let submitText = submit.find('#submit-text');
+            let submitTextUnchanged = submitText.html();
+            let cancel = $('#cancel');
+            let bookForm = $('#book-form');
+            let bookModal = $('#book-session-modal');
+            let modalDismissTimes = bookModal.find('#dismiss-modal-times');
+            let unreviewedSessionsModalId = 'unreviewed-sessions-modal';
+            let unreviewedSessionsModal = $(`#${unreviewedSessionsModalId}`);
+
+            calendar.evoCalendar({
+                theme: "Royal Navy",
+                eventDisplayDefault: true,
+                eventListToggler: true,
+                sidebarDisplayDefault: false,
+                sidebarToggler: true,
+                calendarEvents: sessions
+            })
+
+            calendar.on("selectEvent", function (event, activeEvent) {
+                var selectedSession = sessions.find(s => s.id === activeEvent.id);
+                if (selectedSession.booked === 0) {
+                    bookModal.modal('show');
+
+                    $('#session-id').val(selectedSession.id);
+                    $('#date').html(selectedSession.startDate);
+                    $('#type').html(selectedSession.type);
+                    $('#price').html('RSD ' + selectedSession.price);
+                }
+                else {
+                    Swal.fire(
+                        'Ova seansa je već zakazana',
+                        'Molimo izaberite drugu seansu za zakazivanje.',
+                        'info'
+                    );
+                }
+            })
+
+            calendar.on("selectDate", function (newDate, oldDate) {
+                $('#eventListToggler').click();
+                $('html, body').animate({
+                    scrollTop: $(".calendar-events").offset().top
+                }, 800);
+            });
+
+            function GetSessions() {
+                let sessions = [];
+
+                let sessionArray = $.map(@Html.Raw(Model.SerializedSessions), function (value, index) {
+                    return [value];
+                });
+
+                $.each(sessionArray, function (i, v) {
+                    let startDateTime = new Date(v.StartDateTime);
+                    let endDateTime = new Date(v.EndDateTime);
+                    let time = 'od ' + moment(startDateTime.getTime()).format("HH:mm") + 'h do ' + moment(endDateTime.getTime()).format("HH:mm") + 'h';
+                    let btnClickToBook = v.Booked === 0 ? "<button class='btn btn-mini btn-success btn-lg-block float-right border-0 p-2'>Kliknite da zakažete</button>" : '';
+
+                    sessions.push({
+                        id: v.SessionId,
+                        name: v.Type === 0 ? 'Individualna seansa' : 'Grupna seansa',
+                        description: time + btnClickToBook,
+                        badge: v.Booked === 0 ? v.Price + ' RSD' : 'Zakazano',
+                        date: (startDateTime.getMonth() + 1) + '/' + startDateTime.getDate() + '/' + startDateTime.getFullYear(),
+                        type: 'event',
+                        color: v.Booked === 0 ? '#00d27a' : '#fc3840',
+                        startDate: startDateTime.getDate() + '/' + (startDateTime.getMonth() + 1) + '/' + startDateTime.getFullYear() + ', ' + time,
+                        time: time,
+                        type: v.Type === 0 ? "Individualna seansa" : "Grupna seansa",
+                        price: v.Price,
+                        booked: v.Booked
+                    })
+                })
+
+                return sessions;
+            }
+
+            function ContactMethodsDropdownHighlighter() {
+                let contactsParent = contactMethods.closest('div');
+
+                if (contactMethods.hasClass('is-valid')) {
+                    contactsParent.removeClass('is-invalid');
+                    contactsParent.addClass('is-valid');
+                }
+
+                if (contactMethods.hasClass('is-invalid')) {
+                    contactsParent.removeClass('is-valid');
+                    contactsParent.addClass('is-invalid');
+                }
+            }
+
+            contactMethods.change(function () {
+                let atLeastOneSelected = false;
+                let contactMethodName;
+                let contactMethodIcon;
+                let dataOptionString;
+
+                $('#Chosen_ContactMethodId > option').each(function () {
+                    if ($(this).is(':selected')) {
+                        atLeastOneSelected = true;
+                        contactMethodName = $(this).html();
+                        contactMethodIcon = $(this).attr('data-icon') + "";
+                        dataOptionString = $(this).attr('data-option') + "";
+
+                        if ($('#div-in-person').length) {
+                            if (dataOptionString.toLowerCase() !== '@InPerson.Id') {
+                                $('#div-in-person').addClass('d-none');
+                            }
+                            else {
+                                $('#div-in-person').removeClass('d-none');
+                            }
+                        }
+
+                        if (dataOptionString.toLowerCase() !== '@InPerson.Id')
+                            $('#contact-method-message-holder').html(
+                                '<div class="media mt-3">' +
+                                contactMethodIcon +
+                                '<div class="media-body">' +
+                                '<h6><label>' + contactMethodName + ' link za pristup</label></h6>' +
+                                '<div class="alert alert-primary mb-0 text-dark-primary" role="alert">' +
+                                contactMethodName + ' link za pristup ovoj seansi biće poslat na Vaš imejl najkasnije 4 sata do početka seanse.' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>');
+                        else $('#contact-method-message-holder').html('');
+                    }
+                })
+
+                if (atLeastOneSelected) {
+                    contactMethods.closest('div').removeClass('is-invalid');
+                    contactMethods.closest('div').addClass('is-valid');
+                } else {
+                    contactMethods.closest('div').removeClass('is-valid');
+                    contactMethods.closest('div').addClass('is-invalid');
+                }
+
+            });
+
+            submit.click(async function () {
+                let width = submit.width();
+                let height = submit.height();
+                DisableInputs();
+
+                submitText.fadeOut('fast', function () {
+                    submitText.html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                    submit.width(width);
+                    submit.height(height);
+                });
+
+                setTimeout(async function () {
+                    if (FormIsValid()) {
+                        let formData = new FormData(bookForm.get(0));
+                        formData.append('publicVm.UserId', '@Model.UserId');
+                        formData.append('sessionId', bookForm.find('#sessiod-id').val());
+                        formData.append('publicVm.Chosen_ContactMethodId', contactMethods.val());
+
+                        $.ajax({
+                            url: '@Url.Action("BookSession", "Therapists", new { Area = "" })',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            headers: {
+                                'RequestVerificationToken': bookForm.find("input[name='__RequestVerificationToken']").val()
+                            },
+                            success: async function (response) {
+                                if (response.success === true) {
+                                    submitText.fadeOut('fast', async function () {
+                                        $(this).html('<i class="fas fa-check no-tick"></i>').fadeIn('slow', async function () {
+                                            setTimeout(function () {
+                                                Swal.fire({
+                                                    title: response.title,
+                                                    text: response.body,
+                                                    icon: response.severity,
+                                                    confirmButtonText: 'Pogledajte detalje',
+                                                }).then(() => {
+                                                    window.location.href = response.redirectUrl;
+                                                })
+                                            }, 600)
+                                        })
+                                    });
+                                } else {
+                                    if (response.hasUnreviewedSessions === true) {
+                                        submitText.fadeOut('fast', function () {
+                                            $(this).html('<i class="fas fa-times text-danger no-tick"></i>').fadeIn('slow', function () {
+                                                setTimeout(function () {
+                                                    EnableInputs();
+                                                    bookModal.modal('hide');
+
+                                                    let modalId = MakeUnreviewedSessionsModal(response.title, response.body, response.unreviewedSessions);
+                                                    $(modalId).modal('show');
+
+                                                    submitText.fadeOut('fast', function () {
+                                                        $(this).html(submitTextUnchanged).fadeIn('slow');
+                                                        EnableInputs();
+                                                    });
+                                                }, 600)
+                                            })
+                                        })
+                                    } else if (response.notEnoughWebCredit === true) {
+                                        if (response.publicKey && response.clientSecret && response.paymentSuccessfulReturnUrl) {
+                                            submitText.fadeOut('fast', function () {
+                                                $(this).html('<i class="fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                                    setTimeout(async function () {
+                                                        await RenderSessionPaymentModal(
+                                                            response.publicKey,
+                                                            response.clientSecret,
+                                                            response.amount,
+                                                            response.currency,
+                                                            response.mustCompletePaymentUntil,
+                                                            response.paymentSuccessfulReturnUrl,
+                                                            response.title,
+                                                            response.body,
+                                                            response.severity
+                                                        );
+                                                    }, 600);
+                                                })
+                                            })
+                                        } else {
+                                            HandleError();
+                                            EnableInputs();
+                                            Swal.mixin({
+                                                customClass: {
+                                                    confirmButton: 'btn btn-sm btn-danger mr-2',
+                                                    cancelButton: 'btn btn-sm btn-falcon-secondary'
+                                                },
+                                                buttonsStyling: false
+                                            }).fire({
+                                                title: 'Došlo je do greške',
+                                                text: 'Molimo kontaktirajte korisničku podršku.',
+                                                icon: 'error',
+                                                showCancelButton: true,
+                                                confirmButtonText: 'Korisnička podrška',
+                                                cancelButtonText: 'Odustani'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.location.href = '@Url.Action("CustomerSupport", "Home", new { Area = "" })';
+                                                }
+                                            });
+                                        }
+                                    } else if (response.redirectUrl) {
+                                        submitText.fadeOut('fast', function () {
+                                            $(this).html('<i class="fas fa-times text-danger no-tick"></i>').fadeIn('slow', function () {
+                                                setTimeout(function () {
+                                                    window.location.href = response.redirectUrl;
+                                                }, 600)
+                                            });
+                                        })
+                                    } else {
+                                        submitText.fadeOut('fast', function () {
+                                            $(this).html('<i class="fas fa-times text-danger no-tick"></i>').fadeIn('slow', function () {
+                                                setTimeout(function () {
+                                                    EnableInputs();
+                                                    Swal.fire({
+                                                        title: response.title,
+                                                        text: response.body,
+                                                        icon: response.severity,
+                                                        confirmButtonText: 'Ok',
+                                                    }).then((result) => {
+                                                        ContactMethodsDropdownHighlighter();
+                                                        bookModal.modal('show');
+                                                        submitText.fadeOut('fast', function () {
+                                                            $(this).html(submitTextUnchanged).fadeIn('slow');
+                                                        });
+                                                    })
+                                                }, 600)
+                                            })
+                                        })
+                                    }
+                                }
+                            },
+                            error: function () {
+                                Swal.fire(
+                                    'Došlo je do greške',
+                                    'Molimo osvežite stranicu i pokušajte ponovo ili kontaktirajte korisničku podršku.',
+                                    'error'
+                                );
+                                HandleError();
+                            }
+                        })
+                    } else {
+                        toastr['info']('', 'Popunite sva obavezna polja')
+                        HandleError();
+                    }
+                }, 1200)
+            });
+
+            function ElementIsValid(element) {
+                return bookForm.validate().element($(element));
+            }
+
+            function FormIsValid() {
+                const contactMethodsValid = ElementIsValid(contactMethods);
+
+                ContactMethodsDropdownHighlighter();
+
+                return contactMethodsValid;
+            }
+
+            function EnableInputs() {
+                submit.prop('disabled', false);
+                cancel.prop('disabled', false);
+                modalDismissTimes.prop('disabled', false);
+            }
+
+            function DisableInputs() {
+                submit.prop('disabled', true);
+                cancel.prop('disabled', true);
+                modalDismissTimes.prop('disabled', true);
+            }
+
+            function HandleError() {
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-times text-danger no-tick"></i>').fadeIn('slow');
+                }).promise()
+                    .done(function () {
+                        setTimeout(function () {
+                            submitText.fadeOut('fast', function () {
+                                $(this).html(submitTextUnchanged).fadeIn('slow');
+                                EnableInputs();
+                            })
+                        }, 1300)
+                    })
+            }
+
+            function MakeUnreviewedSessionsModal(title, body, unreviewedSessions) {
+                $('#unreviewed-sessions-modal-title').html(title);
+                $('#unreviewed-sessions-modal-body').html(body);
+                let unreviewedSessionsModalContent = '';
+                $('#unreviewed-sessions-modal-sessions-holder').html('');
+
+                $.each(unreviewedSessions, function (index) {
+                    unreviewedSessionsModalContent = '';
+                    unreviewedSessionsModalContent += '<div class="card mb-3">' +
+                        '<div class="card-body">' +
+                        '<div class="media">' +
+                        '<div class="avatar avatar-3xl mr-3">' +
+                        `<img src="${unreviewedSessions[index].therapistProfilePhoto}" class="rounded-circle d-inline-flex"` +
+                        `alt="Psihoterapeut ${unreviewedSessions[index].therapistFirstName} ${unreviewedSessions[index].therapistLastName}" />` +
+                        '</div>' +
+                        '<div class="media-body">' +
+                        `<p class="mb-2 text-700">${unreviewedSessions[index].therapistFirstName} ${unreviewedSessions[index].therapistLastName}</p>` +
+                        `<p class="mb-2 text-muted fs--1">${unreviewedSessions[index].type}, ${unreviewedSessions[index].contactMethod}</p>` +
+                        `<p class="mb-2 text-muted fs--1">${unreviewedSessions[index].startTime}h - ${unreviewedSessions[index].endTime}h</p>` +
+                        `<div id="session-stars-holder-${unreviewedSessions[index].bookingId}">${unreviewedSessions[index].partialView}</div>` +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
+
+                    $('#unreviewed-sessions-modal-sessions-holder').append(unreviewedSessionsModalContent);
+                });
+
+                return '#' + unreviewedSessionsModalId;
+            }
+
+            $('#btn-unreviewed-sessions-done').click(function () {
+                unreviewedSessionsModal.modal('hide');
+                bookModal.modal('show');
+            })
+
+            async function RenderSessionPaymentModal(publicKey, clientSecret, amount, currency, mustCompletePaymentUntil, paymentSuccessfulReturnUrl, title, body, severity) {
+                let modal = '<div id="session-payment-modal" data-backdrop="static" data-keyboard="false" data-toggle="modal" class="modal fade p-0" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">' +
+                    '<div class="modal-dialog modal-dialog-centered" role="document">' +
+                    '<div class="modal-content border body-color">' +
+                    '<div class="modal-header border-bottom-0 pb-0">' +
+                    '<h5 class="modal-title text-center mx-auto">Unesite podatke za uplatu</h5>' +
+                    '<button type="button" id="dismiss-session-payment-modal" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvori" disabled>' +
+                    '<span aria-hidden="true">&times;</span>' +
+                    '</button>' +
+                    '</div>' +
+                    '<div id="modal-body" class="modal-body text-center">' +
+                    //'<div id="alert-countdown" class="alert alert-secondary text-center" role="alert">' +
+                    //'<span>Uplatu izvršite najkasnije za: </span>' +
+                    //'<span id="payment-countdown"></span>' +
+                    //'</div>' +
+                    '<form id="payment-form">' +
+                    '<div id="payment-element">' +
+                    '<div id="loader" class="row no-gutters placeholder-wave">' +
+                    '<div class="col-7 placeholder rounded-lg my-3"><h2 class="py-3 mb-1"></h2></div>' +
+                    '<div class="col-5"></div>' +
+                    '<div class="col-12 placeholder rounded-lg my-3"><h2 class="py-3 mb-1"></h2></div>' +
+                    '<div class="col-6 placeholder rounded-lg my-3"><h2 class="py-3 mb-1"></h2></div>' +
+                    '<div class="col-5 placeholder rounded-lg my-3 ml-auto"><h2 class="py-3 mb-1"></h2></div>' +
+                    '<div class="col-12 placeholder rounded-lg my-3"><h2 class="py-3 mb-1"></h2></div>' +
+                    '<div class="col-12 placeholder rounded-lg my-3"><h2 class="py-3 mb-1"></h2></div>' +
+                    '<button class="btn btn-primary col-12 placeholder disabled mb-1"></button>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="alert alert-danger text-center mt-2 d-none" role="alert" id="error-messages"></div>' +
+                    '<div id="pay-button-holder" class="d-none mt-3"><button id="pay-button" type="button" class="btn btn-primary btn-block">' +
+                    `<span id="pay-button-text">&nbsp;<i class="fas fa-lock mr-2"></i>Platite ${amount} ${currency}&nbsp;</span>` +
+                    '</button></div>' +
+                    '</form>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+
+                let createdModal = $($.parseHTML(modal));
+                const stripe = Stripe(publicKey);
+                const elements = stripe.elements({ clientSecret });
+                const paymentElement = elements.create('payment');
+
+                bookModal.modal('hide');
+                $(createdModal).modal();
+
+                let countDownDate = new Date(moment(`${mustCompletePaymentUntil}`).valueOf());
+
+                $(createdModal).on('hidden.bs.modal', function () {
+                    $(createdModal).remove();
+                });
+
+                setTimeout(function () {
+                    //let alertCountDown = $('#alert-countdown');
+                    //let paymentCountDown = $('#payment-countdown');
+                    let x = setInterval(function () {
+                        let now = new Date().getTime();
+
+                        let distance = countDownDate - now;
+
+                        //let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        //let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                        //paymentCountDown.html(minutes + "m " + seconds + "s ");
+
+                        //if (distance < 10000) {
+                        //    if (alertCountDown.hasClass('alert-secondary'))
+                        //        alertCountDown.removeClass('alert-secondary');
+                        //    if (!alertCountDown.hasClass('alert-danger'))
+                        //        alertCountDown.addClass('alert-danger');
+                        //}
+
+                        if (distance < 0) {
+                            clearInterval(x);
+                            $(createdModal).modal('hide');
+
+                            Swal.fire({
+                                title: "Vreme za izvršavanje uplate je isteklo",
+                                icon: "error",
+                                confirmButtonColor: "#34a4ff",
+                                confirmButtonText: "Pokušajte ponovo"
+                            }).then((result) => {
+                                EnableInputs();
+                                submitText.html(submitTextUnchanged);
+                                bookModal.modal('show');
+                            });
+                        }
+                    }, 1000)
+
+                    const paymentElementHolder = $('#payment-element');
+                    const paymentElementHolderWidth = paymentElementHolder.width();
+                    const paymentElementHolderHeight = paymentElementHolder.height();
+                    paymentElement.mount('#payment-element');
+                    paymentElementHolder.width(paymentElementHolderWidth);
+                    paymentElementHolder.height(paymentElementHolderHeight);
+
+                    paymentElement.on('ready', function () {
+                        paymentElementHolder.css('width', 'auto');
+                        paymentElementHolder.css('height', 'auto');
+                        $('#pay-button-holder').removeClass('d-none');
+                        const payButton = $('#pay-button');
+                        const dismissPaymentModal = $('#dismiss-session-payment-modal');
+                        const payButtonText = $('#pay-button-text');
+                        const payButtonTextUnchanged = payButtonText.html();
+
+                        dismissPaymentModal.prop('disabled', false);
+                        dismissPaymentModal.click(function (event) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            EnableInputs();
+
+                            Swal.mixin({
+                                customClass: {
+                                    confirmButton: "btn btn-sm btn-falcon-secondary",
+                                    cancelButton: "btn btn-sm btn-primary mr-2"
+                                },
+                                buttonsStyling: false
+                            }).fire({
+                                title: "Da li želite da prekinete proces plaćanja?",
+                                html: `Ukoliko prekinete proces, ova seansa će biti zaključana narednih <span id="swal-payment-countdown"></span>`,
+                                icon: "question",
+                                showCancelButton: true,
+                                confirmButtonText: "Prekini",
+                                cancelButtonText: "Nastavi sa plaćanjem",
+                                reverseButtons: true
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $(createdModal).modal('hide');
+                                    bookModal.modal('hide');
+                                }
+                            })
+
+                            var swalCountDownDate = new Date(moment(`${mustCompletePaymentUntil}`).valueOf());
+
+                            setTimeout(function () {
+                                let swalPaymentCountDown = $('#swal-payment-countdown');
+                                let swalX = setInterval(function () {
+                                    let swalNow = new Date().getTime();
+
+                                    let swalDistance = swalCountDownDate - swalNow;
+
+                                    let swalMinutes = Math.floor((swalDistance % (1000 * 60 * 60)) / (1000 * 60));
+                                    let swalSeconds = Math.floor((swalDistance % (1000 * 60)) / 1000);
+
+                                    swalPaymentCountDown.html(swalMinutes + "m " + swalSeconds + "s ");
+
+                                    if (swalDistance < 0) {
+                                        clearInterval(swalX);
+                                        $(createdModal).modal('hide');
+                                    }
+                                }, 1000);
+                            }, 100)
+
+                            submit.html(submitTextUnchanged);
+                        })
+
+                        payButton.click(async function () {
+                            payButton.prop('disabled', true);
+                            dismissPaymentModal.prop('disabled', true);
+
+                            payButtonText.fadeOut('fast', async function () {
+                                $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                            })
+                            const { paymentIntent, error } = await stripe.confirmPayment({
+                                elements,
+                                confirmParams: {
+                                    return_url: paymentSuccessfulReturnUrl
+                                },
+                                redirect: "if_required"
+                            })
+
+                            setTimeout(function () {
+                                if (error) {
+                                    dismissPaymentModal.prop('disabled', false);
+                                    payButtonText.fadeOut(function () {
+                                        $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                                        $('#error-messages').text(error.message)
+                                        $('#error-messages').removeClass('d-none');
+                                    })
+                                        .promise()
+                                        .done(function () {
+                                            setTimeout(function () {
+                                                payButtonText.fadeOut('fast', function () {
+                                                    $(this).html(payButtonTextUnchanged).fadeIn('slow');
+                                                    payButton.prop('disabled', false);
+                                                    dismissPaymentModal.prop('disabled', false);
+                                                })
+                                            }, 1300)
+                                        })
+                                } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                                    payButtonText.fadeOut('fast', function () {
+                                        $(this).html('<i class="ca-lightgreen fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                $(createdModal).modal('hide');
+                                                $(createdModal).remove();
+                                                Swal.fire({
+                                                    title: title,
+                                                    text: body,
+                                                    icon: severity,
+                                                    confirmButtonText: 'Pogledajte detalje',
+                                                }).then(() => {
+                                                    window.location.href = paymentSuccessfulReturnUrl;
+                                                })
+                                            }, 600)
+                                        })
+                                    })
+                                } else {
+                                    Swal.mixin({
+                                        customClass: {
+                                            confirmButton: 'btn btn-sm btn-primary mr-2',
+                                            cancelButton: 'btn btn-sm btn-falcon-secondary'
+                                        },
+                                        buttonsStyling: false
+                                    }).fire({
+                                        title: 'Došlo je do greške prilikom plaćanja',
+                                        text: 'Vaš račun nije zadužen. Osvežite stranicu i pokušajte ponovo ili kontaktirajte korisničku podršku.',
+                                        icon: 'error',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Korisnička podrška',
+                                        cancelButtonText: 'Kasnije ću'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = '@Url.Action("CustomerSupport", "Home", new { Area = "" })'
+                                        } else {
+                                            location.reload();
+                                        }
+                                    })
+                                    throw new Error('Unhandled PaymentIntent.Status = ' + paymentIntent.status)
+                                }
+                            }, 1200);
+                        })
+                    })
+
+                    paymentElement.on('change', function (event) {
+                        const displayError = $('#error-messages');
+                        if (event.error) {
+                            displayError.text(event.error.message)
+                            displayError.removeClass('d-none');
+                        } else {
+                            displayError.text('')
+                            displayError.addClass('d-none');
+                        }
+                    });
+                }, 1000);
+            }
+        })
+</script>)

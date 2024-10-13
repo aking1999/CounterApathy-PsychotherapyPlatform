@@ -1,0 +1,27 @@
+﻿@model WebApplication9.SharedPartialViewModels.SideMenuPartialViewModel
+
+<div class="col-lg-3 mb-3 mb-lg-0">
+    <div class="card">
+        <div class="card-header border-bottom-0 pb-2">
+            <span class="text-secondary"><i class="@Model.TitleIcon fa-fw @Model.TitleIconClasses mr-2 no-tick"></i>@Model.Title</span>
+            @*<p class="description">@User.GetUserName()</p>*@
+        </div>
+        <div id="aside-nav" class="card-body collapse show pt-0">
+            <ul class="list-unstyled mb-0">
+                @foreach (var menuLink in Model.MenuLinks)
+                {
+                    <li class="@menuLink.Active mt-2">
+                        <a asp-area="@menuLink.Area" asp-controller="@menuLink.Controller" asp-action="@menuLink.Action" class="text-decoration-none text-secondary">
+                            <i class="@menuLink.FontAwesomeIcon fa-fw mr-2"></i>@menuLink.Text
+
+                            @if (menuLink.ShowCount)
+                            {
+                                <span id="@menuLink.Id" class="badge badge-soft-danger font-weight-bold float-right"></span>
+                            }
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

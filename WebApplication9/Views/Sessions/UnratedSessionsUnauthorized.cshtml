@@ -1,0 +1,97 @@
+﻿@model DataTransferObjects.ViewModels.Client.BookedSessionAddRatingViewModel
+@using Framework.Helpers.ExtensionMethods
+@inject Framework.Interfaces.IDateTimeHelper DateHelper
+@{
+    ViewData.SetTitle("Neocenjena seansa");
+    ViewData.SetMetaDescription("Vaša neocenjena seansa.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/star-rating/star-rating.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+}
+
+<h3 class="text-center mb-3">
+    Kliknite na dugme <button class="btn btn-sm btn-soft-warning"><i class="far fa-star"></i></button> ispod kako biste ocenili seansu
+</h3>
+
+<div class="row no-gutters">
+    @if (Model != null)
+    {
+        <div class="col-12 has-unrated-session">
+            <div class="row justify-content-center no-gutters">
+                <div class="col-12 col-sm-8 col-md-7 col-lg-5 col-xl-4">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="media">
+                                <div class="avatar avatar-3xl mr-3">
+                                    <img src="@Model.ProfilePhoto" class="rounded-circle d-inline-flex" alt="psihoterapeut @Model.TherapistFirstName @Model.TherapistLastName" />
+                                </div>
+                                <div class="media-body">
+                                    <p class="mb-2 text-700">@Model.TherapistFirstName @Model.TherapistLastName</p>
+                                    @if (Model.Type == 0)
+                                    {
+                                        <p class="mb-2 text-muted fs--1">Individualna seansa</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="mb-2 text-muted fs--1">Grupna seansa</p>
+                                    }
+                                    <p class="mb-2 text-muted fs--1">@DateHelper.ConvertDateTimeFromUtcToLocalString(Model.StartTime)h - @DateHelper.ConvertDateTimeFromUtcToLocalString(Model.EndTime)</p>
+                                    <div id="session-stars-holder-@Model.BookingId">
+                                        @await Html.TryPartialAsync("~/Views/Shared/_RenderRateSessionButtonUnauthorized.cshtml", Model)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-12 text-center px-4 mb-3 text-secondary">
+            Trenutno nemate nijednu završenu neocenjenu seansu.
+            <br />
+            <strong>Vaša završena neocenjena seansa biće prikazana ovde.</strong>
+            <br />
+            Kliknite na dugme ispod kako biste pogledali sve psihoterapeute i zakazali seansu sa nekim od njih.
+        </div>
+        <div class="col-12 text-center mb-3">
+            <a href="@Url.AllPsychotherapistsUrl()"
+               class="btn btn-sm btn-primary mr-2">
+                <i class="far fa-users mr-2"></i>Pogledajte psihoterapeute
+            </a>
+            <a asp-controller="Home" asp-action="Index"
+               class="btn btn-sm btn-falcon-primary">
+                <i class="far fa-home mr-2"></i>Početna
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script async src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+    <script async>
+        $(document).ready(function () {
+            $('#container-main main').removeClass('pb-3');
+
+            let checkRatedSession = setInterval(function () {
+                if ($('.has-unrated-session').length && !$('div[id^="session-modal-holder-"]').length) {
+                    clearInterval(checkRatedSession);
+                    Swal.fire({
+                        title: "Hvala Vam što ste ocenili sve seanse!",
+                        icon: "success",
+                        confirmButtonColor: "#00d27a",
+                        confirmButtonText: "U redu"
+                    }).then(() => {
+                        window.location.href = '@Url.Action("Index", "Home", new { Area = "" })'
+                    });
+                }
+            }, 200)
+        })
+    </script>
+}

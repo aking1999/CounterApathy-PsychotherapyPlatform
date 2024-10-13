@@ -1,0 +1,230 @@
+﻿@using Framework.Providers
+@using Framework.Helpers.ExtensionMethods
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+    var appDomain = Configuration.GetSection("Application:AppDomain")?.Value;
+    var title = !string.IsNullOrWhiteSpace(ViewData.GetTitle()) ? ViewData.GetTitle() : "Psihoterapija";
+    var metaDescription = !string.IsNullOrWhiteSpace(ViewData.GetMetaDescription()) ?
+        ViewData.GetMetaDescription() : $"{appName} omogućava jednostavno povezivanje sa psihoterapeutima " +
+        "različitih tehnika i specijalnosti, uz mogućnost zakazivanja seansi i čitanja " +
+        "recenzija koje pružaju korisne informacije pri izboru terapeuta.";
+    var locale = "sr_Latn_RS";
+    var logoPath = "/images/content-images/counterapathy-logo.png";
+    var logoAlt = $"{appName} logo";
+    var logoType = "image/png";
+    var userRole = await User.GetRoleAsync();
+    var requestPath = Context?.Request?.Path.Value;
+    var addNoIndex = false;
+    if (!string.IsNullOrWhiteSpace(requestPath))
+    {
+        foreach (var url in WebApplication9.Helpers.SeoHelper.DisabledUrls)
+        {
+            if (requestPath.Contains(url))
+            {
+                addNoIndex = true;
+                break;
+            }
+        }
+    }
+}
+
+<!DOCTYPE html>
+<html lang="sr-RS">
+<head>
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-TLR4M5W');
+    </script>
+    <!-- End Google Tag Manager -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="title" content="@title" />
+    <meta name="description" content="@metaDescription" />
+    <meta name="keywords" content="@Html.KeyWords()" />
+    @if (addNoIndex)
+    {
+        <meta name="robots" content="noindex, nofollow" />
+    }
+    else
+    {
+        <meta name="robots" content="max-snippet:-1">
+        //standard or large
+        <meta name="robots" content="max-image-preview:large">
+    }
+    <title>@title | @appName</title>
+    <link rel="stylesheet" href="~/css/colors.css" />
+    <link rel="stylesheet" href="~/custom-site-layout/counter-apathy.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" id="bootstrap-min-css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="~/toastr/toastr.min.css" />
+    <script src="~/toastr/toastr.min.js"></script>
+    <script src="~/toastr/toastr-options.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("StyleSheets", required: false)
+    @Html.RenderResources("css")
+    <open-graph-website url="@appDomain"
+                        site-name="@appName"
+                        title="@title - @appName"
+                        locale="new Locale(locale)"
+                        description="@metaDescription"
+                        images="new List<Image>
+                {
+                    new Image(new Uri(new Uri(appDomain), logoPath).OriginalString)
+                    {
+                        SecureUrl = new Uri(new Uri(appDomain), logoPath).OriginalString,
+                        Alt = logoAlt,
+                        Width = 1200,
+                        Height = 230,
+                        Type = logoType
+                    }
+                }">
+    </open-graph-website>
+    <link rel="stylesheet" href="~/icons/counter-apathy/iconmoon.css" />
+</head>
+<body id="body-main">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TLR4M5W"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    @if (User.Identity.IsAuthenticated)
+    {
+        await Html.RenderMenuBasedOnUserRole();
+    }
+    <div id="home-section" class="home-section px-2 px-lg-0">
+        <div id="nav-container-main" class="container mt-3">
+            <div id="nav-card-main" class="card mb-3">
+                <div id="nav-cardbody-main" class="card-body p-0">
+                    <header>
+                        <nav id="nav-main" class="navbar navbar-expand-md navbar-toggleable-md navbar-light">
+                            @*class shadow, mb-3*@
+                            <div class="container">
+                                <a tabindex="-1" class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@appName</a>
+                                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-main-collapse" aria-controls="navbarSupportedContent"
+                                        aria-expanded="false" aria-label="Toggle navigation">
+                                    <span class="navbar-toggler-icon"></span>
+                                </button>
+                                <div id="nav-main-collapse" class="navbar-collapse mt-1 mt-md-0 collapse d-md-inline-flex flex-md-row-reverse">
+                                    <partial name="_LoginPartial" />
+                                    <ul class="navbar-nav flex-grow-1">
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" href="@Url.AllPsychotherapistsUrl()">Psihoterapeuti</a>
+                                        </li>
+                                        <li class="nav-item" role="button">
+                                            <div class="dropdown">
+                                                <span class="nav-link text-dark dropdown-toggle noselect" data-toggle="dropdown" aria-expanded="false">
+                                                    Dodatno
+                                                </span>
+                                                <div class="dropdown-menu position-absolute">
+                                                    <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="FAQ">
+                                                        <i class="fal fa-question fa-fw text-info mr-2 no-tick"></i>Česta pitanja
+                                                    </a>
+                                                    <a class="dropdown-item" asp-area="" asp-controller="Guides" asp-action="All">
+                                                        <i class="fal fa-book-open fa-fw text-primary mr-2 no-tick"></i>Uputstva
+                                                    </a>
+                                                    @if (userRole == UserRoles.None || userRole == UserRoles.Client)
+                                                    {
+                                                        <a class="dropdown-item" asp-area="" asp-controller="Consultations" asp-action="Index">
+                                                            <i class="fal fa-comments-alt fa-fw text-primary mr-2 no-tick"></i>Besplatne konsultacije
+                                                        </a>
+                                                        <a class="dropdown-item" asp-area="" asp-controller="Guides" asp-action="BookingRoadmap">
+                                                            <i class="fal fa-calendar-check fa-fw text-success mr-2 no-tick"></i>Lako zakažite seansu
+                                                        </a>
+                                                    }
+                                                    <a class="dropdown-item" asp-area="" asp-controller="Therapists" asp-action="PsychotherapistsExperiences">
+                                                        <i class="fal fa-star fa-fw text-warning mr-2 no-tick"></i>Iskustva sa psihoterapije
+                                                    </a>
+                                                    @if (User.HasSupportAvailable())
+                                                    {
+                                                        string supportText = "Korisnička podrška";
+                                                        string supportIconClasses = "fa-user-headset text-pink";
+                                                        if (await User.GetRoleAsync() == UserRoles.Therapist)
+                                                        {
+                                                            supportText = "Podrška za terapeute";
+                                                            supportIconClasses = "fa-headset text-orange";
+                                                        }
+                                                        <a class="dropdown-item" href="@await User.GetSupportUrlAsync()">
+                                                            <i class="fal @supportIconClasses fa-fw mr-2 no-tick"></i>@supportText
+                                                        </a>
+                                                    }
+                                                    @if (userRole == UserRoles.None || userRole == UserRoles.Client)
+                                                    {
+                                                        <div class="dropdown-divider"></div>
+                                                        <a class="dropdown-item" asp-controller="Home" asp-action="TherapistApplications">
+                                                            <span class="btn btn-soft-info">
+                                                                <i class="fal fa-paste fa-fw mr-2 no-tick"></i>Poslovi za terapeute
+                                                            </span>
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </nav>
+                    </header>
+                </div>
+            </div>
+        </div>
+        <div id="container-main" class="container">
+            <main role="main" class="pb-3">
+                <div id="preloader">
+                    <svg id="infinity-preloader"
+                         class="fade-in"
+                         xmlns="http://www.w3.org/2000/svg"
+                         xmlns:xlink="http://www.w3.org/1999/xlink"
+                         style="margin: auto; background: rgb(241, 242, 243); display: block; shape-rendering: auto;"
+                         width="100px"
+                         height="100px"
+                         viewBox="0 0 100 100"
+                         preserveAspectRatio="xMidYMid">
+                        <path fill="none"
+                              stroke="#34a4ff"
+                              stroke-width="8"
+                              stroke-dasharray="42.76482137044271 42.76482137044271"
+                              d="M24.3 30C11.4 30 5 43.3 5 50s6.4 20 19.3 20c19.3 0 32.1-40 51.4-40 C88.6 30 95 43.3 95 50s-6.4 20-19.3 20C56.4 70 43.6 30 24.3 30z"
+                              stroke-linecap="round"
+                              style="transform:scale(0.8);transform-origin:50px 50px">
+                            <animate attributeName="stroke-dashoffset"
+                                     repeatCount="indefinite"
+                                     dur="1.5873015873015872s"
+                                     keyTimes="0;1"
+                                     values="0;256.58892822265625">
+
+                            </animate>
+                        </path>
+                    </svg>
+                </div>
+                @RenderBody()
+                @await Html.PartialAsync("_ShowToast")
+            </main>
+        </div>
+        <footer id="footer">
+            @await Html.PartialAsync("~/Views/Shared/_Footer.cshtml")
+        </footer>
+    </div>
+    <script>
+        var authenticated = (String('@User.Identity.IsAuthenticated').toLowerCase() === 'true');
+    </script>
+    <script>
+        var frontEndErrorLoggerUrl = '@Url.Action("LogFrontEndErrors", "Error")';
+    </script>
+    <script src="~/js/error-logger.js"></script>
+    <script src="~/js/counter-apathy.js" asp-append-version="true"></script>
+    <script src="~/js/cookie.js"></script>
+    @RenderSection("Scripts", required: false)
+    @Html.RenderPartialSectionScripts()
+    @*<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>*@
+    @*<script src="https://www.google.com/recaptcha/api.js?render=reCAPTCHA_site_key"></script>*@
+</body>
+</html>

@@ -1,0 +1,609 @@
+﻿@model WebApplication9.Areas.Therapist.ViewModels.TherapistPublicProfileForAuthenticatedNonClientVisitorViewModel
+@using Framework.Helpers.ExtensionMethods
+@inject Framework.Interfaces.IDateTimeHelper dateHelper
+@{
+    ViewData.SetTitle(!Model.UnderSupervision ? $"Psihoterapeut {Model.FirstName} {Model.LastName}" : $"Psihoterapeut pod supervizijom - {Model.FirstName} {Model.LastName}");
+    ViewData.SetMetaDescription(!Model.UnderSupervision ?
+        $"Licencirani psihoterapeut - {Model.FirstName} {Model.LastName} - {string.Join(" · ", Model.PsychotherapyTechniquesExperiences.Select(tech => tech.Name))} · " +
+        $"{string.Join(" · ", Model.SpecialtiesExperiences.Select(tech => tech.Name))}" :
+        $"Psihoterapeut pod supervizijom - {Model.FirstName} {Model.LastName} - {string.Join(" · ", Model.PsychotherapyTechniquesExperiences.Select(tech => tech.Name))} · " +
+        $"{string.Join(" · ", Model.SpecialtiesExperiences.Select(tech => tech.Name))}");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/star-rating/star-rating.css" />
+    <style>
+        /*.modal-backdrop:nth-child(2n-1) {
+            display: none;
+        }*/
+        .swal2-footer {
+            margin: 0.3em 0 0 !important;
+        }
+
+        @@media all and (max-width:1024px) {
+            .btn-lg-block {
+                width: 100%;
+                display: block;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="~/evocalendar/evo-calendar.css" />
+    <link rel="stylesheet" href="~/evocalendar/evo-calendar.royal-navy.min.css" />
+    <script src="~/evocalendar/evo-calendar.js"></script>
+    <script src="~/year-picker/moment.min.js"></script>
+    <link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+    <script async src="~/multiselect/bootstrap-select.min.js"></script>
+}
+
+<div class="card mb-3">
+    <div class="card-header position-relative min-vh-25 mb-7">
+        <div class="bg-holder rounded-soft rounded-bottom-0" style="background-image: url(/images/content-images/public-profile-cover-photo.png);">
+        </div>
+        <div class="avatar avatar-5xl avatar-profile">
+            <img class="rounded-circle img-thumbnail shadow-sm" src="@Model.ProfilePhoto"
+                 alt="Psihoterapeut @Model.FirstName @Model.LastName"
+                 loading="lazy" />
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-8 d-flex flex-column">
+                <h4 class="mb-3 text-black">
+                    @Model.FirstName @Model.LastName<small class="fas fa-badge-check text-primary ml-1 no-tick" data-toggle="tooltip" data-placement="bottom" title="Psihoterapeut verifikovan" data-fa-transform="shrink-4 down-2"></small>
+                </h4>
+                @if (Model.UnderSupervision)
+                {
+                    <h5 class="fs-0 font-weight-normal text-500"><i class="fal fa-minus fa-fw mr-2 no-tick"></i>Psihoterapeut pod supervizijom</h5>
+                }
+                else
+                {
+                    <h5 class="fs-0 font-weight-normal text-500"><i class="fal fa-minus fa-fw mr-2 no-tick"></i>Psihoterapeut</h5>
+                }
+                <h5 class="fs-0 font-weight-normal text-500"><i class="@Model.Gender.Icon fa-fw @Model.Gender.ColorClass mr-2 no-tick"></i>@Model.Gender.Name</h5>
+                <h5 class="fs-0 font-weight-normal text-500 mb-3"><i class="fal fa-location-circle text-primary fa-fw mr-2 no-tick"></i>@Model.City, @Model.Country</h5>
+                @if (!string.IsNullOrWhiteSpace(Model.SessionPrice))
+                {
+                    <h5 class="fs-0 font-weight-normal text-500 mb-3">
+                        <span class="badge badge-pill badge-soft-success">@Model.SessionPrice</span>
+                    </h5>
+                }
+                else
+                {
+                    <h5 class="fs-0 font-weight-normal text-500 mb-3">
+                        <span class="badge badge-pill badge-soft-warning">Trenutno nema seanse</span>
+                    </h5>
+                }
+                @if (Model.Rating > 0)
+                {
+                    <h5 class="fs-0 font-weight-normal text-500 mb-3">
+                        @await Html.TryPartialAsync("_RenderStars", Model.Rating)
+                    </h5>
+                }
+                <div class="mt-auto">
+                    <button id="main-btn-book-session"
+                            class="btn btn-sm btn-success"
+                            type="button">
+                        <i class="far fa-calendar-plus mr-2"></i>Zakaži seansu
+                    </button>
+                    @if (Model.HasUpcomingConsultation)
+                    { 
+                        <button data-therapist-id="@Model.TherapistAccountId"
+                                class="btn-therapist-free-consultations btn btn-sm btn-soft-primary"
+                                type="button"
+                                style="opacity: 1 !important;">
+                            <span class="btn-therapist-free-consultations-text">Besplatne konsultacije</span>
+                        </button>
+                    }
+                </div>
+                <div class="border-dotted-bottom-4 my-4 d-lg-none"></div>
+            </div>
+            <div class="col mt-0 mt-lg-5">
+                @if (Model.PsychotherapyTechniquesExperiences != null && Model.PsychotherapyTechniquesExperiences.Any())
+                {
+                    foreach (var technique in Model.PsychotherapyTechniquesExperiences)
+                    {
+                        <div class="media align-items-center mb-2">
+                            <i class="@technique.Icon fa-fw mr-2 no-tick" style="color: @technique.Color"></i>
+                            <div class="media-body">
+                                <h6 class="mb-0">@technique.Name</h6>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="media align-items-center mb-2">
+                        <i class="far fa-times mr-2 text-700"></i>
+                        <div class="media-body">
+                            <h6 class="mb-0">Nema psihoterapijsku tehniku</h6>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <ul class="nav nav-pills nav-fill" id="pill-myTab" role="tablist">
+                    <li class="nav-item no-tick"><a class="nav-link active" id="pill-info-tab" data-toggle="tab" href="#pill-tab-info" role="tab" aria-controls="pill-tab-info" aria-selected="true"><i class="far fa-address-card mr-2"></i>Informacije</a></li>
+                    <li class="nav-item no-tick"><a class="nav-link" id="pill-sessions-tab" data-toggle="tab" href="#pill-tab-sessions" role="tab" aria-controls="pill-tab-sessions" aria-selected="false"><i class="far fa-calendar-alt text-success mr-2"></i>Seanse</a></li>
+                    <li class="nav-item no-tick"><a class="nav-link" id="pill-skills-tab" data-toggle="tab" href="#pill-tab-skills" role="tab" aria-controls="pill-tab-skills" aria-selected="false"><i class="far fa-magic text-pink mr-2"></i>Struka i veštine</a></li>
+                    <li class="nav-item no-tick"><a class="nav-link" id="pill-reviews-tab" data-toggle="tab" href="#pill-tab-reviews" role="tab" aria-controls="pill-tab-reviews" aria-selected="false"><i class="far fa-star text-warning mr-2"></i>Iskustva klijenata</a></li>
+                    <li class="nav-item no-tick"><a class="nav-link" id="pill-blog-tab" data-toggle="tab" href="#pill-tab-blog" role="tab" aria-controls="pill-tab-blog" aria-selected="false"><i class="far fa-th-large mr-2"></i>Blog</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="tab-content mt-3" id="pill-myTabContent">
+            <div class="tab-pane fade show active" id="pill-tab-info" role="tabpanel" aria-labelledby="info-tab">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">O meni</h5>
+                    </div>
+                    <div class="collapse show" id="profile-intro">
+                        <div class="card-body text-justify">
+                            <p class="mb-0 text-1000 text-break">@Model.About</p>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light p-0 border-top">
+                        <button class="btn btn-link btn-block btn-intro-collapse"
+                                type="button"
+                                data-toggle="collapse"
+                                data-target="#profile-intro"
+                                aria-expanded="true"
+                                aria-controls="profile-intro">
+                            Prikaži
+                            <span class="less">manje<i class="fas fa-chevron-up ml-2 fs--2"></i></span>
+                            <span class="full">više<i class="fas fa-chevron-down ml-2 fs--2"></i></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-lg-6 pb-3 pb-md-0">
+                        <div class="card h-100 mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Psihoterapijske tehnike</h5>
+                            </div>
+                            <div class="card-body fs--1">
+                                @if (Model.PsychotherapyTechniquesExperiences != null && Model.PsychotherapyTechniquesExperiences.Any())
+                                {
+                                    foreach (var technique in Model.PsychotherapyTechniquesExperiences)
+                                    {
+                                        <div class="media">
+                                            <i data-icon="@technique.Icon" class="@technique.Icon fa-fw fa-2x no-tick" style="color: @technique.Color"></i>
+                                            <div class="media-body position-relative pl-3">
+                                                <h6 class="text-1000 fs-0 mb-0 pb-1">
+                                                    @technique.Name
+                                                    <small class="fas fa-check-circle text-primary ml-1" data-toggle="tooltip" data-placement="bottom" title="Tehnika verifikovana" data-fa-transform="shrink-4 down-2"></small>
+                                                </h6>
+                                                @if (technique.FromDate.HasValue && !string.IsNullOrWhiteSpace(technique.City) && !string.IsNullOrWhiteSpace(technique.Country))
+                                                {
+                                                    if (technique.Present)
+                                                    {
+                                                        <p class="text-muted mt-2 mb-0">
+                                                            @dateHelper.DateStringFromDateTime(technique.FromDate.Value) - danas
+                                                            &bull;
+                                                            @((dateHelper.ConvertDateTimeFromUtcToLocal(DateTime.UtcNow) - technique.FromDate.Value).Days) dana
+                                                        </p>
+                                                    }
+                                                    else if (technique.ToDate.HasValue)
+                                                    {
+                                                        <p class="text-muted mt-2 mb-0">
+                                                            @dateHelper.DateStringFromDateTime(technique.FromDate.Value)
+                                                            -
+                                                            @dateHelper.DateStringFromDateTime(technique.ToDate.Value)
+                                                            &bull;
+                                                            @((technique.ToDate.Value - technique.FromDate.Value).Days) dana
+                                                        </p>
+                                                    }
+                                                    <p class="text-muted mb-0">@technique.City @technique.Country</p>
+                                                    @if (Model.IsSelf)
+                                                    {
+                                                        <div class="pt-1">
+                                                            <a onclick="sessionStorage.setItem('AddTechniqueExperience', '@technique.Id')"
+                                                               asp-area="Therapist" asp-controller="Account" asp-action="PsychotherapyTechniquesExperiences"
+                                                               class="btn btn-mini btn-soft-primary rounded-pill mb-0 mt-2 ml-auto border-0">
+                                                                <i class="far fa-edit fa-fw mr-1"></i>Ažurirajte iskustvo
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                }
+                                                else if (Model.IsSelf)
+                                                {
+                                                    <a onclick="sessionStorage.setItem('AddTechniqueExperience', '@technique.Id')"
+                                                       asp-area="Therapist" asp-controller="Account" asp-action="PsychotherapyTechniquesExperiences"
+                                                       class="btn btn-mini btn-soft-success rounded-pill mb-0 mt-2 ml-auto border-0">
+                                                        <i class="far fa-plus fa-fw mr-1"></i>Dodajte iskustvo
+                                                    </a>
+                                                }
+                                                <hr class="border-dashed border-bottom-0" />
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="media">
+                                        <i data-icon="fal fa-times" class="fal fa-times fa-fw fa-2x no-tick"></i>
+                                        <div class="media-body position-relative pl-3">
+                                            <h6 class="fs-0 mb-0">
+                                                Nema psihoterapijsku tehniku
+                                            </h6>
+                                            <p class="text-1000 mb-0">Psihoterapeut nije dodao tehniku.</p>
+                                            <hr class="border-dashed border-bottom-0" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                        <div class="card h-100 mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Specijalnosti</h5>
+                            </div>
+                            <div class="card-body fs--1">
+                                @if (Model.SpecialtiesExperiences != null && Model.SpecialtiesExperiences.Any())
+                                {
+                                    foreach (var specialty in Model.SpecialtiesExperiences)
+                                    {
+                                        <div class="media">
+                                            <i data-icon="@specialty.Icon" class="@specialty.Icon fa-fw fa-2x no-tick" style="color: @specialty.Color"></i>
+                                            <div class="media-body position-relative pl-3">
+                                                <h6 class="text-1000 fs-0 mb-0 pb-1">
+                                                    @specialty.Name
+                                                    <small class="fas fa-check-circle text-primary ml-1" data-toggle="tooltip" data-placement="bottom" title="Specijalnost verifikovana" data-fa-transform="shrink-4 down-2"></small>
+                                                </h6>
+                                                @if (specialty.FromDate.HasValue && !string.IsNullOrWhiteSpace(specialty.City) && !string.IsNullOrWhiteSpace(specialty.Country))
+                                                {
+                                                    if (specialty.Present)
+                                                    {
+                                                        <p class="text-muted mt-2 mb-0">
+                                                            @dateHelper.DateStringFromDateTime(specialty.FromDate.Value) - danas
+                                                            &bull;
+                                                            @((dateHelper.ConvertDateTimeFromUtcToLocal(DateTime.UtcNow) - specialty.FromDate.Value).Days) dana
+                                                        </p>
+                                                    }
+                                                    else if (specialty.ToDate.HasValue)
+                                                    {
+                                                        <p class="text-muted mt-2 mb-0">
+                                                            @dateHelper.DateStringFromDateTime(specialty.FromDate.Value)
+                                                            -
+                                                            @dateHelper.DateStringFromDateTime(specialty.ToDate.Value)
+                                                            &bull;
+                                                            @((specialty.ToDate.Value - specialty.FromDate.Value).Days) dana
+                                                        </p>
+                                                    }
+                                                    <p class="text-muted mb-0">@specialty.City @specialty.Country</p>
+                                                    @if (Model.IsSelf)
+                                                    {
+                                                        <div class="pt-1">
+                                                            <a onclick="sessionStorage.setItem('AddSpecialtyExperience', '@specialty.Id')"
+                                                               asp-area="Therapist" asp-controller="Account" asp-action="SpecialtiesExperiences"
+                                                               class="btn btn-mini btn-soft-primary rounded-pill mb-0 mt-2 ml-auto border-0">
+                                                                <i class="far fa-edit fa-fw mr-1"></i>Ažurirajte iskustvo
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                }
+                                                else if (Model.IsSelf)
+                                                {
+                                                    <a onclick="sessionStorage.setItem('AddSpecialtyExperience', '@specialty.Id')"
+                                                       asp-area="Therapist" asp-controller="Account" asp-action="SpecialtiesExperiences"
+                                                       class="btn btn-mini btn-soft-success rounded-pill mb-0 mt-2 ml-auto border-0">
+                                                        <i class="far fa-plus fa-fw mr-1"></i>Dodajte iskustvo
+                                                    </a>
+                                                }
+                                                <hr class="border-dashed border-bottom-0" />
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="media">
+                                        <i data-icon="fal fa-times" class="fal fa-times fa-fw fa-2x no-tick"></i>
+                                        <div class="media-body position-relative pl-3">
+                                            <h6 class="fs-0 mb-0">
+                                                Nema specijalnost
+                                            </h6>
+                                            <p class="text-1000 mb-0">Psihoterapeut nije dodao specijalnost.</p>
+                                            <hr class="border-dashed border-bottom-0" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pill-tab-sessions" role="tabpanel" aria-labelledby="sessions-tab">
+                <div class="row">
+                    <div class="col-md-12 col-lg-12">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    Seanse
+                                    @if (Model.IsSelf)
+                                    {
+                                        <a asp-area="Therapist" asp-controller="Sessions" asp-action="All" class="btn btn-sm btn-soft-success ml-1">
+                                            <i class="far fa-plus mr-2"></i>Dodajte seansu
+                                        </a>
+                                    }
+                                </h5>
+                            </div>
+                            <div class="card-body fs--1">
+                                <div id="calendar"></div>
+                            </div>
+                        </div>
+                        @await Html.TryPartialAsync("~/Views/Shared/FAQs/ClientAndAnonymous/_SessionsBookingFAQ.cshtml")
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pill-tab-skills" role="tabpanel" aria-labelledby="skills-tab">
+                <div class="row">
+                    <div class="col-md-12 col-lg-12">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Psihoterapijske tehnike</h5>
+                            </div>
+                            <div class="card-body fs--1">
+                                @if (Model.PsychotherapyTechniquesExperiences != null && Model.PsychotherapyTechniquesExperiences.Any())
+                                {
+                                    foreach (var technique in Model.PsychotherapyTechniquesExperiences)
+                                    {
+                                        <div class="media">
+                                            <i class="@technique.Icon fa-fw fa-2x no-tick" style="color: @technique.Color"></i>
+                                            <div class="media-body position-relative pl-3">
+                                                <h6 class="text-1000 fs-0 mb-0 pb-1">
+                                                    @technique.Name
+                                                    <small class="fas fa-check-circle text-primary ml-1" data-toggle="tooltip" data-placement="bottom" title="Tehnika verifikovana" data-fa-transform="shrink-4 down-2"></small>
+                                                </h6>
+                                                @if (technique.FromDate.HasValue && !string.IsNullOrWhiteSpace(technique.City) && !string.IsNullOrWhiteSpace(technique.Country))
+                                                {
+                                                    if (technique.Present)
+                                                    {
+                                                        <p class="text-muted mt-2 mb-0">
+                                                            @dateHelper.DateStringFromDateTime(technique.FromDate.Value) - danas
+                                                            &bull;
+                                                            @((dateHelper.ConvertDateTimeFromUtcToLocal(DateTime.UtcNow) - technique.FromDate.Value).Days) dana
+                                                        </p>
+                                                    }
+                                                    else if (technique.ToDate.HasValue)
+                                                    {
+                                                        <p class="text-muted mt-2 mb-0">
+                                                            @dateHelper.DateStringFromDateTime(technique.FromDate.Value)
+                                                            -
+                                                            @dateHelper.DateStringFromDateTime(technique.ToDate.Value)
+                                                            &bull;
+                                                            @((technique.ToDate.Value - technique.FromDate.Value).Days) dana
+                                                        </p>
+                                                    }
+                                                    <p class="text-muted mb-0">@technique.City @technique.Country</p>
+                                                    @if (!string.IsNullOrWhiteSpace(technique.Description))
+                                                    {
+                                                        <p class="text-1000 text-break mt-2 mb-0 pt-1">@technique.Description</p>
+                                                    }
+                                                    @if (Model.IsSelf)
+                                                    {
+                                                        <div class="pt-1">
+                                                            <a onclick="sessionStorage.setItem('AddTechniqueExperience', '@technique.Id')"
+                                                               asp-area="Therapist" asp-controller="Account" asp-action="PsychotherapyTechniquesExperiences"
+                                                               class="btn btn-mini btn-soft-primary rounded-pill mb-0 mt-2 ml-auto border-0">
+                                                                <i class="far fa-edit fa-fw mr-1"></i>Ažurirajte iskustvo
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                }
+                                                else if (Model.IsSelf)
+                                                {
+                                                    <a onclick="sessionStorage.setItem('AddTechniqueExperience', '@technique.Id')"
+                                                       asp-area="Therapist" asp-controller="Account" asp-action="PsychotherapyTechniquesExperiences"
+                                                       class="btn btn-mini btn-soft-success rounded-pill mb-0 mt-2 ml-auto border-0">
+                                                        <i class="far fa-plus fa-fw mr-1"></i>Dodajte iskustvo
+                                                    </a>
+                                                }
+                                                <hr class="border-dashed border-bottom-0" />
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="media">
+                                        <i class="fal fa-times fa-2x fa-fw"></i>
+                                        <div class="media-body position-relative pl-3">
+                                            <h6 class="fs-0 mb-0">
+                                                Nema psihoterapijsku tehniku
+                                            </h6>
+                                            <p class="text-1000 mb-0">Psihoterapeut nije dodao tehniku.</p>
+                                            <hr class="border-dashed border-bottom-0" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-12">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Specijalnosti</h5>
+                            </div>
+                            <div class="card-body fs--1">
+                                @if (Model.SpecialtiesExperiences != null && Model.SpecialtiesExperiences.Any())
+                                {
+                                    foreach (var specialty in Model.SpecialtiesExperiences)
+                                    {
+                                        <div class="media">
+                                            <i class="@specialty.Icon fa-fw fa-2x no-tick" style="color: @specialty.Color"></i>
+                                            <div class="media-body position-relative pl-3">
+                                                <h6 class="text-1000 fs-0 mb-0 pb-1">
+                                                    @specialty.Name
+                                                    <small class="fas fa-check-circle text-primary ml-1" data-toggle="tooltip" data-placement="bottom" title="Specijalnost verifikovana" data-fa-transform="shrink-4 down-2"></small>
+                                                </h6>
+                                                @if (specialty.FromDate.HasValue && !string.IsNullOrWhiteSpace(specialty.City) && !string.IsNullOrWhiteSpace(specialty.Country))
+                                                {
+                                                    if (specialty.Present)
+                                                    {
+                                                        <p class="text-muted mt-2 mb-0">
+                                                            @dateHelper.DateStringFromDateTime(specialty.FromDate.Value) - danas
+                                                            &bull;
+                                                            @((dateHelper.ConvertDateTimeFromUtcToLocal(DateTime.UtcNow) - specialty.FromDate.Value).Days) dana
+                                                        </p>
+                                                    }
+                                                    else if (specialty.ToDate.HasValue)
+                                                    {
+                                                        <p class="text-muted mt-2 mb-0">
+                                                            @dateHelper.DateStringFromDateTime(specialty.FromDate.Value)
+                                                            -
+                                                            @dateHelper.DateStringFromDateTime(specialty.ToDate.Value)
+                                                            &bull;
+                                                            @((specialty.ToDate.Value - specialty.FromDate.Value).Days) dana
+                                                        </p>
+                                                    }
+                                                    <p class="text-muted mb-0">@specialty.City @specialty.Country</p>
+                                                    @if (!string.IsNullOrWhiteSpace(specialty.Description))
+                                                    {
+                                                        <p class="text-1000 text-break mt-2 mb-0 pt-1">@specialty.Description</p>
+                                                    }
+                                                    @if (Model.IsSelf)
+                                                    {
+                                                        <div class="pt-1">
+                                                            <a onclick="sessionStorage.setItem('AddSpecialtyExperience', '@specialty.Id')"
+                                                               asp-area="Therapist" asp-controller="Account" asp-action="SpecialtiesExperiences"
+                                                               class="btn btn-mini btn-soft-primary rounded-pill mb-0 mt-2 ml-auto border-0">
+                                                                <i class="far fa-edit fa-fw mr-1"></i>Ažurirajte iskustvo
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                }
+                                                else if (Model.IsSelf)
+                                                {
+                                                    <a onclick="sessionStorage.setItem('AddSpecialtyExperience', '@specialty.Id')"
+                                                       asp-area="Therapist" asp-controller="Account" asp-action="SpecialtiesExperiences"
+                                                       class="btn btn-mini btn-soft-success rounded-pill mb-0 mt-2 ml-auto border-0">
+                                                        <i class="far fa-plus fa-fw mr-1"></i>Dodajte iskustvo
+                                                    </a>
+                                                }
+                                                <hr class="border-dashed border-bottom-0" />
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="media">
+                                        <i class="fal fa-times fa-2x fa-fw"></i>
+                                        <div class="media-body position-relative pl-3">
+                                            <h6 class="fs-0 mb-0">
+                                                Nema specijalnost
+                                            </h6>
+                                            <p class="text-1000 mb-0">Psihoterapeut nije dodao specijalnost.</p>
+                                            <hr class="border-dashed border-bottom-0" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="pill-tab-reviews" class="tab-pane fade" role="tabpanel" aria-labelledby="reviews-tab">
+                @if (Model.ClientReviews != null && Model.ClientReviews.Any())
+                {
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6">
+                                            Prosečna ocena: @await Html.TryPartialAsync("~/Views/Shared/_RenderStars.cshtml", Model.Rating)
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            Ocenjen: @Model.ClientReviews.Count puta
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @await Html.TryPartialAsync("~/Views/Shared/_ClientsReviews.cshtml", Model.ClientReviews)
+            </div>
+            <div id="pill-tab-blog" class="tab-pane fade" role="tabpanel" aria-labelledby="blog-tab">
+                <div class="alert alert-pink text-center mb-0" role="alert">
+                    <i class="far fa-bullhorn mr-2"></i>Mogućnost pisanja blogova biće dodata uskoro.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.TryPartialAsync("_BookSessionModalForAuthenticatedNonClientVisitor", Model)
+
+@section Scripts {
+    @if (Model.HasUpcomingConsultation)
+    {
+        <script async>
+            var getConsultationsUrl = '@Url.Action("GetConsultations", "Consultations", new { Area = "" })';
+        </script>
+        <script async src="~/js/free-consultations-setup.js"></script>
+    }
+    <script async src="~/js/accordion-setup.js"></script>
+    <script async>
+        $(document).ready(function () {
+            function ShowCalendarTab() {
+                $('#pill-myTab').find('.active').removeClass('active');
+                $('#pill-myTabContent').find('.active').removeClass('active');
+                $('#pill-sessions-tab').addClass('active');
+                $('#pill-tab-sessions').addClass('show active');
+
+                $('html, body').animate({
+                    scrollTop: $("#pill-tab-sessions").offset().top
+                }, 2000);
+            };
+
+            function ShowSkillsTab() {
+                $('#pill-myTab').find('.active').removeClass('active');
+                $('#pill-myTabContent').find('.active').removeClass('active');
+                $('#pill-skills-tab').addClass('active');
+                $('#pill-tab-skills').addClass('show active');
+
+                $('html, body').animate({
+                    scrollTop: $('#pill-tab-skills').offset().top
+                }, 1000)
+            }
+
+            function ShowReviewsTab() {
+                $('#pill-myTab').find('.active').removeClass('active');
+                $('#pill-myTabContent').find('.active').removeClass('active');
+                $('#pill-reviews-tab').addClass('active');
+                $('#pill-tab-reviews').addClass('show active');
+
+                $('html, body').animate({
+                    scrollTop: $('#pill-tab-reviews').offset().top
+                }, 1000)
+            }
+
+            if (sessionStorage.getItem('showCalendarTab') === 'true') {
+                sessionStorage.removeItem('showCalendarTab');
+                ShowCalendarTab();
+            }
+
+            if (sessionStorage.getItem('showSkillsTab') === 'true') {
+                sessionStorage.removeItem('showSkillsTab');
+                ShowSkillsTab();
+            }
+
+            $('#main-btn-book-session').click(function () {
+                ShowCalendarTab();
+            });
+        });
+    </script>
+}
+

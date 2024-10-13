@@ -1,0 +1,9 @@
+﻿@using Framework.Helpers.ExtensionMethods
+
+@{
+    ViewData.SetTitle("403 - Zabranjen pristup");
+    ViewData.SetMetaDescription("Zabranjen pristup zahtevanoj stranici.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/ErrorPages/PartialViews/_Forbidden403.cshtml")

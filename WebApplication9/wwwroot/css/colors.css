@@ -1,0 +1,67 @@
+﻿:root {
+  --ca-red: #fc3840;
+  /*--ca-red: ##ff3366; mnogo lepa boja*/
+  /*--ca-lightgreen: #aff1b6;*/
+  --ca-lightgreen: #81f78e;
+  --ca-green: #33c453;
+  /*--ca-green: #29ab45;*/
+  --ca-white: white;
+  --ca-lila: #b980ff;
+  --ca-yellow: #ffc107; /*losa je ova zuta*/
+  --ca-bg-lightblue: #e8f5f3;
+  /*--ca-yellow: #d9a404;*/
+  /*yellow #f7be16*/
+  /*info soft #c3ecfe*/
+  /*info #146284*/
+  /*danger #781d2d*/
+  /*soft danger #fad7dd*/
+  /*soft danger #f8c7d0*/
+}
+
+.ca-blue {
+  color: var(--ca-blue) !important;
+}
+
+.ca-lila {
+  color: var(--ca-lila) !important;
+}
+
+.ca-red {
+  color: var(--ca-red) !important;
+}
+
+.ca-red-background {
+  background-color: var(--ca-red) !important;
+}
+
+.ca-lightgreen {
+  color: var(--ca-lightgreen) !important;
+}
+
+.ca-bg-lightgreen {
+  background-color: var(--ca-lightgreen) !important;
+}
+
+.ca-green {
+  color: var(--ca-green) !important;
+}
+
+.ca-blue-background {
+  background-color: var(--ca-blue) !important;
+}
+
+.ca-lightgreen-background {
+  background-color: var(--ca-lightgreen) !important;
+}
+
+.ca-green-background {
+  background-color: var(--ca-green) !important;
+}
+
+.ca-white {
+  color: white !important;
+}
+
+.ca-white-background {
+  background-color: white;
+}

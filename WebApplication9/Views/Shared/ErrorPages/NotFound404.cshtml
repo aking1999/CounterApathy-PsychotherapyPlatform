@@ -1,0 +1,11 @@
+﻿@model DataTransferObjects.PartialViewModels.NotFoundPartialViewModel
+
+@using Framework.Helpers.ExtensionMethods 
+
+@{
+    ViewData.SetTitle("404 - Stranica nije pronađena");
+    ViewData.SetMetaDescription("Zahtevana stranica nije pronađena.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/ErrorPages/PartialViews/_NotFound404.cshtml", Model) 

@@ -1,0 +1,554 @@
+﻿@using Framework.Providers
+@using Framework.Helpers.ExtensionMethods
+@using WebApplication9.SharedPartialViewModels;
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+    var appDomain = Configuration.GetSection("Application:AppDomain")?.Value;
+
+    ViewData.SetTitle("Uslovi korišćenja");
+    ViewData.SetMetaDescription("Naši uslovi korišćenja osiguravaju Vam sigurno i " +
+        $"profesionalno iskustvo na {appName} platformi.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var sideMenuItems = new List<SideMenuItemPartialViewModel>()
+    {
+        new SideMenuItemPartialViewModel("", null, "Home", "About", "fal fa-address-card fa-fw text-info", "O nama"),
+        new SideMenuItemPartialViewModel("", null, "Consultations", "Index", "fal fa-comments-alt fa-fw text-primary", "Besplatne konsultacije"),
+        new SideMenuItemPartialViewModel("", null, "Guides", "BookingRoadmap", "fal fa-calendar-check fa-fw text-success", "Lako zakažite seansu"),
+        new SideMenuItemPartialViewModel("", null, "Therapists", "PsychotherapistsExperiences", "fal fa-star fa-fw text-warning", "Iskustva sa psihoterapije"),
+        //new SideMenuItemPartialViewModel("", null, "Home", "EasySiteNavigation", "fal fa-map-marked fa-fw text-info", "Easy site navigation"),
+        new SideMenuItemPartialViewModel("", null, "Home", "FAQ", "fal fa-question fa-fw text-info", "Česta pitanja")
+    };
+
+    var userRole = await User.GetRoleAsync();
+
+    if (userRole == UserRoles.None || userRole == UserRoles.Client || userRole == UserRoles.Admin)
+    {
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Guides", "All", "fal fa-book-open fa-fw text-primary", "Uputstva"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("active", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi korišćenja"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TherapistsTerms", "fal fa-scroll fa-fw text-primary", "Uslovi za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "Privacy", "fal fa-shield fa-fw text-primary", "Politika privatnosti"));
+        if (userRole == UserRoles.None || userRole == UserRoles.Client)
+            sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "CustomerSupport", "fal fa-user-headset fa-fw text-pink", "Korisnička podrška"));
+    }
+    else if (userRole == UserRoles.Therapist)
+    {
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Guides", "All", "fal fa-book-open fa-fw text-primary", "Uputstva za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("active", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi korišćenja"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "TherapistsTerms", "fal fa-scroll fa-fw text-primary", "Uslovi za terapeute"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", null, "Home", "Privacy", "fal fa-shield fa-fw text-primary", "Politika privatnosti"));
+        sideMenuItems.Add(new SideMenuItemPartialViewModel("", "Therapist", "Account", "Support", "fal fa-headset fa-fw text-orange", "Podrška za terapeute"));
+    }
+
+    var payPalFee = Configuration.GetSection("PayPalSettings").Get<WebApplication9.Controllers.PayPalController.PayPalSettings>().FeePercentage;
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/notification-center/notification-center.css" />
+    <style>
+        .terms li {
+            padding-bottom: 0.5rem;
+        }
+
+            .terms li:last-child {
+                padding-bottom: 0;
+            }
+    </style>
+}
+
+<div class="row">
+    @await Html.TryPartialAsync("~/Views/Shared/Menues/_SideMenu.cshtml",
+        new SideMenuPartialViewModel("fal fa-info-circle", "Centar za pomoć", "text-info", sideMenuItems))
+    <div class="col-lg-9 terms">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card pt-1 mb-3">
+                    <div class="card-header pb-0">
+                        <h4 class="text-center mb-0 text-primary">Uslovi korišćenja</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            Dobrodošli na @appName, platformu koja Vam pomaže u pronalasku odgovarajućeg psihoterapeuta.
+                            Ovi uslovi korišćenja ("Uslovi") upravljaju Vašim korišćenjem naše platforme ("Platforma" ili "@appName")
+                            i povezanih usluga ("Usluge") koje se nalaze na adresi
+                            <a href="@appDomain" target="_blank">@appDomain</a>, pa ih pažljivo pročitajte.
+                        </p>
+                        <p>
+                            Usluge na Platformi su namenjene isključivo za ličnu i nekomercijalnu upotrebu.
+                            Ne možete koristiti Usluge u druge svrhe bez našeg izričitog pismenog odobrenja.
+                        </p>
+                        <p class="mb-0">
+                            Korišćenjem Usluga, slažete se da ste obavezani ovim Uslovima. Ukoliko se ne slažete sa bilo kojom
+                            stavkom Uslova, molimo da ne koristite Platformu.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="account">@*Korišćenje usluga*@1. Korisnički nalog</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">1.1 Kvalifikacija</h6>
+                        <p class="mb-0">
+                            Morate imati najmanje šesnaest (16) godina i biti državljanin Republike Srbije da biste
+                            kreirali korisnički nalog na Platformi.
+                            Korišćenjem Platforme, garantujete da ispunjavate ove zahteve.
+                            <br />
+                            Platforma ima pravo da ugasi svaki nalog koji je napravljen od strane lica sa manje od šesnaest (16) godina
+                            ili van Republike Srbije.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">1.2 Prihvatanje ovih Uslova</h6>
+                        <p class="mb-0">
+                            Ovi Uslovi se primenjuju od trenutka kada se registrujete na Platformu. Klikom na dugme
+                            "Registracija" ili "Završi" na stranici za registraciju znači da ste zvanično
+                            "potpisali" Uslove i sklopili ugovor na osnovu Uslova ("Ugovor"). Ako se registrujete
+                            u ime kompanije ili druge pravne osobe, garantujete da imate
+                            ovlašćenje da prihvatite ove Uslove u njihovo ime.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">1.3 Registracija</h6>
+                        <p>
+                            Da biste koristili određene funkcije Platforme kao što su zakazivanje seanse,
+                            pregled zakazanih seansi, ocenjivanje i dr. potrebno je da
+                            napravite korisnički nalog (odnosno da se registrujete).
+                        </p>
+                        Za uspešnu registraciju neophodno je da:
+                        <ol class="mb-0">
+                            <li>Odete na <a asp-controller="Authorization" asp-action="Register" target="_blank">stranicu za registraciju</a>.</li>
+                            <li>
+                                Popunite sva obavezna polja (imate opciju da ostanete anonimni što znaci da ime i prezime koje unesete
+                                ne moraju biti Vaše legalno ime i prezime, već samo alijas kojim ćete biti identifikovani u sistemu,
+                                <strong>ali imejl mora biti tačan jer ćete putem njega biti kontaktirani u slučaju zakazivanja seanse</strong>).
+                            </li>
+                            <li>Složite se sa ovim Uslovima i <a asp-controller="Home" asp-action="Privacy" target="_blank">politikom privatnosti</a>.</li>
+                            <li><a asp-controller="Authorization" asp-action="ConfirmEmail" target="_blank">Potvrdite imejl adresu</a>.</li>
+                        </ol>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">1.4 Gašenje Vašeg naloga</h6>
+                        <p>
+                            Vi ili mi možemo u svakom trenutku i iz bilo kog razloga okončati ovaj Ugovor
+                            slanjem imejl obaveštenja u pisanom obliku drugoj strani.
+                        </p>
+                        <p>
+                            Ukoliko mi okončavamo Ugovor sa Vama i na svom nalogu imate nepotrošenog Veb kredita,
+                            pre gašenja Vašeg naloga, naš predstavnik će Vas kontaktirati putem imejla radi dogovora
+                            o isplati tih sredstava sa naloga na Vaš poštanski ili bankovni račun u Srbiji.
+                        </p>
+                        Ukoliko Vi želite da okončate Ugovor sa nama i na svom nalogu:
+                        <ul>
+                            <li>
+                                <strong>Imate nepotrošenog Veb kredita</strong>, neophodno je da se ulogujete na nalog
+                                koji želite da bude ugašen, zatim odete na stranicu za kontaktiranje
+                                <a asp-controller="Home" asp-action="CustomerSupport" target="_blank">korisničke podrške</a>,
+                                kliknete na "Izaberite temu" i iz padajućeg menija izaberete opciju "Zahtev za gašenje naloga" i
+                                popunite polja zahtevanim podacima. Dva do tri
+                                radnih dana nakon toga, naš predstavnik će Vas kontaktirati putem imejla radi dogovora o
+                                isplati tih sredstava sa naloga na Vaš poštanski ili bankovni račun u Srbiji.
+                            </li>
+                            <li>
+                                <strong>Nemate nepotrošenog Veb kredita</strong>, neophodno je da se ulogujete na nalog
+                                koji želite da bude ugašen, zatim odete na
+                                <a asp-controller="Account" asp-action="Profile" target="_blank">profilnu stranicu</a>,
+                                kliknete na "Podešavanja" i iz padajućeg menija izaberete opciju "Gašenje naloga",
+                                zatim unesete lozinku naloga i potvrđivanjem, nalog se gasi.
+                            </li>
+                        </ul>
+                        Nakon prestanka Ugovora, mi možemo trajno izbrisati Vaš nalog i sve podatke koji
+                        su s njim povezani, uključujući sav Vaš sadržaj sa naše Platforme.
+                        <hr class="my-4" />
+                        <h6 class="text-primary">1.5 Nalog i lozinka</h6>
+                        <p>
+                            Samo ste Vi odgovorni za održavanje poverljivosti imejla i lozinke
+                            svog naloga.
+                            Takođe ste odgovorni za bilo koje korišćenje Vašeg naloga,
+                            bez obzira da li ste ovlastili takvo korišćenje. Saglasni ste da nas
+                            odmah obavestite ukoliko posumnjate u neovlašćen pristup i korišćenje svog naloga.
+                            <br />
+                            Nismo odgovorni za bilo kakve gubitke usled ukradenih ili hakovanih lozinki.
+                            Nemamo pristup Vašoj trenutnoj lozinki i iz sigurnosnih razloga,
+                            možemo samo obnoviti (resetovati) Vašu lozinku.
+                        </p>
+                        <p class="mb-0">
+                            Klijent snosi troškove štete i nadoknade štete nastale usled neovlašćene upotrebe njegovog naloga.
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="subscriptions">2. Plaćanja i dopune Veb kredita</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">2.1 Cene</h6>
+                        <p class="mb-0">Sve cene na Platformi su izražene u RSD.</p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">2.2 Plaćanje Usluga Platforme</h6>
+                        <p>
+                            Sve usluge na Platformi se plaćaju Veb kreditom na Vašem nalogu. Da biste platili bilo koju uslugu (na primer zakazali seansu),
+                            neophodno je da u tom trenutku, na svom nalogu imate Veb kredita u visini cene te usluge.
+                            <br />
+                            Dopuna Veb kredita naloga se vrši na <a asp-controller="Account" asp-action="AddWebCredit" target="_blank">stranici za dopunu Veb kredita</a>.
+                        </p>
+                        <p>
+                            <strong class="text-black">1 RSD = 1 Veb kredit</strong>
+                            <br />
+                            <strong class="text-black">1000 RSD = 1000 Veb kredita</strong> itd.
+                        </p>
+                        <p class="mb-0">
+                            Sav nepotrošeni Veb kredit ostaje na Vašem nalogu bez vremenskog ograničenja do kad ga morate iskoristiti.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">2.3 Dopuna Veb kredita</h6>
+                        <p class="mb-0">
+                            Platforma trenutno nudi dopune Veb kredita putem E-Bankinga, pošte ili PayPala.
+                            Ubuduće, biće omogućene dopune i preko servisa Banca Intesa, Visa i Mastercard.
+                            <br />
+                            <strong>Ne čuvamo Vaše podatke</strong> prilikom dopune Veb kredita.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">2.4 Dopuna putem PayPala</h6>
+                        <p class="mb-0">
+                            U slučaju dopune Veb kredita putem PayPala, PayPal naplaćuje @payPalFee% provizije.
+                            <br />
+                            Nakon uplate dopune, Veb kredit se momentalno dodaje na Vaš nalog.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">2.5 Dopuna putem E-Bankinga ili pošte</h6>
+                        <p class="mb-0">
+                            U slučaju dopune Veb kredita putem E-Bankinga ili uplatnice u pošti, ta aplikacija, odnosno pošta određuje visinu provizije.
+                            <br />
+                            Nakon uplate dopune, Veb kredit se dodaje na Vaš nalog najkasnije jedan radni dan od trenutka uplate (odmah pri proknjižavanju).
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">2.6 Povraćaj novca</h6>
+                        <p class="mb-0">
+                            Nećete imati pravo na povraćaj i isplatu Veb kredita koji imate na svom nalogu,
+                            osim u slučaju gašenja Vašeg naloga od strane Vas ili nas.
+                            <br />
+                            Za više informacija o isplati
+                            Veb kredita u slučaju gašenja naloga, pročitajte sekciju 1 "Korisnički nalog", stavku 4 "Gašenje Vašeg naloga".
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="subscriptions">3. Seanse i zakazivanja</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">3.1 Tipovi seansi</h6>
+                        <p class="mb-0">
+                            Seansa može biti individualna ili grupna (ovde spadaju partnerska i porodična seansa) i psihoterapeut
+                            određuje tip seanse, a na klijentu je da zakaže seansu koja mu odgovara.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">3.2 Načini održavanja seanse (kontakt metoda)</h6>
+                        <p class="mb-0">
+                            Seansa se može održati lično, na adresi psihoterapeuta ili online, putem Google Meet aplikacije.
+                            Klijent bira način održavanja seanse prilikom njenog zakazivanja.
+                            Klijentu će za izbor biti ponuđene one kontakt metode koje je terapeut unapred odredio.
+                            <br />
+                            Za više informacija o održavanju i pristupu seansi, pročitajte sekciju 4 "Održavanje i pristup seansi".
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">3.3 Cene seansi</h6>
+                        <p>
+                            Terapeuti određuju cene za svoje seanse, pakete i ostale usluge.
+                            Cene su prikazane na njihovim profilima.
+                            Takođe, psihoterapeuti za svaku svoju seansu mogu odrediti različitu cenu.
+                            <strong>Cena seanse ne zavisi od njenog načina održavanja</strong>.
+                        </p>
+                        Napomena:
+                        <ul class="mb-0">
+                            <li>
+                                <strong>Ukoliko su seanse psihoterapeuta iste cene</strong>, na primer 2500 RSD,
+                                na njegovom profilu će pisati
+                                <span class="badge badge-soft-success badge-pill">Cena seanse: 2500 RSD</span>.
+                            </li>
+                            <li>
+                                <strong>Ukoliko seanse psihoterapeuta nisu iste cene</strong>,
+                                na primer 3000, 1000, 2500 i 4000 RSD, na njegovom profilu će pisati
+                                <span class="badge badge-soft-success badge-pill">Cena seanse: 1000 RSD - 4000 RSD</span>,
+                                gde se na levoj strani nalazi cena njegove najjeftinije seanse, a na desnoj, cena najskuplje.
+                            </li>
+                            <li>
+                                <strong>Ukoliko psihoterapeut trenutno nema nijednu aktivnu seansu</strong>, na njegovom profilu neće pisati cena.
+                            </li>
+                        </ul>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">3.4 Zakazivanje seanse</h6>
+                        <p>
+                            Prilikom zakazivanja seanse slažete se da ćete psihoterapeutu platiti naveden iznos te seanse.
+                            Sistem će automatski sa Vašeg naloga skinuti Veb kredit u punom iznosu seanse.
+                            <br />
+                            Platforma ne naplaćuje proviziju klijentima i nema dodatnih troškova prilikom zakazivanja.
+                        </p>
+                        <p>
+                            Slobodna seansa može biti zakazana samo ukoliko se zakazivanje vrši bar
+                            @(WebApplication9.Areas.Therapist.Controllers.SessionsController.MIN_DAYS_ADD_SESSION_IN_ADVANCE) dan(a)
+                            (@(WebApplication9.Areas.Therapist.Controllers.SessionsController.MIN_DAYS_ADD_SESSION_IN_ADVANCE * 24) časa)
+                            pre početka seanse.
+                        </p>
+                        <p>
+                            Da biste zakazali i platili seansu, neophodno je da u tom trenutku,
+                            na svom nalogu imate Veb kredita u visini cene te seanse.
+                        </p>
+                        <p class="mb-0">
+                            Pre zakazivanja nove seanse sve dosadašnje neocenjene završene seanse morate oceniti.
+                            <br />
+                            Za više informacija o ocenjivanju seansi, pročitajte sekciju 5 "Ocenjivanje seansi",
+                            stavku 2 "Dozvoljene i nedozvoljene stvari prilikom ocenjivanja".
+                            @*U slučaju da želite da zakažete seansu, a imate završene seanse od ranije*@
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">3.5 Otkazivanje seanse</h6>
+                        <p>
+                            Zakazanu seansu nije moguće odložiti, promeniti joj termin, zameniti je za drugu seansu niti je
+                            otkazati i dobiti novac nazad.
+                            <br />
+                            Nije moguća nikakva nadoknada za zakazanu seansu kojoj klijent iz bilo kog razloga nije prisustvovao
+                            ili tek planira da joj ne prisustvuje.
+                        </p>
+                        <p class="mb-0">
+                            U slučaju tehničkih problema, pročitati sekciju 4 "Održavanje i pristup seansi", stavku 4 "Tehnički problemi".
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="subscriptions">4. Održavanje i pristup seansi</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">4.1 Individualna seansa</h6>
+                        Ukoliko je klijent zakazao individualnu seansu da se održava:
+                        <ul>
+                            <li>
+                                <strong>Lično</strong> - neophodno je da dođe na adresu terapeuta 5 minuta pre početka seanse.
+                            </li>
+                            <li>
+                                <strong>Online</strong> - najkasnije 4 sata pre početka seanse na imejl klijenta će biti poslat link za pristup seansi.
+                                <br />
+                                Na vreme početka seanse, klijent će pristupiti seansi putem linka.
+                            </li>
+                        </ul>
+                        <p>
+                            U slučaju zakazivanja online seanse, klijent je dužan da blagovremeno instalira aplikaciju na kojoj je izabrao
+                            da seansa bude održana. Platforma i psihoterapeut nisu odgovorni niti dužni da na bilo koji način
+                            nadoknade štetu koja je nastala usled toga što je klijent nespreman dočekao početak seanse.
+                        </p>
+                        <p class="mb-0">
+                            Ukoliko Vam treba pomoć oko pristupa online seansi, pročitajte
+                            <a asp-controller="Guides" asp-action="JoinGoogleMeetByComputer" target="_blank">uputstvo za pristup seansi putem računara</a> ili
+                            <a asp-controller="Guides" asp-action="JoinGoogleMeetByPhone" target="_blank">uputstvo za pristup seansi putem mobilnog telefona</a>.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">4.2 Grupna seansa</h6>
+                        <p class="mb-0">
+                            Ukoliko je klijent zakazao grupnu seansu da se održava:
+                            <ul>
+                                <li>
+                                    <strong>Lično</strong> - neophodno je da svi dođu na adresu terapeuta 5 minuta pre početka seanse.
+                                    Klijent koji je preko svog naloga zakazao grupnu seansu, dužan je da informiše sve ostale učesnike seanse.
+                                </li>
+                                <li>
+                                    <strong>Online</strong> - najkasnije 4 sata pre početka seanse, klijentu koji je putem svog naloga
+                                    zakazao seansu, biće poslat imejl sa linkom za pristup. Taj klijent je sam dužan da
+                                    informiše sve ostale učesnike.
+                                    <br />
+                                    Na vreme početka seanse, svi klijenti će pristupiti seansi putem linka.
+                                </li>
+                            </ul>
+                        <p>
+                            U slučaju zakazivanja grupne online seanse, svi učesnici su dužani da blagovremeno instaliraju aplikaciju na kojoj je izabrano
+                            da seansa bude održana. Platforma i psihoterapeut nisu odgovorni niti dužni da na bilo koji način
+                            nadoknade štetu koja je nastala usled toga što su klijenti nespremni dočekali početak seanse.
+                        </p>
+                        <p class="mb-0">
+                            Ukoliko Vam treba pomoć oko pristupa online seansi, pročitajte
+                            <a asp-controller="Guides" asp-action="JoinGoogleMeetByComputer" target="_blank">uputstvo za pristup seansi putem računara</a> ili
+                            <a asp-controller="Guides" asp-action="JoinGoogleMeetByPhone" target="_blank">uputstvo za pristup seansi putem mobilnog telefona</a>.
+                        </p>
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">4.3 Kašnjenje na zakazanu seansu</h6>
+                        <p class="mb-0">
+                            Platforma i psihoterapeut nisu odgovorni niti dužni da klijentu na bilo koji način nadoknade štetu
+                            koja je nastala usled toga što je iz bilo kog razloga kasnio ili nespremno dočekao početak seanse.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">4.4 Tehnički problemi</h6>
+                        <p class="mb-0">
+                            U slučaju da dođe do tehničkih problema u tolikoj meri da nije moguće nastaviti seansu,
+                            obavestite terapeuta usmeno, putem imejla ili pozivom na mobilni telefon u toku trajanja seanse.
+                            Nakon toga, neophodno je da se ulogujete na svoj nalog i
+                            obavestite <a asp-controller="Home" asp-action="CustomerSupport" target="_blank">korisničku podršku</a>
+                            o ovom problemu. Ubrzo nakon toga, pun iznos te seanse će biti vraćen na Vaš nalog u obliku Veb kredita.
+                            <br />
+                            <br />
+                            Ukoliko ste zakazali seansu bez registracije, neophodno je da se
+                            <a asp-controller="Authorization" asp-action="Register" target="_blank">registrujete</a> istim imejlom koji
+                            ste koristili za zakazivanje seanse. Nakon toga, neophodno je da se ulogujete na svoj nalog i
+                            obavestite <a asp-controller="Home" asp-action="CustomerSupport" target="_blank">korisničku podršku</a>
+                            o ovom problemu. Ubrzo nakon toga, pun iznos te seanse će biti vraćen na Vaš nalog u obliku Veb kredita.
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="subscriptions">5. Ocenjivanje seansi</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">5.1 Privatnost podataka klijenta koji je ocenio seansu</h6>
+                        <p class="mb-0">
+                            U skladu sa <a asp-controller="Home" asp-action="Privacy" target="_blank">politikom privatnosti</a> ocenjivanje je potpuno anonimno.
+                            <br />
+                            Kad klijent oceni seansu, Platforma garantuje da ni u kom trenutku neće
+                            prikazati njegove lične podatke javno niti bilo kom terapeutu.
+                            Biće prikazani samo ocena, komentar i datum ocenjivanja.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">5.2 Dozvoljene i nedozvoljene stvari prilikom ocenjivanja</h6>
+                        <p>
+                            Klijent može oceniti seansu nakon završetka. Ocene i propratni komentari su
+                            podložni našem pregledu.
+                            <br />
+                            Zabranjene su ocene sa komentarima koji sadrže lične informacije klijenta, terapeuta ili bilo koga drugog,
+                            klevetnički ili uznemirujući sadržaj.
+                        </p>
+                        <p>
+                            Ocene od tri zvezdice i niže, moraju imati jasan propratni komentar koji detaljno
+                            opisuje šta je dovelo do toga da klijent da nisku ocenu. Odnosno šta je u toku
+                            seanse klijentu odgovaralo, a šta nije. Ocene od tri zvezdice i niže, koje ne
+                            sadrže jasan propratni komentar neće biti prikazane.
+                        </p>
+                        <p class="mb-0">
+                            Zadržavamo pravo da uklonimo bilo koju ocenu koja krši naša pravila,
+                            <a asp-controller="Home" asp-action="Privacy" target="_blank">politiku privatnosti</a> ili ove Uslove.
+                        </p>
+                        <hr class="my-4" />
+                        <h6 class="text-primary">5.3 Ažuriranje ocene</h6>
+                        <p class="mb-0">
+                            Nije moguće ažuriranje ocene i propratnog komentara.
+                        </p>
+                    </div>
+                </div>
+                @*<div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0" id="termination">Termination</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0">Either you or we may terminate this Agreement upon written notice
+                            to the other party of a material breach, or if the other party becomes the subject
+                            of a petition in insolvency proceedings, bankruptcy, receivership, liquidation
+                            or assignment for the benefit of its creditors.</p>
+                        </div>
+                    </div>*@
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="rules">6. Intelektualna svojina</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">
+                            Usluge i sav sadržaj i materijali dostupni putem usluga zaštićeni su autorskim pravima
+                            i drugim zakonima o intelektualnoj svojini. Ne možete kopirati, distribuirati ili koristiti
+                            bilo koji sadržaj ili materijale sa Usluga bez našeg pismenog odobrenja.
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="rules">7. Ograničenje odgovornosti za garancije</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">
+                            Usluge se pružaju "kakve jesu" i bez garancija bilo koje vrste, bilo da su
+                            izričite ili podrazumevane. Ne garantujemo da će Usluge biti bez greške ili
+                            besprekorne, ili da će se greške ispravljati. Ne pružamo nikakve izjave ili
+                            garancije o tačnosti ili potpunosti sadržaja ili materijala dostupnih putem Usluga.
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="rules">8. Ograničenje odgovornosti</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">
+                            Ni u kom slučaju @appName ili naše afilijacije neće biti odgovorne za
+                            bilo kakvu indirektnu, slučajnu, specijalnu, kaznenu ili posledičnu štetu koja
+                            proizlazi iz ili je povezana sa Uslugama ili ovim Uslovima, bez obzira da li
+                            smo obavešteni o mogućnosti takve štete.
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="rules">9. Naknada štete</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">
+                            Slažete se da ćete nadoknaditi i zaštititi @appName i naše
+                            afilijacije od bilo kakvih zahteva, gubitaka, odgovornosti, šteta,
+                            troškova ili izdataka, uključujući advokatske naknade koji proizlaze
+                            iz ili su povezani sa Vašim korišćenjem Usluga ili kršenjem ovih Uslova.
+                        </p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="rules">10. Raskid ugovora</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">
+                            Možemo privremeno ili trajno suspendovati ili ugasiti Vaš nalog i pristup Uslugama u bilo kom trenutku,
+                            bez obzira na uzrok ili obaveštenje ako prekršite ove Uslove.
+                        </p>
+                    </div>
+                </div>
+                @*<div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0" id="rules">11. Rešavanje sporova</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0">
+                                Svi sporovi koji nastanu u vezi sa ovim Uslovima ili Uslugama biće rešavani
+                                putem obavezujuće arbitraže u skladu sa pravilima Američke arbitražne asocijacije.
+                                Arbitraža će se održati u San Francisku, Kalifornija, a nagrada arbitra će
+                                biti obavezujuća i može se uneti kao presuda u svaki sud nadležne jurisdikcije.
+                            </p>
+                        </div>
+                    </div>*@
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="rules">11. Izmene</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">
+                            Zadržavamo pravo da u bilo kom trenutku izmenimo ove Uslove.
+                            Ukoliko učinimo bilo kakve bitne promene ovih Uslova,
+                            obavestićemo Vas putem imejla ili postavljanjem obaveštenja na Platformu.
+                            Ukoliko ne ugasite svoj nalog u roku od sedam (7) dana od tog obaveštenja,
+                            novi Uslovi će odmah stupiti na snagu i primenjivati se na sve naloge i Usluge.
+                            Možemo promeniti Platformu, Uslugu ili bilo koju funkciju Usluge u
+                            bilo koje vreme.
+                        </p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0" id="rules">12. Kontaktirajte nas</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">
+                            Ako imate bilo kakvih pitanja u vezi sa ovim Uslovima
+                            ili Uslugama, molimo kontaktirate nas na adresi
+                            <a href="mailto:@($"podrska@{appName}.com")">@($"podrska@{appName}.com")</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

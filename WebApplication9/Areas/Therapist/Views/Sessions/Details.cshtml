@@ -1,0 +1,610 @@
+﻿@model DataTransferObjects.ViewModels.Therapist.BookedSessionAddInviteLinkViewModel
+@using static Framework.Providers.ContactMethodsProvider
+@using Framework.Models
+@using Framework.Helpers.ExtensionMethods
+@using Microsoft.Extensions.Configuration
+@inject Framework.Interfaces.IDateTimeHelper DateHelper
+@inject IConfiguration Configuration
+@{
+    ViewData.SetTitle("Detalji zakazane seanse");
+    ViewData.SetMetaDescription($"Detalji zakazane seanse #{Model.BookedSession.BookingId}.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var _therapistFee = Configuration.GetSection("TherapistFee").Get<TherapistFee>();
+}
+
+@section StyleSheets {
+    @if (!Model.BookedSession.SessionEnded && Model.BookedSession.ContactMethod.Id != InPerson.Id)
+    {
+        <link rel="stylesheet" href="~/animations/btn-send-paper-plane/btn-send-paper-plane.css" />
+    }
+    <link rel="stylesheet" href="~/star-rating/star-rating.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+    <style>
+        .swal2-footer {
+            margin: 0.3em 0 0 !important;
+        }
+    </style>
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-receipt fa-sm",
+        "text-info",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row justify-content-between align-items-center">
+            <div class="col-md">
+                <h5 class="mb-2 mb-md-0 text-secondary">ID zakazivanja #@Model.BookedSession.BookingId</h5>
+            </div>
+            <div class="col-auto">
+                @*<button class="btn btn-falcon-default btn-sm mr-2 mb-2 mb-sm-0" type="button"><i class="fas fa-arrow-down mr-1"></i>Download (.pdf)</button>*@
+                @if (Model.BookedSession.SessionEnded && !Model.BookedSession.TherapistIsPaid)
+                {
+                    <form id="get-paid-form" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input asp-for="BookedSession.BookingId" type="hidden" />
+                        <button id="btn-get-paid-for-session" class="btn btn-success btn-sm mr-1"
+                            type="button">
+                            <span>Naplati @(Model.BookedSession.Price * (1 - (_therapistFee.PercentageAmount / 100))) RSD</span>
+                        </button>
+                    </form>
+                }
+                else if(!Model.BookedSession.SessionEnded && !Model.BookedSession.TherapistIsPaid)
+                {
+                    <button data-toggle="popover"
+                            data-placement="bottom"
+                            data-content="Manuelna naplata je moguća odmah nakon završetka seanse."
+                            type="button"
+                            class="btn btn-success btn-sm mr-1"
+                            disabled>
+                        <span>Naplati @(Model.BookedSession.Price * (1 - (_therapistFee.PercentageAmount / 100))) RSD</span>
+                    </button>
+                }
+                <button class="btn btn-sm btn-falcon-info"
+                        type="button"
+                        onclick="window.print()">
+                    <i class="fas fa-print mr-2"></i>Odštampaj
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@if (!Model.BookedSession.SessionEnded)
+{
+    if (Model.BookedSession.ContactMethod.Id != InPerson.Id)
+    {
+        <div class="alert alert-pink" role="alert">
+            <center id="alert-invite-link-text">
+                <div id="invite-link-notice-placeholder">
+                    @if (!string.IsNullOrWhiteSpace(Model.InviteLink))
+                    {
+                        <div>
+                            <i class="far fa-link mr-2"></i>@Model.BookedSession.ContactMethod.Name link za pristup seansi:
+                            <p class="text-primary mt-3 mb-4 text-break">@Model.InviteLink</p>
+                        </div>
+                    }
+                    else
+                    {
+                        var requiredTimeEarlier = Model.BookedSession.StartTime.Subtract(new TimeSpan(4, 0, 0));
+
+                        <div class="mb-3">
+                            <p>
+                                <strong>Trenutno niste dodali @Model.BookedSession.ContactMethod.Name link za pristup ovoj seansi</strong>.
+                            </p>
+                            Molimo da najkasnije 4 sata pre početka dodate link za pristup seansi.
+                            <br />
+                            Ova seansa počinje datuma @DateHelper.DateStringFromDateTime(Model.BookedSession.StartTime),
+                            u @DateHelper.TimeStringFromDateTime(Model.BookedSession.StartTime)h,
+                            stoga dodajte @Model.BookedSession.ContactMethod.Name link za pristup
+                            najkasnije do datuma @DateHelper.DateStringFromDateTime(requiredTimeEarlier), u @DateHelper.TimeStringFromDateTime(requiredTimeEarlier)h.
+                            <br />
+                            Odmah nakon dodavanja linka, klijent će primiti notifikaciju i imejl sa linkom.
+                        </div>
+                    }
+                </div>
+                <button id="btn-launch-modal"
+                        data-target="#add-invite-link-modal"
+                        data-toggle="modal"
+                        class="btn btn-sm btn-soft-success mb-2"
+                        data-contactmethodname="@Model.BookedSession.ContactMethod.Name">
+                    <i class="far fa-link mr-2"></i>Dodajte novi @Model.BookedSession.ContactMethod.Name link za pristup
+                </button>
+            </center>
+        </div>
+
+        <div id="add-invite-link-modal"
+             data-toggle="modal"
+             data-backdrop="static"
+             data-keyboard="false"
+             class="modal fade p-0"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="ModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content border overflow-hidden">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title text-center mx-auto">Dodajte @Model.BookedSession.ContactMethod.Name link za pristup</h5>
+                        <button type="button" id="btn-dismiss-modal-times" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvori">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="add-invite-link-form" autocomplete="off">
+                        @Html.AntiForgeryToken()
+                        <input asp-for="BookedSession.BookingId" type="hidden" />
+                        <input asp-for="BookedSession.SessionId" type="hidden" />
+                        <div class="modal-body pb-0">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-pink mb-3" role="alert">
+                                        <center>
+                                            Odmah nakon dodavanja linka za pristup, klijent prima notifikaciju i imejl sa linkom.
+                                        </center>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="far fa-link text-info no-tick"></i>
+                                                </span>
+                                            </div>
+                                            <textarea asp-for="InviteLink"
+                                              class="form-control"
+                                              rows="6"
+                                              placeholder="Unesite @Model.BookedSession.ContactMethod.Name link za pristup seansi...">
+                                            </textarea>
+                                        </div>
+                                        <span asp-validation-for="InviteLink" class="invalid-feedback"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0">
+                            <button id="btn-submit" type="button" class="button p-0">
+                                <span class="btn btn-sm text-white default">Dodaj</span>
+                                <span class="success text-secondary"><i class="fas fa-check text-success mr-2 no-tick"></i>Link dodat</span>
+                                <div class="left"></div>
+                                <div class="right"></div>
+                            </button>
+                            <button id="cancel" type="button" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Zatvori</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        var requiredTimeEarlier = Model.BookedSession.StartTime.Subtract(new TimeSpan(0, 5, 0));
+
+        <div class="alert alert-pink" role="alert">
+            <center>
+                Klijent će doći na Vašu adresu 5 minuta pre
+                početka seanse, odnosno datuma @DateHelper.DateStringFromDateTime(requiredTimeEarlier),
+                u @DateHelper.TimeStringFromDateTime(requiredTimeEarlier)h.
+            </center>
+        </div>
+    }
+}
+<div id="therapist-is-paid-alert-holder">
+    @if (Model.BookedSession.SessionEnded && Model.BookedSession.TherapistIsPaid)
+    {
+        <div class="alert alert-success text-center" role="alert">
+            Naplatili ste seansu @Model.Transaction.CurrencyCode @Model.Transaction.Amount
+            datuma @DateHelper.DateStringFromDateTime(Model.Transaction.DateTime),
+            u @DateHelper.TimeStringFromDateTime(Model.Transaction.DateTime)h.
+        </div>
+    }
+    else
+    {
+        <div id="get-paid-modal"
+             data-backdrop="static"
+             data-keyboard="false"
+             data-toggle="modal"
+             class="modal fade p-0"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="ModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title text-center mx-auto">Isplata</h5>
+                        <button id="dismiss-modal" type="button" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvori">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="avatar avatar-4xl d-block mx-auto mb-3">
+                            <img id="modal-profile-photo"
+                                 class="d-inline-block rounded-circle" />
+                        </div>
+                        <h5 id="modal-full-name" class="text-center mb-3 text-1000"></h5>
+                        <h4 class="text-center pb-1">
+                            <span>
+                                <span id="modal-earnings-amount"
+                                      class="fs-0 badge badge-soft-success"
+                                      data-countup='{"endValue":}'>
+                                </span>
+                            </span>
+                        </h4>
+                        <div id="amount-added-holder" class="text-center text-success"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row text-center d-sm-flex justify-content-sm-center">
+            <div class="col-sm-6 text-sm-left">
+                <div class="avatar avatar-5xl">
+                    <img src="@Model.BookedSession.ProfilePhoto"
+                         class="rounded-circle d-inline-block"
+                         alt="Klijent @Model.BookedSession.ClientFirstName @Model.BookedSession.ClientLastName">
+                </div>
+            </div>
+            <div class="col text-sm-right mt-3 mt-sm-0">
+                <h4 class="mb-3 text-secondary">Klijent</h4>
+                <p class="fs--1 mb-0">@Model.BookedSession.ClientFirstName @Model.BookedSession.ClientLastName</p>
+                <p class="fs--1 mb-0"><i class="far fa-envelope text-info mr-2"></i><a href="mailto:@Model.BookedSession.ClientEmail">@Model.BookedSession.ClientEmail</a></p>
+                <p class="fs--1 mb-0">
+                    <i class="far fa-phone text-success mr-1"></i>
+                    @if (!string.IsNullOrWhiteSpace(Model.BookedSession.ClientPhoneNumber))
+                    {
+                        <a href="tel:@Model.BookedSession.ClientPhoneNumber">@Model.BookedSession.ClientPhoneNumber</a>
+                    }
+                    else
+                    {
+                        <text>Broj telefona nije dodat.</text>
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row justify-content-center justify-content-md-between">
+            <div class="col mb-3">
+                <h4 class="mb-3 text-secondary">Psihoterapeut</h4>
+                <p class="fs--1 mb-0">@Model.BookedSession.TherapistFirstName @Model.BookedSession.TherapistLastName</p>
+                <p class="fs--1 mb-0"><i class="far fa-envelope text-info fa-fw mr-2"></i>@Model.BookedSession.TherapistEmail</p>
+                <p class="fs--1 mb-0"><i class="far fa-phone text-success fa-fw mr-2"></i>@Model.BookedSession.TherapistPhoneNumber</p>
+            </div>
+            <div class="col-sm-auto ml-md-auto d-flex align-items-center">
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless fs--1 mb-0">
+                        <tbody class="text-secondary">
+                            <tr>
+                                <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-calendar-check fa-fw text-success mr-2"></i>Datum zakazivanja:</th>
+                                <td class="text-sm-left pl-0 pl-md-3 text-secondary">@DateHelper.DateTimeStringFromDateTime(Model.BookedSession.BookingDate)h</td>
+                            </tr>
+                            @if (Model.BookedSession.EndTime.Day > Model.BookedSession.StartTime.Day)
+                            {
+                                <tr>
+                                    <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-calendar fa-fw text-success mr-2"></i>Datum seanse:</th>
+                                    <td class="text-sm-left pl-0 pl-md-3 text-secondary">
+                                        @DateHelper.DateTimeStringFromDateTime(Model.BookedSession.StartTime)h &minus; @DateHelper.DateTimeStringFromDateTime(Model.BookedSession.EndTime)h
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-calendar fa-fw text-success mr-2"></i>Datum seanse:</th>
+                                    <td class="text-sm-left pl-0 pl-md-3 text-secondary">@DateHelper.DateStringFromDateTime(Model.BookedSession.StartTime)</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-clock fa-fw text-success mr-2"></i>Vreme seanse:</th>
+                                    <td class="text-sm-left pl-0 pl-md-3 text-secondary">
+                                        @DateHelper.TimeStringFromDateTime(Model.BookedSession.StartTime)h &minus; @DateHelper.TimeStringFromDateTime(Model.BookedSession.EndTime)h
+                                    </td>
+                                </tr>
+                            }
+                            <tr>
+                                <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-stopwatch text-primary fa-fw mr-2"></i>Trajanje seanse:</th>
+                                <td class="text-sm-left pl-0 pl-md-3 text-secondary">
+                                    @{
+                                        var dateDiff = Model.BookedSession.EndTime - Model.BookedSession.StartTime;
+                                        var dateDiffFormatted = $"{dateDiff.Hours} sati, {dateDiff.Minutes} minuta";
+                                        if (dateDiff.Days > 0) dateDiffFormatted = $"{dateDiff.Days} dana, {dateDiffFormatted}";
+                                    }
+                                    @dateDiffFormatted
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pl-0 pl-md-3" colspan="2">
+                                    <span id="status" class="badge badge-soft-warning d-block w-100"><i class="fas fa-stream mr-1"></i>Na čekanju</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pl-0 pl-md-3" colspan="2">
+                                    <strong id="badge-countdown" class="badge badge-soft-info d-block w-100">
+                                        Počinje za:
+                                        <span id="countdown" class="ml-1"></span>
+                                    </strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive mt-3 fs--1">
+            <table class="table table-striped border-bottom">
+                <thead>
+                    <tr class="bg-primary text-white">
+                        <th class="border-0 text-center align-middle">Usluga</th>
+                        <th class="border-0 text-center align-middle">Tip</th>
+                        <th class="border-0 text-center align">Kontakt metoda</th>
+                        @*<th class="border-0 text-center align-middle">Contact info</th>*@
+                        <th class="border-0 text-center align-middle">Ocena</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fs--1 align-middle text-center">
+                            <h6 class="mb-0 text-nowrap">Seansa</h6>
+                        </td>
+                        <td class="fs--1 align-middle text-center">
+                            @{
+                                var sessionTypeText = string.Empty;
+                                var sessionTypeIcon = string.Empty;
+
+                                if (Model.BookedSession.Type == 0)
+                                {
+                                    sessionTypeText = "Individualna seansa";
+                                    sessionTypeIcon = "fa-user";
+                                }
+                                else
+                                {
+                                    sessionTypeText = "Grupna seansa";
+                                    sessionTypeIcon = "fa-user-friends";
+                                }
+                            }
+                            <i class="far @sessionTypeIcon mr-1" style="color: #0000FF"></i>@sessionTypeText
+                        </td>
+                        <td class="fs--1 align-middle text-center">
+                            <i class="@Model.BookedSession.ContactMethod.Icon mr-1" style="color: @Model.BookedSession.ContactMethod.Color"></i>@Model.BookedSession.ContactMethod.Name
+                        </td>
+                        @*<td class="align-middle text-center">
+                            @Model.ContactInfo
+                            </td>*@
+                        <td class="align-middle text-center">
+                            @if (Model.BookedSession.HasRating)
+                            {
+                                <span id="rendered-stars" class="d-none"></span>
+                                @await Html.TryPartialAsync("~/Views/Shared/_RenderStars.cshtml", Model.BookedSession.StarsRating)
+                            }
+                            else
+                            {
+                                <p class="mb-0">Seansa trenutno neocenjena</p>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="row no-gutters justify-content-end">
+                <div class="col-auto">
+                    <table class="table table-sm table-borderless fs--1 text-right">
+                        <tr>
+                            <th class="text-900">Cena seanse:</th>
+                            <td class="font-weight-semi-bold text-success">RSD @Model.BookedSession.Price</td>
+                        </tr>
+                        <tr>
+                            <th class="text-900">Provizija:</th>
+                            <td class="font-weight-semi-bold">@_therapistFee.PercentageAmount%</td>
+                        </tr>
+                        <tr class="border-top border-2x font-weight-bold text-900">
+                            <th>Ukupno za isplatu:</th>
+                            <td class="text-success">RSD @(Model.BookedSession.Price * (1 - (_therapistFee.PercentageAmount / 100)))</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer py-3 border-top-0">
+        <div class="text-center">
+            <a class="btn btn-falcon-danger btn-sm"
+               href='@Url.Action("BookedSessions", "Sessions", new { Area = "Therapist" })'>
+                Nazad
+            </a>
+        </div>
+    </div>
+</div>
+
+@await Html.TryPartialAsync("~/Views/Shared/FAQs/Therapist/_EarningsWithdrawalsFAQ.cshtml")
+
+@section Scripts {
+    <script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+    <script src="~/year-picker/moment.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            let badgeCountdown = $('#badge-countdown');
+            let status = $('#status');
+            let countdown = $("#countdown");
+            let countDownDate = new Date(moment("@DateHelper.ConvertDateTimeToDateTimeStringISO(Model.BookedSession.StartTime)").valueOf());
+
+            var x = setInterval(function () {
+                var distance = countDownDate - ((new Date()).getTime()); //now
+
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                countdown.html(days + "d " + hours + "h " + minutes + "m " + seconds + "s ")
+
+                if (distance < 0) {
+                    //clearInterval(x);
+
+                    if (status.hasClass('badge-soft-warning')) {
+                        status.removeClass('badge-soft-warning');
+                        status.addClass('badge-soft-primary');
+
+                        if (!status.has('i.fa-spinner.fa-spin').length)
+                            status.html('<i class="fas fa-spinner fa-spin mr-1 no-tick"></i>Seansa u toku');
+                    }
+
+                    var finished = new Date(moment("@DateHelper.ConvertDateTimeToDateTimeStringISO(Model.BookedSession.EndTime)").valueOf());
+
+                    if (new Date() >= finished) {
+                        clearInterval(x);
+                        badgeCountdown.html("<i class='far fa-star mr-1'></i>Čeka ocenu klijenta")
+
+                        if ($('#rendered-stars').length)
+                            badgeCountdown.remove();
+
+                        if (status.hasClass('badge-soft-primary')) {
+                            status.removeClass('badge-soft-primary');
+                            status.addClass('badge-soft-success');
+                            status.html('<i class="fas fa-check mr-1"></i>Seansa završena');
+                        }
+                    } else {
+                        if (!$('strong.badge i.fa-play').length)
+                            badgeCountdown.html("<i class='far fa-play mr-1'></i>Seansa počela");
+                    }
+                }
+            }, 1000);
+        });
+    </script>
+    @if (!Model.BookedSession.SessionEnded && Model.BookedSession.ContactMethod.Id != InPerson.Id)
+    {
+        <partial name="_ValidationScriptsPartial" />
+        <script>
+            var sessionInviteLinkEndpoint = '@Url.Action("AddSessionInviteLink", "Sessions", new { Area = "Therapist" })';
+        </script>
+        <script src="~/animations/btn-send-paper-plane/gsap.min.js"></script>
+        <script src="~/animations/btn-send-paper-plane/send-session-invite-link.js"></script>
+    }
+    @if (Model.BookedSession.SessionEnded && !Model.BookedSession.TherapistIsPaid)
+    {
+        <script src="~/js/countUp.umd.js"></script>
+        <script>
+            $(document).ready(function () {
+                let btnGetPaid = $('#btn-get-paid-for-session');
+                let btnGetPaidText = btnGetPaid.find('span');
+                let btnGetPaidTextUnchanged = btnGetPaidText.html();
+                let getPaidForm = $('#get-paid-form');
+
+                btnGetPaid.click(function () {
+                    $(this).prop('disabled', true);
+                    let width = $(this).width();
+                    let height = $(this).height();
+                    btnGetPaidText.fadeOut('fast', function () {
+                        $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                        btnGetPaid.width(width);
+                        btnGetPaid.height(height);
+                    });
+
+                    setTimeout(function () {
+                        let formData = new FormData(getPaidForm.get(0));
+                        formData.append('bookingId', getPaidForm.find('#BookedSession_BookingId').val());
+                        $.ajax({
+                            url: '@Url.Action("GetPaid", "Sessions", new { Area = "Therapist" })',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            headers: {
+                                'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                            },
+                            success: function (response) {
+                                if (response.success === true) {
+                                    btnGetPaidText.fadeOut('fast', function () {
+                                        $(this).html('<i class="fas fa-check no-tick"></i>').fadeIn('slow');
+                                        setTimeout(function () {
+                                            let getPaidModal = $('#get-paid-modal');
+                                            getPaidModal.modal();
+
+                                            $('#modal-profile-photo').attr('src', response.therapistProfilePhotoPath);
+                                            $('#modal-profile-photo').attr('alt', `profila slika terapeuta ${response.therapistFullName}`);
+                                            $('#modal-full-name').text(response.therapistFullName);
+                                            $('#modal-earnings-amount').text(`${response.amountBeforeAdding} ${response.currencyCode}`)
+
+                                            
+                                            $('#amount-added-holder').fadeIn(100).html('<i class="far fa-plus mr-1"></i>' + response.amountAdded);
+                                            $('#modal-earnings-amount')
+                                                .attr('data-countup', JSON.stringify({ 'startVal': response.amountBeforeAdding, 'endValue': response.totalAmount, "suffix": ' ' + response.currencyCode, "separator": '' }));
+
+                                            setTimeout(function () {
+                                                document.querySelectorAll('[data-countup]').forEach((node) => {
+                                                    const { endValue, ...options } = JSON.parse($(node).attr('data-countup'));
+                                                    const c = new countUp.CountUp(node, endValue, {
+                                                        duration: 4,
+                                                        ...options
+                                                    });
+                                                    if (!c.error) {
+                                                        c.start();
+                                                    } else {
+                                                        throw new Error('CountUp error');
+                                                    }
+                                                });
+                                            }, 400)
+                                            
+                                            setTimeout(function () {
+                                                getPaidModal.modal('hide');
+                                                getPaidForm.fadeOut('slow', function () {
+                                                    getPaidModal.remove();
+                                                    $(this).remove();
+                                                    $('#therapist-is-paid-alert-holder')
+                                                        .css('display', 'none')
+                                                        .html(
+                                                            '<div class="alert alert-success text-center" role="alert">' +
+                                                            `Naplatili ste seansu ${response.currencyCode} ${response.amountAdded} ` +
+                                                            `datuma ${response.paymentDate}, u ${response.paymentTime}h.` +
+                                                            '</div>')
+                                                        .fadeIn('slow');
+                                                });
+                                            }, 4600);
+                                        }, 1300)
+                                    })
+                                } else {
+                                    if (response.redirectUrl) window.location.href = response.redirectUrl;
+                                    else HandlePaymentError(response.title, response.body, response.severity);
+                                }
+                            },
+                            error: function () {
+                                HandlePaymentError('Došlo je do greške', 'Molimo pokušajte ponovo ili kontaktirajte korisničku podršku.');
+                            }
+                        })
+                    }, 1200)
+                })
+
+                function HandlePaymentError(title, body) {
+                    btnGetPaidText.fadeOut('fast', function () {
+                        $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                        Swal.mixin({
+                            customClass: {
+                                confirmButton: 'btn btn-sm btn-info mr-2'
+                            },
+                            buttonsStyling: false
+                        }).fire({
+                            title: title,
+                            text: body,
+                            icon: 'error',
+                            confirmButtonText: 'U redu',
+                            footer: '<a href="@Url.Action("Support", "Account", new { Area = "Therapist" })" target="_blank">Kontaktirajte podršku za terapeute</a>.'
+                        })
+                    })
+                        .promise()
+                        .done(function () {
+                            setTimeout(function () {
+                                btnGetPaidText.fadeOut('fast', function () {
+                                    $(this).html(btnGetPaidTextUnchanged).fadeIn('slow')
+                                    btnGetPaid.prop('disabled', false);
+                                })
+                            }, 1300)
+                        })
+                }
+            });
+        </script>
+    }
+    <script async src="~/js/accordion-setup.js"></script>
+}

@@ -1,0 +1,33 @@
+﻿.floating-btn {
+    position: fixed;
+    right: 1px;
+    margin: 0 1.2rem 0.5rem 0;;
+    bottom: 90px;
+    z-index: 996;
+    background: var(--success);
+    color: white !important;
+    /*width: 40px;
+    height: 40px;*/
+    border-radius: 40px;
+    transition: all 0.4s;
+    padding: 0.5rem;
+}
+
+    .floating-btn i {
+        font-size: 28px;
+        color: #fff;
+        line-height: 0;
+    }
+
+    .floating-btn:hover {
+        /* !!! Ova boja nije dobra, treba da nadjem koje boje postaje success nakon hovera, ali nisam jos nasao, samo sam 
+        privremeno lupio boju!!! */
+        background: #1d9138;
+        color:white;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+/*.fc-daygrid-day {
+    width: 100px !important;
+}*/

@@ -1,0 +1,98 @@
+﻿@using Framework.Helpers.ExtensionMethods
+@using Framework.Providers
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+    var userRole = await User.GetRoleAsync();
+    var paddingBottom = userRole == UserRoles.Admin ? "pb-3" : "pb-0";
+    var supportUrl = string.Empty;
+    if (userRole == UserRoles.None || userRole == UserRoles.Client)
+    {
+        supportUrl = Url.Action("CustomerSupport", "Home");
+    }
+    else if (userRole == UserRoles.Therapist)
+    {
+        supportUrl = Url.Action("Support", "Account", new { Area = "Therapist" });
+    }
+}
+
+<div class="card pt-1 mb-3">
+    <div class="card-header pb-0">
+        <h4 class="text-center mb-0 text-primary">Česta pitanja o plaćanju</h4>
+    </div>
+    <div class="card-body @paddingBottom">
+        <div class="accordion">
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Koje načine plaćanja prihvatate?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Prihvatamo sledeće načine plaćanja: Visa, Mastercard, Maestro, AmericanExpress, Discover, JCB, China UnionPay,
+                            Google Pay, Apple Pay, PayPal, Payoneer, Link, Binance Pay, USDC i USDT.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            U kom slučaju vršite nadoknadu uplate?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            U slučaju da dođe do tehničkih problema u tolikoj meri da nije moguće nastaviti seansu,
+                            obavestite terapeuta usmeno, putem imejla ili pozivom na mobilni telefon u toku trajanja seanse.
+                            Nakon toga, neophodno je da se ulogujete na svoj nalog i
+                            obavestite <a asp-controller="Home" asp-action="CustomerSupport" target="_blank">korisničku podršku</a>
+                            o ovom problemu. Ubrzo nakon toga, pun iznos te seanse će biti vraćen na Vaš nalog u obliku Veb kredita
+                            koji možete iskoristiti za zakazivanje druge seanse.
+                            <br />
+                            <br />
+                            Ukoliko ste zakazali seansu bez registracije, neophodno je da se
+                            <a asp-controller="Authorization" asp-action="Register" target="_blank">registrujete</a> istim imejlom koji
+                            ste koristili za zakazivanje seanse. Nakon toga, neophodno je da se ulogujete na svoj nalog i
+                            obavestite <a asp-controller="Home" asp-action="CustomerSupport" target="_blank">korisničku podršku</a>
+                            o ovom problemu. Ubrzo nakon toga, pun iznos te seanse će biti vraćen na Vaš nalog u obliku Veb kredita
+                            koji možete iskoristiti za zakazivanje druge seanse.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (userRole == UserRoles.None || userRole == UserRoles.Client)
+    {
+        <div class="card-footer text-center">
+            <small>
+                <i class="far fa-info-circle text-info mr-2"></i>Imate dodatna pitanja? Pogledajte
+                <a asp-controller="Guides" asp-action="All">uputstva</a>,
+                <a asp-controller="Home" asp-action="TermsOfService">uslove korišćenja</a> ili
+                <a href="@supportUrl">kontaktirajte podršku</a>.
+            </small>
+        </div>
+    }
+    else if (userRole == UserRoles.Therapist)
+    {
+        <div class="card-footer text-center">
+            <small>
+                <i class="far fa-info-circle text-info mr-2"></i>Imate dodatna pitanja? Pogledajte
+                <a asp-controller="Guides" asp-action="All">uputstva</a>,
+                <a asp-controller="Home" asp-action="TermsOfService">uslove korišćenja</a> ili
+                <a href="@supportUrl">kontaktirajte podršku</a>.
+            </small>
+        </div>
+    }
+</div>

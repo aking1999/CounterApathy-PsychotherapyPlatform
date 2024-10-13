@@ -1,0 +1,456 @@
+﻿@model WebApplication9.Areas.Therapist.ViewModels.AddSessionViewModel
+@using Framework.Helpers.ExtensionMethods
+@using Framework.Models.Settings
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    ViewData.SetTitle("Menadžer konsultacija");
+    ViewData.SetMetaDescription("Upravljajte besplatnim konsultacijama.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var _consultationDurationInMinutes = Configuration.GetSection("ConsultationSettings").Get<ConsultationSettings>().DurationInMinutes;
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/fullcalendar/main.min.css" />
+    <link rel="stylesheet" href="~/session-manager/session-manager.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+    <link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+    <link rel="stylesheet" href="~/timepicker/timepicker.css" />
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-calendar-plus fa-sm",
+        "text-success",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+<div id="no-consultation-alert-placeholder"></div>
+
+<div class="card">
+    <div class="card-body">
+        <div id="consultations-calendar"></div>
+    </div>
+</div>
+
+<div id="add-consultation"
+     data-backdrop="static"
+     data-keyboard="false"
+     data-toggle="modal"
+     class="modal theme-modal fade p-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title text-center mx-auto">Dodajte nov termin za besplatne konsultacije</h5>
+                <button id="consultation-dismiss-modal-times" type="button" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvori">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="add-consultation-form" autocomplete="off">
+                @Html.AntiForgeryToken()
+                <div class="modal-body pb-0">
+                    <div class="form-group">
+                        <label asp-for="AddConsultation.StartEndDate"></label>
+                        <input asp-for="AddConsultation.StartEndDate" class="form-control" readonly />
+                        <span>
+                            <span asp-validation-for="AddConsultation.StartEndDate" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="AddConsultation.StartTime"></label>
+                                <div class="input-group date" id="consultation-datetimepicker-start" data-target-input="nearest">
+                                    <div class="input-group-prepend" data-target="#consultation-datetimepicker-start" data-toggle="datetimepicker">
+                                        <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                    </div>
+                                    <input asp-for="AddConsultation.StartTime" class="form-control datetimepicker-input" data-target="#consultation-datetimepicker-start" />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="AddConsultation.StartTime" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="end-time">Vreme završetka</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                    </div>
+                                    <input id="end-time" class="form-control" readonly disabled />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button id="submit-consultation" type="button" class="btn btn-sm btn-primary"><text id="submit-consultation-text">Dodaj</text></button>
+                    <button id="cancel-consultation" type="button" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Poništi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="view-consultation"
+     data-toggle="modal"
+     class="modal theme-modal fade p-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title text-center mx-auto">Detalji besplatne konsultacije</h5>
+                <button type="button" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvori">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <input type="hidden" value="0" id="consultation-event-id" />
+            <div class="modal-body">
+                <div class="modal-body pt-1 pb-0 fs--1">
+                    <div class="media mt-2">
+                        <i class="fal fa-calendar text-success fa-fw fa-lg mr-4 no-tick"></i>
+                        <div class="media-body">
+                            <h6>Datum</h6>
+                            <p class="mb-0" id="consultation-date"></p>
+                        </div>
+                    </div>
+                    <div class="alert mt-4 mb-0 text-center" id="consultation-status" role="alert"></div>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button id="btn-delete-consultation" type="button" class="btn btn-sm btn-danger"><text id="btn-delete-consultation-text">Obriši</text></button>
+                <button id="close-delete-consultation" type="button" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Zatvori</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/fullcalendar/main.min.js"></script>
+    <script src="~/fullcalendar/locales/sr.js"></script>
+    <script async src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+    <script async src="~/multiselect/bootstrap-select.min.js"></script>
+    <script src="~/year-picker/moment.min.js"></script>
+    <script src="~/timepicker/timepicker.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            var consultationsCalendar;
+
+            let submitConsultation = $('#submit-consultation');
+            let submitConsultationText = $('#submit-consultation-text');
+            let submitConsultationTextUnchanged = submitConsultationText.html();
+            let cancelConsultation = $('#cancel-consultation');
+            let consultationModal = $('#add-consultation');
+            let consultationModalDismissTimes = $('#consultation-dismiss-modal-times');
+            let consultationForm = $('#add-consultation-form');
+            let consultationDate = $('#AddConsultation_StartEndDate');
+            let consultationStartTime = $('#AddConsultation_StartTime');
+            let consultationDurationInMinutes = parseInt('@_consultationDurationInMinutes');
+
+            let btnDeleteConsultation = $('#btn-delete-consultation');
+            let btnDeleteConsultationText = $('#btn-delete-consultation-text');
+            let btnDeleteConsultationTextUnchanged = btnDeleteConsultationText.html();
+            let closeDeleteConsultation = $('#close-delete-consultation');
+            let viewConsultationModal = $('#view-consultation');
+
+            consultationStartTime.on('propertychange input', function (e) {
+                setTimeout(function () {
+                    let endTime = moment(consultationStartTime.val(), 'HH:mm').add(consultationDurationInMinutes, 'm').format("HH:mm");
+                    if (String(endTime).toLowerCase() != 'invalid date') $('#end-time').val(endTime)
+                }, 800);
+            });
+
+            $('#consultation-datetimepicker-start').datetimepicker({
+                format: 'HH:mm',
+                defaultDate: moment().format()
+            });
+
+            GetConsultations();
+
+            submitConsultation.click(function () {
+                DisableInputsConsultation();
+                let width = $(this).width();
+                let height = $(this).height();
+
+                submitConsultationText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                    submitConsultation.width(width);
+                    submitConsultation.height(height);
+                })
+
+                setTimeout(function () {
+                    if (ConsultationFormIsValid()) {
+                        let consultationFormData = new FormData(consultationForm.get(0));
+                        consultationFormData.append('addVm.AddConsultation.StartEndDate', consultationDate.val());
+                        consultationFormData.append('addVm.AddConsultation.StartTime', consultationStartTime.val());
+
+                        AddConsultationAjax('@Url.Action("AddConsultation", "Consultations", new { Area = "Therapist" })', consultationFormData);
+                    } else {
+                        HandleErrorConsultation();
+                        toastr['info']('', 'Popunite sva obavezna polja')
+                    }
+                }, 600)
+            })
+
+            function GetConsultations() {
+                let consultations = [];
+                $.ajax({
+                    url: '@Url.Action("GetConsultations", "Consultations", new { Area = "Therapist" })',
+                    type: 'POST',
+                    success: function (response) {
+                        let consultationArray = $.map(response.consultations, function (value, index) {
+                            return [value];
+                        })
+
+                        if (consultationArray.length == 0)
+                            $('#no-consultation-alert-placeholder').hide().html(
+                                "<div class='alert alert-pink text-center' role='alert'>" +
+                                "Trenutno nemate besplatne konsultacije." +
+                                "</div>"
+                            ).fadeIn('slow');
+
+                        $.each(consultationArray, function (i, v) {
+                            consultations.push({
+                                start: v.startDateTime,
+                                end: v.endDateTime,
+                                color: v.booked === 0 ? '#00d27a' : '#fc3830',
+                                extendedProps: {
+                                    consultationId: v.consultationId,
+                                    icon: v.booked === 0 ? 'fas fa-check-circle' : 'far fa-address-book',
+                                    booked: v.booked
+                                }
+                            });
+                        });
+
+                        GenerateConsultationsCalendar(consultations);
+                    },
+                    error: function () {
+                        toastr['error']('Molimo kontaktirajte podršku za terapeute.', 'Došlo je do greške')
+                    }
+                });
+            }
+
+            function GenerateConsultationsCalendar(consultations) {
+                consultationsCalendar = new FullCalendar.Calendar(document.getElementById('consultations-calendar'), {
+                    initialView: 'dayGridMonth',
+                    events: consultations,
+                    eventClick: function (args) {
+                        let startDateTime = new Date(args.event.start);
+                        $('#consultation-date').html(
+                            startDateTime.getDate() + '/' + (startDateTime.getMonth() + 1) + '/' + startDateTime.getFullYear() +
+                            ', ' +
+                            'od ' +
+                            moment(args.event.start).format('HH:mm') + 'h' +
+                            ' do ' +
+                            moment(args.event.end).format('HH:mm') + 'h'
+                        );
+
+                        if (args.event.extendedProps.booked === 0) {
+                            $('#consultation-status')
+                                .addClass('alert-success')
+                                .removeClass('alert-danger')
+                                .html("<i class='mr-2 no-tick " + args.event.extendedProps.icon + "'></i>Ova besplatna konsultacija još uvek nije zakazana.");
+                            btnDeleteConsultation
+                                .prop('disabled', false)
+                                .removeAttr('title');
+                        }
+                        else if (args.event.extendedProps.booked === 1) {
+                            $('#consultation-status')
+                                .addClass('alert-danger')
+                                .removeClass('alert-success')
+                                .html("<i class='mr-2 no-tick " + args.event.extendedProps.icon + "'></i>Ova besplatna konsultacija je zakazana.");
+                            btnDeleteConsultation
+                                .prop('disabled', true)
+                                .attr('title', 'Nije dozvoljeno brisanje zakazanih konsultacija.');
+                        }
+
+                        viewConsultationModal.modal('show');
+
+                        btnDeleteConsultation.click(function () {
+                            viewConsultationModal.modal('hide');
+                            Swal.mixin({
+                                customClass: {
+                                    confirmButton: 'btn btn-sm btn-danger mr-2',
+                                    cancelButton: 'btn btn-sm btn-falcon-secondary'
+                                },
+                                buttonsStyling: false
+                            }).fire({
+                                title: 'Da li biste želeli da obrišete ovaj termin besplatnih konsultacija?',
+                                text: 'Ova aktivnost se ne može poništiti.',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonText: 'Obriši',
+                                cancelButtonText: 'Odustani'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        url: '@Url.Action("DeleteConsultation", "Consultations", new { Area = "Therapist" })',
+                                        type: 'POST',
+                                        data: { consultationId: args.event.extendedProps.consultationId },
+                                        headers: {
+                                            'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                                        },
+                                        success: function (response) {
+                                            if (response.success === true) {
+                                                consultations = consultations.filter(value => value.extendedProps.consultationId !== args.event.extendedProps.consultationId);
+
+                                                GetConsultations()
+                                                toastr[response.severity](response.body, response.title);
+                                            } else {
+                                                if (response.redirectUrl) window.location.href = response.redirectUrl;
+                                                else toastr[response.severity](response.body, response.title);
+                                            }
+                                        },
+                                        error: function () {
+                                            toastr['error']('Molimo osvežite stranicu i pokušajte ponovo ili kontaktirajte podršku za terapeute.', 'Došlo je do greške')
+                                        }
+                                    })
+                                } else {
+                                    viewConsultationModal.modal('show');
+                                }
+                            });
+                        });
+                    },
+                    eventTimeFormat: {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hourCycle: 'h23'
+                    },
+                    selectable: true,
+                    dateClick: function (args) {
+                        $('#AddConsultation_StartEndDate').val(moment(args.dateStr).format('DD/MMM/YYYY'));
+
+                        $('#consultation-datetimepicker-start').datetimepicker({
+                            format: 'HH:mm',
+                            defaultDate: moment().format()
+                        });
+
+                        consultationModal.modal('show');
+                    }
+                });
+                consultationsCalendar.render();
+            }
+
+            function AddConsultationAjax(url, data) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                    },
+                    success: function (response) {
+                        if (response.success === true) {
+                            submitConsultationText.fadeOut('fast', function () {
+                                $(this).html('<i class="ca-lightgreen fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                    setTimeout(function () {
+                                        consultationModal.modal('hide');
+                                        Swal.fire({
+                                            title: response.title,
+                                            html:
+                                                `${response.review}<br />` +
+                                                "<ul class='text-left list-unstyled mt-3 ml-4'>" +
+                                                `<li>Datum: <b>${response.date}</b></li>` +
+                                                `<li>Vreme: <b>${response.startTime}h -</b> <b>${response.endTime}h</b></li>` +
+                                                `<li>Trajanje: <b>${response.duration}</b></li>` +
+                                                '</ul>',
+                                            icon: response.severity
+                                        })
+                                        submitConsultationText.fadeOut('fast', function () {
+                                            $(this).html(submitConsultationTextUnchanged).fadeIn('slow');
+                                            EnableInputsConsultation();
+                                        })
+                                    }, 400)
+                                })
+                            })
+
+                            $('#no-consultation-alert-placeholder').fadeOut('slow');
+
+                            consultationsCalendar.addEvent({
+                                id: response.consultation.consultationId,
+                                start: response.consultation.startDateTime,
+                                end: response.consultation.endDateTime,
+                                color: '#00d27a',
+                                extendedProps: {
+                                    consultationId: response.consultation.consultationId,
+                                    icon: 'fas fa-check-circle',
+                                    booked: 0
+                                }
+                            });
+
+                        } else {
+                            if (response.redirectUrl) window.location.href = response.redirectUrl;
+                            else {
+                                HandleErrorConsultation();
+                                Swal.fire({
+                                    title: response.title,
+                                    text: response.body,
+                                    icon: response.severity,
+                                    confirmButtonText: 'U redu',
+                                })
+                            }
+                        }
+                    },
+                    error: function () {
+                        HandleErrorConsultation();
+                        toastr['error']('Molimo osvežite stranicu i pokušajte ponovo ili kontaktirajte podršku za terapeute.', 'Došlo je do greške')
+                    }
+                })
+            }
+
+            function ConsultationElementIsValid(element) {
+                return consultationForm.validate().element($(element));
+            }
+
+            function ConsultationFormIsValid() {
+                let consultationDateValid = ConsultationElementIsValid(consultationDate);
+                let consultationStartTimeValid = ConsultationElementIsValid(consultationStartTime);
+
+                return (consultationDateValid && consultationStartTimeValid);
+            }
+
+            function EnableInputsConsultation() {
+                submitConsultation.prop('disabled', false);
+                cancelConsultation.prop('disabled', false);
+                consultationModalDismissTimes.prop('disabled', false);
+
+                consultationStartTime.prop('readonly', false);
+            }
+
+            function DisableInputsConsultation() {
+                submitConsultation.prop('disabled', true);
+                cancelConsultation.prop('disabled', true);
+                consultationModalDismissTimes.prop('disabled', true);
+
+                consultationStartTime.prop('readonly', true);
+            }
+
+            function HandleErrorConsultation() {
+                submitConsultationText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-times text-danger no-tick"></i>').fadeIn('slow');
+                }).promise()
+                    .done(function () {
+                        setTimeout(function () {
+                            submitConsultationText.fadeOut('fast', function () {
+                                $(this).html(submitConsultationTextUnchanged).fadeIn('slow');
+                                EnableInputsConsultation();
+                            })
+                        }, 1300)
+                    })
+            }
+        })
+    </script>
+}

@@ -1,0 +1,117 @@
+﻿@using Framework.Helpers.ExtensionMethods
+
+@{
+    ViewData.SetTitle("Uputstvo za pristup Google Meet seansi putem mobilnog telefona");
+    ViewData.SetMetaDescription("Saznajte kako da u samo 3 koraka, putem mobilnog telefona pristupite psihoterapijskoj " +
+        "seansi na Google Meetu.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/css/booking-roadmap.css" />
+    <link rel="stylesheet" href="~/custom-site-layout/vendor/lightbox/css/lightbox.min.css" />
+}
+
+<h2 class="text-center my-5 mx-3">Kako da putem mobilnog telefona pristupim seansi na Google Meetu?</h2>
+<div class="booking-timeline">
+    <div class="timeline__event  animated fadeInUp timeline__event--type2">
+        <div class="timeline__event__icon">
+            <i class="far fa-envelope"></i>
+        </div>
+        <div class="timeline__event__step">
+            Korak 1.
+        </div>
+        <div class="timeline__event__content ">
+            <div class="timeline__event__title">
+                Otvorite imejl sa linkom za pristup seansi
+            </div>
+            <br />
+            <div class="timeline__event__description">
+                <p>
+                    Najkasnije 4 sata pre početka zakazane seanse, stići će Vam imejl sa linkom za pristup Google Meet seansi.
+                    <br>
+                    Slika imejla je prikazana ispod (kliknite na sliku da je uvećate):
+                </p>
+                <a href="~/images/content-images/join-session/session-invite-link-email.png"
+                   data-lightbox="join-google-meet-session-by-phone"
+                   data-title="Imejl sa linkom za pristup Google Meet seansi"
+                   class="avatar">
+                    <img class="border border-primary d-inline-block"
+                         src="~/images/content-images/join-session/session-invite-link-email.png"
+                         alt="imejl sa linkom za pristup Google Meet seansi" />
+                </a>
+                <p class="mb-0 mt-3">
+                    <span class="fa-stack">
+                        <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                        <i class="far fa-star fa-stack-1x text-warning"></i>
+                    </span>
+                    Ako ste zakazali grupnu Google Meet seansu, svim članovima prosledite link za pristup.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="timeline__event animated fadeInUp timeline__event--type2">
+        <div class="timeline__event__icon">
+            <i class="far fa-link"></i>
+        </div>
+        <div class="timeline__event__step">
+            Korak 2.
+        </div>
+        <div class="timeline__event__content">
+            <div class="timeline__event__title">
+                Kliknite na link za pristup
+            </div>
+            <br />
+            <div class="timeline__event__description">
+                <p>
+                    Klikom na link za pristup u imejlu, otvoriće se nova stranica u samoj Gmail aplikaciji, na kojoj je potrebno da
+                    pritisnete dugme "Ask to join".
+                    <br>
+                    Slika stranice je prikazana ispod (kliknite na sliku da je uvećate):
+                </p>
+                <a href="~/images/content-images/join-session/join-google-meet-by-phone.jpg"
+                   data-lightbox="join-google-meet-session-by-phone"
+                   data-title="Kliknite na dugme 'Ask to join'"
+                   class="avatar">
+                    <img class="border border-primary d-inline-block"
+                         src="~/images/content-images/join-session/join-google-meet-by-phone.jpg"
+                         alt="kliknite na dugme 'Ask to join'" />
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="timeline__event animated fadeInUp timeline__event--type3">
+        <div class="timeline__event__icon">
+            <i class="far fa-check"></i>
+        </div>
+        <div class="timeline__event__step">
+            Korak 3.
+        </div>
+        <div class="timeline__event__content">
+            <div class="timeline__event__title">
+                Pristupite seansi sa terapeutom i dozvolite upotrebu mikrofona
+            </div>
+            <br />
+            <div class="timeline__event__description">
+                <p>
+                    Terapeut će ubrzo prihvatiti Vaš zahtev za pristup. Kada ste pristupili seansi,
+                    dozvolite upotrebu Vašeg mikrofona.
+                    <br>
+                    Slika je prikazana ispod (kliknite na sliku da je uvećate):
+                </p>
+                <a href="~/images/content-images/join-session/allow-microphone.jpg"
+                   data-lightbox="join-google-meet-session-by-phone"
+                   data-title="Dozvolite upotrebu mikrofona"
+                   class="avatar">
+                    <img class="border border-primary d-inline-block"
+                         src="~/images/content-images/join-session/allow-microphone.jpg"
+                         alt="dozvolite mikrofon na stranici na kojoj se održava seansa" />
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/custom-site-layout/vendor/lightbox/js/lightbox.min.js"></script>
+}

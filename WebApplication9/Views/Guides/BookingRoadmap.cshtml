@@ -1,0 +1,129 @@
+﻿@using Framework.Helpers.ExtensionMethods
+
+@{
+    ViewData.SetTitle("Zakažite seansu sa psihoterapeutom u 4 koraka");
+    ViewData.SetMetaDescription("Želeli biste da zakažete seansu sa psihoterapeutom? " +
+        "Dozvolite CounterApathy platformi da bude Vaš vodič kroz 4 koraka. " +
+        "Pregledajte licencirane psihoterapeute, dopunite Veb kredit na svom nalogu, " +
+        "izaberite prikladno vreme i mesto i zakažite seansu. Toliko je jednostavno!");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/css/booking-roadmap.css" />
+    <style>
+        .booking-timeline li {
+            padding-bottom: 0.5rem;
+        }
+
+            .booking-timeline li:last-child {
+                padding-bottom: 0;
+            }
+    </style>
+}
+
+<h2 class="text-center my-5 mx-3">Zakažite seansu sa psihoterapeutom u 3 koraka</h2>
+<div class="booking-timeline">
+    <div class="timeline__event animated fadeInUp timeline__event--type2 mt-0">
+        <div class="timeline__event__icon bg-soft-info">
+            <i class="fal fa-users text-info"></i>
+        </div>
+        <div class="timeline__event__step">
+            Korak 1.
+        </div>
+        <div class="timeline__event__content">
+            <div class="timeline__event__title text-800 font-weight-bold">
+                Pogledajte psihoterapeute i izaberite sa kim biste zakazali seansu
+            </div>
+            <br />
+            <div class="timeline__event__description">
+                Pogledajte psihoterapeute na <a href='@Url.AllPsychotherapistsUrl()' target="_blank">stranici za pregled psihoterapeuta</a>.
+                Klikom na ime psihoterapeuta se prikazuje njegov profil.
+                Tamo možete saznati cene seansi,
+                veštine i <a href="@Url.Action("PsychotherapistsExperiences", "Therapists")" target="_blank">iskustva dosadašnjih klijenata</a>.
+            </div>
+        </div>
+    </div>
+    <div class="timeline__event animated fadeInUp timeline__event--type2">
+        <div class="timeline__event__icon bg-soft-success">
+            <i class="fal fa-calendar-check text-success"></i>
+        </div>
+        <div class="timeline__event__step">
+            Korak 2.
+        </div>
+        <div class="timeline__event__content">
+            <div class="timeline__event__title text-800 font-weight-bold">
+                Na profilu izabranog psihoterapeuta zakažite seansu koja Vam odgovara
+            </div>
+            <br />
+            <div class="timeline__event__description">
+                <p>
+                    Na profilu psihoterapeuta,
+                    klikom na dugme za zakazivanje seanse, prikazuje se kalendar sa označenim datumima. Klikom na neki od tih datuma,
+                    <strong>izlistavaju se seanse</strong>. Klikom na izabranu seansu i popunjavanjem
+                    podataka i potvrdom, seansa se zakazuje. Nakon zakazivanja, prikazaće se formular za unos platne kartice.
+                    Rok za uplatu je 10 minuta.
+                </p>
+                <p class="mb-0">
+                    <span class="fa-stack">
+                        <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                        <i class="far fa-star fa-stack-1x text-warning"></i>
+                    </span>
+                    Kontakt metodu birate prilikom zakazivanja.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="timeline__event animated fadeInUp timeline__event--type2">
+        <div class="timeline__event__icon">
+            <i class="far fa-stopwatch"></i>
+        </div>
+        <div class="timeline__event__step">
+            Korak 3.
+        </div>
+        <div class="timeline__event__content">
+            <div class="timeline__event__title text-800 font-weight-bold">
+                Sačekajte da dođe datum održavanja seanse
+            </div>
+            <br />
+            <div class="timeline__event__description">
+                Kad dođe datum održavanja:
+                <ul>
+                    <li class="pl-0">
+                        <strong>Ako ste zakazali ličnu seansu,</strong>
+                        dođite na adresu terapeuta 5 minuta pre početka.
+                    </li>
+                    <li class="pl-0">
+                        <strong>Ako ste zakazali Google Meet seansu,</strong>
+                        link za pristup seansi biće poslat na Vaš imejl najkasnije 4 sata pre početka seanse.
+                        <br />
+                        Za pomoć oko pristupa online seansi, pročitajte
+                        <a asp-area="" asp-controller="Guides" asp-action="JoinGoogleMeetByComputer" target="_blank">uputstvo za pristup putem računara</a> ili
+                        <a asp-area="" asp-controller="Guides" asp-action="JoinGoogleMeetByPhone" target="_blank">uputstvo za pristup putem mobilnog telefona</a>.
+                    </li>
+                </ul>
+                <p class="text-black">
+                    Ako ste zakazali grupnu seansu, treba da obavestite sve članove.
+                </p>
+                <p class="mb-0">Svoje zakazane seanse možete pregledati <a href='@Url.Action("BookedSessions", "Sessions", new { Area = await User.GetAreaAsync() })' target="_blank">ovde</a> (morate biti ulogovani).</p>
+            </div>
+        </div>
+    </div>
+    <hr class="mt-0" />
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            @await Html.TryPartialAsync("~/Views/Shared/FAQs/ClientAndAnonymous/_SessionsBookingFAQ.cshtml")
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="row justify-content-center">
+                @await Html.TryPartialAsync("~/Views/Shared/Guides/ClientAndAnonymous/_JoinSessionGuide.cshtml")
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/accordion-setup.js"></script>
+}

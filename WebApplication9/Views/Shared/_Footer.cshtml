@@ -1,0 +1,89 @@
+﻿@using Framework.Providers
+@using Framework.Helpers.ExtensionMethods
+
+<div class="footer-top pt-3 mt-1">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card h-100">
+                    <div class="card-header border-bottom-0">
+                        <h3 class="fs-2 text-primary text-nowrap">
+                            <a asp-area="" asp-controller="Home" asp-action="Index" class="text-decoration-none">CounterApathy</a>
+                        </h3>
+                    </div>
+                    <div class="card-body pt-0">
+                        <ul class="list-unstyled mb-0">
+                            <li><p class="text-muted mb-0"><i class="fal fa-cog mr-2 no-tick"></i>CounterApathy v1.0.0</p></li>
+                            <li><p class="text-muted"><i class="fal fa-sync mr-2 no-tick"></i>Updated Nov 17, 2023</p></li>
+                            <li class="text-muted notranslate">Lewes DE 19958, US</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3 footer-links">
+                <div class="card h-100">
+                    <div class="card-header border-bottom-0">
+                        <h4 class="text-secondary">Korisni linkovi</h4>
+                    </div>
+                    <div class="card-body pt-0">
+                        <ul>
+                            <li><i class="fal fa-address-card fa-fw text-info mr-2 no-tick"></i><a asp-area="" asp-controller="Home" asp-action="About">O nama</a></li>
+                            <li><i class="fal fa-question fa-fw text-info mr-2 no-tick"></i><a asp-area="" asp-controller="Home" asp-action="FAQ">Česta pitanja</a></li>
+                            <li><i class="fal fa-book-open fa-fw text-primary mr-2 no-tick"></i><a asp-area="" asp-controller="Guides" asp-action="All">Uputstva</a></li>
+                            <li><i class="fal fa-scroll fa-fw text-primary mr-2 no-tick"></i><a asp-area="" asp-controller="Home" asp-action="TermsOfService">Uslovi korišćenja</a></li>
+                            <li><i class="fal fa-scroll fa-fw text-primary mr-2 no-tick"></i><a asp-area="" asp-controller="Home" asp-action="TherapistsTerms">Uslovi za terapeute</a></li>
+                            <li><i class="fal fa-shield fa-fw text-primary mr-2 no-tick"></i><a asp-area="" asp-controller="Home" asp-action="Privacy">Politika privatnosti</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3 footer-links">
+                <div class="card h-100">
+                    <div class="card-header border-bottom-0">
+                        <h4 class="text-secondary">Naše usluge</h4>
+                    </div>
+                    <div class="card-body pt-0">
+                        <ul>
+                            <li><i class="fal fa-users fa-fw text-info mr-2 no-tick"></i><a href="@Url.AllPsychotherapistsUrl()">Pogledajte psihoterapeute</a></li>
+                            <li><i class="fal fa-comments-alt fa-fw text-primary mr-2 no-tick"></i><a asp-area="" asp-controller="Consultations" asp-action="Index">Besplatne konsultacije</a></li>
+                            <li><i class="fal fa-calendar-check fa-fw text-success mr-2 no-tick"></i><a asp-area="" asp-controller="Guides" asp-action="BookingRoadmap">Lako zakažite seansu</a></li>
+                            <li><i class="far fa-star fa-fw text-warning mr-2 no-tick"></i><a asp-area="" asp-controller="Therapists" asp-action="PsychotherapistsExperiences">Iskustva sa psihoterapije</a></li>
+                            <li><i class="fal fa-paste fa-fw text-info mr-2 no-tick"></i><a asp-area="" asp-controller="Home" asp-action="TherapistApplications">Poslovi za terapeute</a></li>
+                            @if (User.HasSupportAvailable())
+                            {
+                                var userRole = await User.GetRoleAsync();
+                                if (userRole == UserRoles.Therapist)
+                                {
+                                    <li><i class="fal fa-headset fa-fw text-orange mr-2 no-tick"></i><a asp-area="Therapist" asp-controller="Account" asp-action="Support">Podrška za terapeute</a></li>
+                                }
+                                else if (userRole == UserRoles.None || userRole == UserRoles.Client)
+                                {
+                                    <li><i class="fal fa-user-headset fa-fw text-pink mr-2 no-tick"></i><a asp-area="" asp-controller="Home" asp-action="CustomerSupport">Korisnička podrška</a></li>
+                                }
+                            }
+                            @*<li><i class="fal fa-code fa-fw text-primary mr-2 no-tick"></i><a asp-area="" asp-controller="Home" asp-action="Developer">Developer</a></li>*@
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3 footer-links">
+                <div class="card h-100">
+                    <div class="card-header border-bottom-0 pb-0">
+                        <h4 class="text-secondary">Društvene mreže</h4>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="icon-group d-flex justify-content-between">
+                            <a href="https://www.instagram.com/kontraapatija/" rel="nofollow noreferrer" class="icon-item bg-white text-pink text-decoration-none" role="button"><span class="fab fa-instagram"></span></a>
+                            <a onclick="toastr['info']('', 'Linkovi za društvene mreže biće dodati uskoro');" class="icon-item bg-white text-youtube text-decoration-none" role="button"><span class="fab fa-youtube"></span></a>
+                            <a onclick="toastr['info']('', 'Linkovi za društvene mreže biće dodati uskoro');" class="icon-item bg-white text-twitter text-decoration-none" role="button"><span class="fab fa-twitter"></span></a>
+                            <a onclick="toastr['info']('', 'Linkovi za društvene mreže biće dodati uskoro');" class="icon-item bg-white text-facebook text-decoration-none" role="button"><span class="fab fa-facebook-f"></span></a>
+                            <a onclick="toastr['info']('', 'Linkovi za društvene mreže biće dodati uskoro');" class="icon-item bg-white text-linkedin text-decoration-none" role="button"><span class="fab fa-linkedin-in"></span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br class="d-xxl-none" />
+<br class="d-xxl-none" />

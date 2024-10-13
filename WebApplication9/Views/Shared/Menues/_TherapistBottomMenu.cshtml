@@ -1,0 +1,52 @@
+﻿@using Framework.Helpers.ExtensionMethods
+
+<link rel="stylesheet" href="~/css/bottom-menu.css" />
+
+<div class="mobile-bm">
+    <div class="navigation-bm">
+        <ul class="pl-0">
+            <li class="list">
+                <a asp-area="Therapist" asp-controller="Account" asp-action="Profile">
+                    <span class="icon"><i class="fal fa-user text-primary"></i></span>
+                </a>
+            </li>
+            @*<li class="list">
+                <a asp-area="Therapist" asp-controller="Dashboard" asp-action="Main">
+                    <span class="icon"><i class="fal fa-chart-bar"></i></span>
+                </a>
+            </li>*@
+            <li class="list">
+                <a href="@Url.AllPsychotherapistBookedConsultationsUrl()">
+                    <span class="icon"><i class="fal fa-comments-alt text-dark-primary"></i></span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="@Url.AllPsychotherapistBookedSessionsUrl()">
+                    <span class="icon"><i class="fal fa-calendar-check text-success"></i></span>
+                </a>
+            </li>
+            <li class="list">
+                <a asp-area="Therapist" asp-controller="Consultations" asp-action="ChooseAppointmentType">
+                    <span class="icon"><i class="fal fa-calendar-plus text-success"></i></span>
+                </a>
+            </li>
+            <li class="list">
+                <a asp-area="Therapist" asp-controller="Notifications" asp-action="All">
+                    <span class="icon"><i class="fal fa-bells text-danger"></i></span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="@Url.AllTherapistWithdrawalsUrl()">
+                    <span class="icon"><i class="far fa-dollar-sign text-success"></i></span>
+                </a>
+            </li>
+            @*<li class="list">
+                <a asp-area="Therapist" asp-controller="Settings" asp-action="Main">
+                    <span class="icon"><i class="fal fa-cog"></i></span>
+                </a>
+            </li>*@
+        </ul>
+    </div>
+</div>
+
+@Html.PartialSectionScripts(@<script async src="~/js/bottom-menu.js"></script>)

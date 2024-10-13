@@ -1,0 +1,864 @@
+﻿@model WebApplication9.Areas.Therapist.ViewModels.AddSessionViewModel
+@using Framework.Helpers.ExtensionMethods
+@{
+    ViewData.SetTitle("Menadžer seansi");
+    ViewData.SetMetaDescription("Upravljajte seansama.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/fullcalendar/main.min.css" />
+    <link rel="stylesheet" href="~/session-manager/session-manager.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+    <link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+    <link rel="stylesheet" href="~/timepicker/timepicker.css" />
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-calendar-plus fa-sm",
+        "text-success",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+<div id="no-session-alert-placeholder"></div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <div class="row no-gutters align-items-center">
+            <div class="col-auto d-flex order-md-0">
+                <button class="btn btn-success btn-sm"
+                        type="button"
+                        data-target="#btn-add-session"
+                        data-toggle="modal">
+                    <span class="far fa-plus mr-2"></span>Dodajte seansu
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="calendar"></div>
+    </div>
+</div>
+
+@await Html.TryPartialAsync("~/Views/Shared/FAQs/Therapist/_EarningsWithdrawalsFAQ.cshtml")
+
+<div id="tile-add-session"
+     data-backdrop="static"
+     data-keyboard="false"
+     data-toggle="modal"
+     class="modal theme-modal fade p-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title text-center mx-auto">Dodajte novu seansu</h5>
+                <button id="tile-dismiss-modal-times" type="button" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvori">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="tile-form" autocomplete="off">
+                @Html.AntiForgeryToken()
+                <div class="modal-body pb-0">
+                    <div class="form-group">
+                        <label asp-for="TileClicked.StartEndDate"></label>
+                        <input asp-for="TileClicked.StartEndDate" class="form-control" readonly />
+                        <span>
+                            <span asp-validation-for="TileClicked.StartEndDate" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TileClicked.StartTime"></label>
+                        <div class="input-group date" id="tile-datetimepicker-start" data-target-input="nearest">
+                            <div class="input-group-prepend" data-target="#tile-datetimepicker-start" data-toggle="datetimepicker">
+                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            </div>
+                            <input asp-for="TileClicked.StartTime" class="form-control datetimepicker-input" data-target="#tile-datetimepicker-start" />
+                        </div>
+                        <span>
+                            <span asp-validation-for="TileClicked.StartTime" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TileClicked.EndTime"></label>
+                        <div class="input-group date" id="tile-datetimepicker-end" data-target-input="nearest">
+                            <div id="tile-div-datetimepicker-end" class="input-group-prepend" data-target="#tile-datetimepicker-end" data-toggle="datetimepicker">
+                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            </div>
+                            <input asp-for="TileClicked.EndTime" class="form-control datetimepicker-input" data-target="#tile-datetimepicker-end" />
+                        </div>
+                        <span>
+                            <span asp-validation-for="TileClicked.EndTime" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TileClicked.Type"></label>
+                        <select asp-for="TileClicked.Type"
+                                class="selectpicker form-control"
+                                title="Individualna / Grupna">
+                            <option value="0" data-content="<i class='fal fa-user fa-fw mr-2' style='color:#0000FF;'></i>Individualna seansa">
+                                Individualna seansa
+                            </option>
+                            <option value="1" data-content="<i class='fal fa-user-friends fa-fw mr-2' style='color:#0000FF;'></i>Grupna seansa">
+                                Grupna seansa
+                            </option>
+                        </select>
+                        <span>
+                            <span asp-validation-for="TileClicked.Type" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TileClicked.Price"></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">RSD</span>
+                            </div>
+                            <input asp-for="TileClicked.Price"
+                                   class="form-control"
+                                   inputmode="numeric"
+                                   oninput="this.value = this.value.replace(/\D+/g, '')" />
+                        </div>
+                        <span>
+                            <span asp-validation-for="TileClicked.Price" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button id="submit-tile" type="button" class="btn btn-sm btn-primary"><text id="submit-tile-text">Dodaj</text></button>
+                    <button id="cancel-tile" type="button" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Poništi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="btn-add-session"
+     data-backdrop="static"
+     data-keyboard="false"
+     data-toggle="modal"
+     class="modal theme-modal fade p-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title text-center mx-auto">Dodajte novu seansu</h5>
+                <button id="btn-dismiss-modal-times" type="button" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvori">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="btn-form" autocomplete="off">
+                @Html.AntiForgeryToken()
+                <div class="modal-body pb-0">
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.StartEndDate"></label>
+                        <div class="input-group date" id="btnclick-datetimepicker-start-end-date" data-target-input="nearest">
+                            <div id="btnclick-div-datetimepicker-start-end-date" class="input-group-prepend" data-target="#btnclick-datetimepicker-start-end-date" data-toggle="datetimepicker">
+                                <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                            </div>
+                            <input asp-for="ButtonClicked.StartEndDate" class="form-control datetimepicker-input" data-target="#btnclick-datetimepicker-start-end-date" />
+                        </div>
+                        <span>
+                            <span asp-validation-for="ButtonClicked.StartEndDate" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.StartTime"></label>
+                        <div class="input-group date" id="btnclick-datetimepicker-start" data-target-input="nearest">
+                            <div id="btnclick-div-datetimepicker-start" class="input-group-prepend" data-target="#btnclick-datetimepicker-start" data-toggle="datetimepicker">
+                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            </div>
+                            <input asp-for="ButtonClicked.StartTime" class="form-control datetimepicker-input" data-target="#btnclick-datetimepicker-start" />
+                        </div>
+                        <span>
+                            <span asp-validation-for="ButtonClicked.StartTime" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.EndTime"></label>
+                        <div class="input-group date" id="btnclick-datetimepicker-end" data-target-input="nearest">
+                            <div id="btnclick-div-datetimepicker-end" class="input-group-prepend" data-target="#btnclick-datetimepicker-end" data-toggle="datetimepicker">
+                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            </div>
+                            <input asp-for="ButtonClicked.EndTime" class="form-control datetimepicker-input" data-target="#btnclick-datetimepicker-end" />
+                        </div>
+                        <span>
+                            <span asp-validation-for="ButtonClicked.EndTime" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.Type"></label>
+                        <br />
+                        <select asp-for="ButtonClicked.Type"
+                                class="selectpicker form-control btn-click"
+                                title="Individualna / Grupna">
+                            <option value="0" data-content="<i class='fal fa-user fa-fw mr-2' style='color:#0000FF;'></i>Individualna seansa">
+                                Individualna seansa
+                            </option>
+                            <option value="1" data-content="<i class='fal fa-user-friends fa-fw mr-2' style='color:#0000FF;'></i>Grupna seansa">
+                                Grupna seansa
+                            </option>
+                        </select>
+                        <span>
+                            <span asp-validation-for="ButtonClicked.Type" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ButtonClicked.Price"></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">RSD</span>
+                            </div>
+                            <input asp-for="ButtonClicked.Price"
+                                   class="form-control"
+                                   inputmode="numeric"
+                                   oninput="this.value = this.value.replace(/\D+/g, '')" />
+                        </div>
+                        <span>
+                            <span asp-validation-for="ButtonClicked.Price" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button id="submit-btn" type="button" class="btn btn-sm btn-primary"><text id="submit-btn-text">Dodaj</text></button>
+                    <button id="cancel-btn" type="button" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Poništi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="view-session"
+     data-toggle="modal"
+     class="modal theme-modal fade p-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title text-center mx-auto"><span id="type"></span></h5>
+                <button type="button" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvori">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <input type="hidden" value="0" id="event-id" />
+            <div class="modal-body">
+                <div class="modal-body pt-1 pb-0 fs--1">
+                    <div class="media mt-2">
+                        <i class="fal fa-calendar text-success fa-fw fa-lg mr-4 no-tick"></i>
+                        <div class="media-body">
+                            <h6>Datum</h6>
+                            <p class="mb-0" id="date"></p>
+                        </div>
+                    </div>
+                    <div class="media mt-4">
+                        <i class="fal fa-usd-circle text-success fa-lg fa-fw mr-4 no-tick"></i>
+                        <div class="media-body">
+                            <h6>Cena</h6>
+                            <p class="mb-0" id="price"></p>
+                        </div>
+                    </div>
+                    <div class="alert mt-4 mb-0 text-center" id="status" role="alert"></div>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button id="btn-delete-session" type="button" class="btn btn-sm btn-danger"><text id="btn-delete-session-text">Obriši</text></button>
+                <button id="close-delete" type="button" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Zatvori</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/fullcalendar/main.min.js"></script>
+    <script src="~/fullcalendar/locales/sr.js"></script>
+    <script async src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+    <script async src="~/multiselect/bootstrap-select.min.js"></script>
+    <script src="~/year-picker/moment.min.js"></script>
+    <script src="~/timepicker/timepicker.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            var calendar;
+
+            let submitTile = $('#submit-tile');
+            let submitTileText = $('#submit-tile-text');
+            let submitTileTextUnchanged = submitTileText.html();
+            let cancelTile = $('#cancel-tile');
+            let tileModal = $('#tile-add-session');
+            let tileModalDismissTimes = $('#tile-dismiss-modal-times');
+            let tileForm = $('#tile-form');
+            let tileDate = $('#TileClicked_StartEndDate');
+            let tileStartTime = $('#TileClicked_StartTime');
+            let tileEndTime = $('#TileClicked_EndTime');
+            let selectTypeTile = $('#TileClicked_Type');
+            let tilePrice = $('#TileClicked_Price');
+
+            let submitBtn = $('#submit-btn');
+            let submitBtnText = $('#submit-btn-text');
+            let submitBtnTextUnchanged = submitBtnText.html();
+            let cancelBtn = $('#cancel-btn');
+            let btnModal = $('#btn-add-session');
+            let btnModalDismissTimes = $('#btn-dismiss-modal-times');
+            let btnForm = $('#btn-form');
+            let btnDate = $('#ButtonClicked_StartEndDate');
+            let btnStartTime = $('#ButtonClicked_StartTime');
+            let btnEndTime = $('#ButtonClicked_EndTime');
+            let selectTypeBtn = $('#ButtonClicked_Type');
+            let btnPrice = $('#ButtonClicked_Price');
+
+            let btnDelete = $('#btn-delete-session');
+            let btnDeleteText = $('#btn-delete-session-text');
+            let btnDeleteTextUnchanged = btnDeleteText.html();
+            let closeDelete = $('#close-delete');
+            let viewSessionModal = $('#view-session');
+
+            $('#tile-datetimepicker-start').datetimepicker({
+                format: 'HH:mm',
+                defaultDate: moment().format()
+            });
+
+            $('#tile-datetimepicker-end').datetimepicker({
+                format: 'HH:mm',
+                defaultDate: moment().format()
+            });
+
+            $('#btnclick-datetimepicker-start').datetimepicker({
+                format: 'HH:mm',
+                defaultDate: moment().format()
+            });
+
+            $('#btnclick-datetimepicker-end').datetimepicker({
+                format: 'HH:mm',
+                defaultDate: moment().format()
+            });
+
+            $('#btnclick-datetimepicker-start-end-date').datetimepicker({
+                format: 'DD/MMM/YYYY',
+                defaultDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+            });
+
+            GetSessions()
+
+            submitTile.click(function () {
+                const triggerElement = 'tile';
+                DisableInputs(triggerElement);
+                let width = $(this).width();
+                let height = $(this).height();
+
+                submitTileText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                    submitTile.width(width);
+                    submitTile.height(height);
+                })
+
+                setTimeout(function () {
+                    if (FormIsValid(triggerElement)) {
+                        let formData = new FormData(tileForm.get(0));
+                        formData.append('addVm.TileClicked.StartEndDate', tileDate.val());
+                        formData.append('addVm.TileClicked.StartTime', tileStartTime.val());
+                        formData.append('addVm.TileClicked.EndTime', tileEndTime.val());
+                        formData.append('addVm.TileClicked.Type', selectTypeTile.val());
+                        formData.append('addVm.TileClicked.Price', tilePrice.val());
+
+                        AddSessionAjax('@Url.Action("AddSessionTileClicked", "Sessions", new { Area = "Therapist"})', formData, triggerElement)
+                    } else {
+                        HandleError(triggerElement);
+                        toastr['info']('', 'Popunite sva obavezna polja')
+                    }
+                }, 600);
+            });
+
+            submitBtn.click(function () {
+                const triggerElement = 'button';
+                DisableInputs(triggerElement);
+                let width = $(this).width();
+                let height = $(this).height();
+
+                submitBtnText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                    submitBtn.width(width);
+                    submitBtn.height(height);
+                })
+
+                setTimeout(function () {
+                    if (FormIsValid(triggerElement)) {
+                        let formData = new FormData(btnForm.get(0));
+                        formData.append('addVm.ButtonClicked.StartEndDate', btnDate.val());
+                        formData.append('addVm.ButtonClicked.StartTime', btnStartTime.val());
+                        formData.append('addVm.ButtonClicked.EndTime', btnEndTime.val());
+                        formData.append('addVm.ButtonClicked.Type', selectTypeBtn.val());
+                        formData.append('addVm.ButtonClicked.Price', btnPrice.val());
+
+                        AddSessionAjax('@Url.Action("AddSessionButtonClicked", "Sessions", new { Area = "Therapist"})', formData, triggerElement)
+                    } else {
+                        HandleError(triggerElement);
+                        toastr['info']('', 'Popunite sva obavezna polja')
+                    }
+                }, 600);
+            })
+
+            function GetSessions() {
+                let sessions = [];
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetSessions", "Sessions", new { Area = "Therapist" })',
+                    success: function (response) {
+                        let sessionArray = $.map(response.sessions, function (value, index) {
+                            return [value];
+                        });
+
+                        if (sessionArray.length == 0)
+                            $('#no-session-alert-placeholder').hide().html(
+                                "<div class='alert alert-pink text-center' role='alert'>" +
+                                "Trenutno nemate seanse." +
+                                "</div>"
+                            ).fadeIn('slow');
+
+                        $.each(sessionArray, function (i, v) {
+                            sessions.push({
+                                start: v.startDateTime,
+                                end: v.endDateTime,
+                                color: v.booked === 0 ? '#00d27a' : '#fc3840',
+                                extendedProps: {
+                                    sessionId: v.sessionId,
+                                @*description: v.description,*@
+                                    type: v.type,
+                                    price: v.price,
+                                    icon: v.booked === 0 ? 'fas fa-check-circle' : 'far fa-address-book',
+                                    booked: v.booked
+                                }
+                            });
+                        });
+
+                        GenerateCalendar(sessions);
+                    },
+                    error: function () {
+                        toastr['error']('Molimo kontaktirajte podršku za terapeute.', 'Došlo je do greške')
+                    }
+                });
+            }
+
+            function GenerateCalendar(sessions) {
+                calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+                    initialView: 'dayGridMonth',
+                    events: sessions,
+                    eventClick: function (args) {
+                    @*$('#subject').val(args.event.title);
+                    $('#description').val(args.event.extendedProps.description);*@
+
+                        let startDateTime = new Date(args.event.start);
+                        $('#date').html(
+                            startDateTime.getDate() + '/' + (startDateTime.getMonth() + 1) + '/' + startDateTime.getFullYear() +
+                            ', ' +
+                            'od ' +
+                            moment(args.event.start).format('HH:mm') + 'h' +
+                            ' do ' +
+                            moment(args.event.end).format('HH:mm') + 'h'
+                        );
+
+                        if (args.event.extendedProps.type === 0) {
+                            $('#type').html('Individualna seansa');
+                            $('#type-icon')
+                                .removeClass('fa-users')
+                                .addClass('fa-user');
+                        }
+                        else if (args.event.extendedProps.type === 1) {
+                            $('#type').html('Grupna seansa');
+                            $('#type-icon')
+                                .removeClass('fa-user')
+                                .addClass('fa-users');
+                        }
+
+                        $('#price').html('RSD ' + args.event.extendedProps.price);
+
+                        if (args.event.extendedProps.booked === 0) {
+                            $('#status')
+                                .addClass('alert-success')
+                                .removeClass('alert-danger')
+                                .html("<i class='mr-2 no-tick " + args.event.extendedProps.icon + "'></i>Ova seansa još uvek nije zakazana.");
+                            btnDelete
+                                .prop('disabled', false)
+                                .removeAttr('title');
+                        }
+                        else if (args.event.extendedProps.booked === 1) {
+                            $('#status')
+                                .addClass('alert-danger')
+                                .removeClass('alert-success')
+                                .html("<i class='mr-2 no-tick " + args.event.extendedProps.icon + "'></i>Ova seansa je zakazana.");
+                            btnDelete
+                                .prop('disabled', true)
+                                .attr('title', 'Nije dozvoljeno brisanje zakazanih seansi.');
+                        }
+
+                        viewSessionModal.modal('show');
+
+                        btnDelete.click(function () {
+                            viewSessionModal.modal('hide');
+                            Swal.mixin({
+                                customClass: {
+                                    confirmButton: 'btn btn-sm btn-danger mr-2',
+                                    cancelButton: 'btn btn-sm btn-falcon-secondary'
+                                },
+                                buttonsStyling: false
+                            }).fire({
+                                title: 'Da li biste želeli da obrišete ovu seansu?',
+                                text: 'Ova aktivnost se ne može poništiti.',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonText: 'Obriši',
+                                cancelButtonText: 'Odustani'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '@Url.Action("DeleteSession", "Sessions", new { Area = "Therapist" })',
+                                        data: { sessionId: args.event.extendedProps.sessionId },
+                                        headers: {
+                                            'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                                        },
+                                        success: function (response) {
+                                            if (response.success === true) {
+                                                sessions = sessions.filter(value => value.extendedProps.sessionId !== args.event.extendedProps.sessionId);
+
+                                                GetSessions()
+                                                toastr[response.severity](response.body, response.title);
+                                                @*$('#calendar').fullCalendar('removeEvents', args.event.extendedProps.sessionId);
+                                                let event = calendar.getEventById(args.event.extendedProps.sessionId);
+                                                event.remove();*@
+                                            } else {
+                                                if (response.redirectUrl) window.location.href = response.redirectUrl;
+                                                else toastr[response.severity](response.body, response.title);
+                                            }
+                                        },
+                                        error: function () {
+                                            toastr['error']('Molimo osvežite stranicu i pokušajte ponovo ili kontaktirajte podršku za terapeute.', 'Došlo je do greške')
+                                        }
+                                    })
+                                } else {
+                                    viewSessionModal.modal('show');
+                                }
+                            });
+                        });
+                    },
+                    eventTimeFormat: {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hourCycle: 'h23'
+                    },
+                    selectable: true,
+                    dateClick: function (args) {
+                        $('#TileClicked_StartEndDate').val(moment(args.dateStr).format('DD/MMM/YYYY'));
+
+                        $('#tile-datetimepicker-start').datetimepicker({
+                            format: 'HH:mm',
+                            defaultDate: moment().format()
+                        });
+
+                        $('#tile-datetimepicker-end').datetimepicker({
+                            format: 'HH:mm',
+                            defaultDate: moment().format()
+                        });
+
+                        tileModal.modal('show');
+                    }
+                @*eventContent: { html: '' }*@
+                });
+                calendar.render();
+            }
+
+            function SessionTypeTileDropdownHighlighter() {
+                let sessParent = selectTypeTile.closest('div');
+
+                if (selectTypeTile.hasClass('is-valid')) {
+                    sessParent.removeClass('is-invalid');
+                    sessParent.addClass('is-valid');
+                } else if (selectTypeTile.hasClass('is-invalid')) {
+                    sessParent.removeClass('is-valid');
+                    sessParent.addClass('is-invalid');
+                }
+            }
+
+            function SessionTypeButtonDropdownHighlighter() {
+                let sessParent = selectTypeBtn.closest('div');
+
+                if (selectTypeBtn.hasClass('is-valid')) {
+                    sessParent.removeClass('is-invalid');
+                    sessParent.addClass('is-valid');
+                } else if (selectTypeBtn.hasClass('is-invalid')) {
+                    sessParent.removeClass('is-valid');
+                    sessParent.addClass('is-invalid');
+                }
+            }
+
+            selectTypeTile.change(function () {
+                let atLeastOneSelected = false;
+                $('#TileClicked_Type > option').each(function () {
+                    if ($(this).is(':selected'))
+                        atLeastOneSelected = true;
+                });
+
+                if (atLeastOneSelected) {
+                    selectTypeTile.closest('div').removeClass('is-invalid');
+                    selectTypeTile.closest('div').addClass('is-valid');
+                }
+                else {
+                    selectTypeTile.closest('div').removeClass('is-valid');
+                    selectTypeTile.closest('div').addClass('is-invalid');
+                }
+            })
+
+            selectTypeBtn.change(function () {
+                let atLeastOneSelected = false;
+                $('#ButtonClicked_Type > option').each(function () {
+                    if ($(this).is(':selected'))
+                        atLeastOneSelected = true;
+                });
+
+                if (atLeastOneSelected) {
+                    selectTypeBtn.closest('div').removeClass('is-invalid');
+                    selectTypeBtn.closest('div').addClass('is-valid');
+                }
+                else {
+                    selectTypeBtn.closest('div').removeClass('is-valid');
+                    selectTypeBtn.closest('div').addClass('is-invalid');
+                }
+            })
+
+            function AddSessionAjax(url, data, triggerElement) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                    },
+                    success: function (response) {
+                        if (response.success === true) {
+                            let targetModal;
+                            let targetSubmitText;
+                            let targetSubmitTextUnchanged;
+                            if (triggerElement === 'tile') {
+                                targetModal = tileModal;
+                                targetSubmitText = submitTileText;
+                                targetSubmitTextUnchanged = submitTileTextUnchanged;
+                            }
+                            else if (triggerElement === 'button') {
+                                targetModal = btnModal;
+                                targetSubmitText = submitBtnText;
+                                targetSubmitTextUnchanged = submitBtnTextUnchanged;
+                            }
+
+                            targetSubmitText.fadeOut('fast', function () {
+                                $(this).html('<i class="ca-lightgreen fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                    setTimeout(function () {
+                                        targetModal.modal('hide');
+                                        Swal.fire({
+                                            title: response.title,
+                                            html:
+                                                `${response.review}<br />` +
+                                                "<ul class='text-left list-unstyled ml-4 mt-3'>" +
+                                                `<li>Datum: <b>${response.date}</b></li>` +
+                                                `<li>Vreme: <b>${response.startTime}h -</b> <b>${response.endTime}h</b></li>` +
+                                                `<li>Trajanje: <b>${response.duration}</b></li>` +
+                                                `<li>Tip: <b>${response.type}</b></li>` +
+                                                `<li>Cena: <b>${response.price}</b></li>` +
+                                                '</ul>',
+                                            icon: response.severity
+                                        })
+                                        targetSubmitText.fadeOut('fast', function () {
+                                            $(this).html(targetSubmitTextUnchanged).fadeIn('slow');
+                                            EnableInputs(triggerElement);
+                                        })
+                                    }, 400)
+                                })
+                            })
+
+                            $('#no-session-alert-placeholder').fadeOut('slow');
+
+                            calendar.addEvent({
+                                id: response.session.sessionId,
+                                start: response.session.startDateTime,
+                                end: response.session.endDateTime,
+                                color: '#00d27a',
+                                extendedProps: {
+                                    sessionId: response.session.sessionId,
+                                    type: response.session.type,
+                                    price: response.session.price,
+                                    icon: 'fas fa-check-circle',
+                                    booked: 0
+                                }
+                            });
+
+                        @*sessions.push({
+                            id: response.session.id,
+                            start: response.session.startDateTime,
+                            end: response.session.endDateTime,
+                            color: '#00d27a',
+                            extendedProps: {
+                                sessionId: response.session.sessionId,
+                                type: response.session.type,
+                                price: response.session.price,
+                                icon: 'fas fa-check-circle',
+                                booked: 0
+                            }
+                        });*@
+                        } else {
+                            if (response.redirectUrl) window.location.href = response.redirectUrl;
+                            else {
+                                HandleError(triggerElement);
+                                Swal.fire({
+                                    title: response.title,
+                                    text: response.body,
+                                    icon: response.severity,
+                                    confirmButtonText: 'U redu',
+                                })
+                            }
+                        }
+                    },
+                    error: function () {
+                        HandleError(triggerElement);
+                        toastr['error']('Molimo osvežite stranicu i pokušajte ponovo ili kontaktirajte podršku za terapeute.', 'Došlo je do greške')
+                    }
+                })
+            }
+
+            function ElementIsValid(triggerElement, element) {
+                let targetForm;
+                if (triggerElement === 'tile') targetForm = tileForm;
+                else if (triggerElement === 'button') targetForm = btnForm;
+
+                return targetForm.validate().element($(element));
+            }
+
+            function FormIsValid(triggerElement) {
+                if (triggerElement === 'tile') {
+                    let dateValid = ElementIsValid(triggerElement, tileDate);
+                    let startTimeValid = ElementIsValid(triggerElement, tileStartTime);
+                    let endTimeValid = ElementIsValid(triggerElement, tileEndTime);
+                    let typeValid = ElementIsValid(triggerElement, selectTypeTile);
+                    let priceValid = ElementIsValid(triggerElement, tilePrice);
+
+                    SessionTypeTileDropdownHighlighter();
+
+                    return (dateValid && startTimeValid &&
+                        endTimeValid && typeValid &&
+                        priceValid);
+                }
+                else if (triggerElement === 'button') {
+                    let dateValid = ElementIsValid(triggerElement, btnDate);
+                    let startTimeValid = ElementIsValid(triggerElement, btnStartTime);
+                    let endTimeValid = ElementIsValid(triggerElement, btnEndTime);
+                    let typeValid = ElementIsValid(triggerElement, selectTypeBtn);
+                    let priceValid = ElementIsValid(triggerElement, btnPrice);
+
+                    SessionTypeButtonDropdownHighlighter();
+
+                    return (dateValid && startTimeValid &&
+                        endTimeValid && typeValid &&
+                        priceValid);
+                }
+            }
+
+            function EnableInputs(triggerElement) {
+                if (triggerElement === 'tile') {
+                    submitTile.prop('disabled', false);
+                    cancelTile.prop('disabled', false);
+                    tileModalDismissTimes.prop('disabled', false);
+
+                    tileStartTime.prop('readonly', false);
+                    tileEndTime.prop('readonly', false);
+                    selectTypeTile.prop('readonly', false);
+                    tilePrice.prop('readonly', false);
+                }
+                else if (triggerElement === 'button') {
+                    submitBtn.prop('disabled', false);
+                    cancelBtn.prop('disabled', false);
+                    btnModalDismissTimes.prop('disabled', false);
+
+                    btnDate.prop('readonly', false);
+                    btnStartTime.prop('readonly', false);
+                    btnEndTime.prop('readonly', false);
+                    selectTypeBtn.prop('readonly', false);
+                    btnPrice.prop('readonly', false);
+                }
+            }
+
+            function DisableInputs(triggerElement) {
+                if (triggerElement === 'tile') {
+                    submitTile.prop('disabled', true);
+                    cancelTile.prop('disabled', true);
+                    tileModalDismissTimes.prop('disabled', true);
+
+                    tileStartTime.prop('readonly', true);
+                    tileEndTime.prop('readonly', true);
+                    selectTypeTile.prop('readonly', true);
+                    tilePrice.prop('readonly', true);
+                }
+                else if (triggerElement === 'button') {
+                    submitBtn.prop('disabled', true);
+                    cancelBtn.prop('disabled', true);
+                    btnModalDismissTimes.prop('disabled', true);
+
+                    btnDate.prop('readonly', true);
+                    btnStartTime.prop('readonly', true);
+                    btnEndTime.prop('readonly', true);
+                    selectTypeBtn.prop('readonly', true);
+                    btnPrice.prop('readonly', true);
+                }
+            }
+
+            function HandleError(triggerElement) {
+                if (triggerElement === 'tile') {
+                    SessionTypeTileDropdownHighlighter();
+                    submitTileText.fadeOut('fast', function () {
+                        $(this).html('<i class="fas fa-times text-danger no-tick"></i>').fadeIn('slow');
+                    })
+                        .promise()
+                        .done(function () {
+                            setTimeout(function () {
+                                submitTileText.fadeOut('fast', function () {
+                                    $(this).html(submitTileTextUnchanged).fadeIn('slow');
+                                    EnableInputs(triggerElement);
+                                })
+                            }, 1300)
+                        })
+                }
+                else if (triggerElement === 'button') {
+                    SessionTypeButtonDropdownHighlighter();
+                    submitBtnText.fadeOut('fast', function () {
+                        $(this).html('<i class="fas fa-times text-danger no-tick"></i>').fadeIn('slow');
+                    })
+                        .promise()
+                        .done(function () {
+                            setTimeout(function () {
+                                submitBtnText.fadeOut('fast', function () {
+                                    $(this).html(submitBtnTextUnchanged).fadeIn('slow');
+                                    EnableInputs(triggerElement);
+                                })
+                            }, 1300)
+                        })
+                }
+            }
+        });
+    </script>
+    <script async src="~/js/accordion-setup.js"></script>
+}

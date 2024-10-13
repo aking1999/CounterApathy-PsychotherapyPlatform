@@ -1,0 +1,44 @@
+﻿@model List<WebApplication9.PartialViewModels.ClientReviewPartialViewModel>
+@using Framework.Helpers.ExtensionMethods
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var review in Model)
+        {
+            <div class="col-12 col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body fs--1">
+                        <div class="media">
+                            <div class="avatar avatar-3xl">
+                                <img class="d-inline-block"
+                                     src="~/images/content-images/default-user-image.png"
+                                     alt="difoltna profilna slika klijenta" />
+                            </div>
+                            <div class="media-body pl-3">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        @await Html.TryPartialAsync("_RenderStars", review.StarsRating)
+                                    </div>
+
+                                    <p class="text-1000 mb-0">@review.RatingDate</p>
+                                </div>
+                                <h6 class="fs-0 text-break py-2 mb-0">
+                                    @review.Comment
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center">
+            <div class="alert alert-pink text-center mb-0" role="alert">
+                Psihoterapeut dosad nije ocenjivan.
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,643 @@
+﻿@model WebApplication9.ViewModels.CustomClientViewModel
+@using Framework.Helpers.ExtensionMethods
+@using Microsoft.AspNetCore.Hosting
+@inject IWebHostEnvironment Environment
+@{
+    ViewData.SetTitle($"{Model.FirstName} - Profil");
+    ViewData.SetMetaDescription("Sa lakoćom pregledajte i ažurirajte svoje podatke.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/country-codes-phone-input/intlTelInput.min.css" />
+    <link rel="stylesheet" href="~/country-codes-phone-input/demo.css" />
+    <link rel="stylesheet" href="~/year-picker/yearpicker.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+    <link rel="stylesheet" href="~/css/dropdown.css" />
+    <link rel="stylesheet" href="~/animations/trash-can/trash-can.css" />
+    <style>
+        .custom-file-input:lang(sr-RS) ~ .custom-file-label::after {
+            content: "Pretraži" !important;
+        }
+
+        .custom-file-input:lang(en) ~ .custom-file-label::after {
+            content: "Browse" !important;
+        }
+
+        .swal2-footer {
+            margin: 0.3em 0 0 !important;
+        }
+    </style>
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-user fa-sm",
+        "text-info",
+        $"Zdravo {Model.FirstName}",
+        "Vaša profilna stranica. Samo Vi možete videti ovu stranicu.",
+        "col-12"))
+
+<form id="profile-form" asp-area="" asp-controller="Account" asp-action="Edit" method="post" enctype="multipart/form-data" autocomplete="off">
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-12 col-lg-4 mb-xs-3 mb-sm-3 mb-md-3 mb-lg-0">
+            <div class="card h-100">
+                <div class="card-body no-tick">
+                    <div class="account-settings">
+                        <div class="user-profile pb-0">
+                            <div class="user-avatar">
+                                <div class="img-holder avatar">
+                                    <img id="output"
+                                         class="d-inline-block"
+                                         src="@User.GetProfilePhotoPathOrDefaultPhotoPath(Environment)"
+                                         alt="profilna slika klijenta @Model.FirstName @Model.LastName" />
+                                </div>
+                            </div>
+                            <h5 class="font-weight-normal text-secondary mb-3"><span id="firstname">@Model.FirstName</span> <span id="lastname">@Model.LastName</span></h5>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fal fa-camera fa-fw"></i></span>
+                            </div>
+                            <div class="custom-file">
+                                <input asp-for="ProfilePhoto" class="custom-file-input">
+                                <label asp-for="ProfilePhoto" class="custom-file-label">Profilna slika</label>
+                            </div>
+                        </div>
+                        <span>
+                            <span id="validation-ProfilePhoto" asp-validation-for="ProfilePhoto" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                        <p class="text-secondary text-center">Dimenzije slike bi idealno trebalo da budu iste, na primer 400x400.</p>
+                        <a asp-controller="Sessions" asp-action="BookedSessions"
+                           class="btn btn-block btn-soft-success mt-4">
+                            <i class="far fa-calendar-check mr-2"></i>Pregledajte zakazane seanse
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-8">
+            <div class="card">
+                <div class="card-header border-bottom-0 d-flex justify-content-between">
+                    <h5 class="mb-0 text-primary fs-1">Lični podaci</h5>
+                    <input id="dropdown"
+                           class="dropdown"
+                           type="checkbox"
+                           name="dropdown" />
+                    <label class="for-dropdown btn-sm btn-soft-info mb-0 no-tick noselect" for="dropdown">
+                        <i class="far fa-cog mr-2"></i>Podešavanja
+                    </label>
+                    <div class="section-dropdown">
+                        @if (Model.ProfilePhoto.FileName != "default-user-image.png")
+                        {
+                            <button class="a-drp pointer-on-hover border-0" id="btn-delete-photo">
+                                <span class="trash ml-1" style="margin-right: 0.8rem!important;">
+                                    <span id="span-trash"></span>
+                                </span>
+                                Obrišite sliku
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="a-drp border-0" id="btn-to-disable" disabled title="Nemate profilnu sliku.">
+                                <span class="trash ml-1" style="margin-right: 0.8rem!important;">
+                                    <span id="span-trash"></span>
+                                </span>
+                                Obrišite sliku
+                            </button>
+
+                            <script>
+                                $('#btn-to-disable').fadeTo(5, 0.5);
+                            </script>
+                        }
+                        <a class="a-drp" asp-area="" asp-controller="Account" asp-action="AddWebCredit">
+                            <i class="fal fa-usd-circle fa-fw text-success mr-2"></i>Dodajte Veb kredit
+                        </a>
+                        <a class="a-drp" asp-area="" asp-controller="Account" asp-action="ChangePassword">
+                            <i class="fal fa-lock fa-fw text-primary mr-2"></i>Promena lozinke
+                        </a>
+                        <a class="a-drp" asp-area="" asp-controller="Home" asp-action="TherapistApplications">
+                            <i class="fal fa-paste fa-fw text-info mr-2"></i>Poslovi za terapeute
+                        </a>
+                        <span id="btn-delete-account" class="a-drp">
+                            <i class="far fa-times fa-fw text-danger mr-2"></i>Gašenje naloga
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="FirstName"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="FirstName"
+                                           class="form-control" />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="FirstName" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="LastName"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="LastName"
+                                           class="form-control" />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="LastName" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="Email"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-envelope fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="Email"
+                                           class="form-control" readonly />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="PhoneNumber"></label>
+                                <div class="input-group">
+                                    <input asp-for="PhoneNumber"
+                                           class="form-control" />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="PhoneNumber" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="YearOfBirth"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-calendar fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="YearOfBirth"
+                                           class="form-control"
+                                           inputmode="numeric"
+                                           oninput="this.value = this.value.replace(/\D+/g, '')"
+                                           readonly />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="YearOfBirth" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="WebCredit"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">RSD</span>
+                                    </div>
+                                    <input asp-for="WebCredit"
+                                           class="form-control"
+                                           readonly />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <a asp-controller="Account" asp-action="AddWebCredit" class="btn btn-mini btn-success border-0">
+                                                <i class="fas fa-plus mr-1"></i>Dodajte još
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-end mt-3 mt-sm-0">
+                        <div class="col-12 col-sm-6">
+                            <div class="text-right">
+                                <button type="button"
+                                        id="btn-submit"
+                                        class="btn btn-sm btn-primary">
+                                    <span id="btn-submit-text">&nbsp;Sačuvaj&nbsp;</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/country-codes-phone-input/intlTelInput.min.js"></script>
+    <script id="wwwroot-utils" src="~/country-codes-phone-input/utils.js"></script>
+    <script src="~/year-picker/moment.min.js"></script>
+    <script src="~/year-picker/yearpicker.js"></script>
+    <script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            window.history.pushState({}, '', '@Url.Action("Profile", "Account", new { Area = "" })');
+
+            const fileExtension = ['jpeg', 'jpg', 'png'];
+            let submit = $('#btn-submit');
+            let submitText = $('#btn-submit-text');
+            let submitTextUnchanged = submitText.html();
+            let profileForm = $('#profile-form');
+            let inputImage = $("#ProfilePhoto");
+            let defaultUserImage = $('#output').attr('src');
+            let profilePhotoAlt = $('#output').attr('alt');
+            let firstName = $('#FirstName');
+            let lastName = $('#LastName');
+            let phoneNumber = $('#PhoneNumber');
+            let yearOfBirth = $("#YearOfBirth");
+            let currentYear = new Date().getFullYear();
+
+            window.intlTelInput(document.querySelector('#PhoneNumber'), {
+                formatOnDisplay: true,
+                separateDialCode: true,
+                initialCountry: 'rs',
+                nationalMode: false,
+                placeholderNumberType: 'MOBILE',
+                onlyCountries: ['rs'],
+                utilsScript: document.getElementById('wwwroot-utils').href
+            });
+
+            yearOfBirth.yearpicker({
+                year: @Model.YearOfBirth,
+                startYear: currentYear - 90,
+                endYear: currentYear - 16
+            });
+
+            $('#output').click(function () {
+                inputImage.click();
+            });
+
+            submit.click(function () {
+                DisableInputs();
+                let width = $(this).width();
+                let height = $(this).height();
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                    submit.width(width);
+                    submit.height(height);
+                });
+
+                setTimeout(function () {
+                    if (FormIsValid()) {
+                        submitText.fadeOut('fast', function () {
+                            $(this).html('<i class="ca-lightgreen fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                setTimeout(function () {
+                                    submitText.fadeOut('fast', function () {
+                                        $(this).html(submitTextUnchanged).fadeIn('slow');
+                                    });
+                                }, 1200)
+
+                                setTimeout(function () {
+                                    profileForm.submit();
+                                }, 200);
+                            })
+                        })
+                    } else HandleError('Popunite sva obavezna polja', '', 'info');
+                }, 1200);
+            });
+
+            inputImage.on('change', function (event) {
+                if (!this.files.length) {
+                    inputImage.removeClass('is-valid');
+                    inputImage.addClass('is-invalid');
+                    inputImage.siblings(".custom-file-label").removeClass("selected").html('<i class="far fa-times text-danger mr-2"></i>Izaberite sliku.');
+                    $('#validation-ProfilePhoto')
+                        .removeAttr('data-valmsg-replace', 'true');
+
+                    $('.img-holder').fadeOut('fast', function () {
+                        $(this).html('<i class="text-primary fas fa-spinner fa-spin no-tick" style="margin-top:42% !important;"></i>')
+                            .fadeIn(800, function () {
+                                $(this).fadeOut(800, function () {
+                                    $(this).html(`<img class="d-inline-block" src="${defaultUserImage}" alt="${profilePhotoAlt}" id="output" />`);
+                                    var image = document.getElementById("output");
+
+                                    $(this).fadeIn('slow');
+                                    inputImage.prop('readonly', false);
+
+                                    @*click listener must also be included here*@
+                                    $(image).click(function () {
+                                        inputImage.click();
+                                    });
+                                });
+                            });
+                    });
+                } else {
+                    if (!FileExtensionValid(inputImage)) {
+                        inputImage.removeClass('is-valid');
+                        inputImage.addClass('is-invalid');
+                        $('#validation-ProfilePhoto')
+                            .removeAttr('data-valmsg-replace')
+                            .html("Dozvoljeni formati: jpeg, jpg, png.");
+
+                        inputImage.siblings(".custom-file-label").removeClass("selected").html('<i class="far fa-times text-danger mr-2"></i>Format nedozvoljen.');
+
+                        $('.img-holder').fadeOut('fast', function () {
+                            $(this).html('<i class="text-primary fas fa-spinner fa-spin no-tick" style="margin-top:42% !important;"></i>')
+                                .fadeIn(800, function () {
+                                    $(this).fadeOut(800, function () {
+                                        $(this).html(`<img class="d-inline-block" src="${defaultUserImage}" alt="${profilePhotoAlt}" id="output" />`);
+                                        var image = document.getElementById("output");
+
+                                        $(this).fadeIn('slow');
+                                        inputImage.prop('readonly', false);
+
+                                        @*click listener must also be included here*@
+                                        $(image).click(function () {
+                                            inputImage.click();
+                                        });
+                                    });
+                                });
+                        });
+                    }
+                    else if (inputImage.val().split("\\").pop().length) {
+                        inputImage.prop('readonly', true);
+                        inputImage.removeClass('is-invalid');
+                        inputImage.addClass('is-valid');
+                        $('#validation-ProfilePhoto').html('');
+
+                        $('.img-holder').fadeOut('fast', function () {
+                            $(this).html('<i class="text-primary fas fa-spinner fa-spin no-tick" style="margin-top:42% !important;"></i>')
+                                .fadeIn(800, function () {
+                                    $(this).fadeOut(800, function () {
+                                        $(this).html(`<img class="d-inline-block" src="" alt="${profilePhotoAlt}" id="output" />`);
+                                        var image = document.getElementById("output");
+                                        image.src = URL.createObjectURL(event.target.files[0]);
+
+                                        $(this).fadeIn('slow');
+                                        inputImage.prop('readonly', false);
+
+                                        @*click listener must also be included here*@
+                                        $(image).click(function () {
+                                            inputImage.click();
+                                        });
+                                    });
+                                });
+                        });
+
+                        inputImage.siblings(".custom-file-label").addClass("selected").html('<i class="far fa-check text-success mr-2"></i>Slika izabrana');
+                    }
+                }
+            });
+
+            function FileExtensionValid(inputImage) {
+                let fileName = $(inputImage).val().split("\\").pop();
+                if (fileName.length && ($.inArray($(inputImage).val().split('.').pop().toLowerCase(), fileExtension) == -1))
+                    return false;
+
+                return true;
+            }
+
+            firstName.on('input', function () {
+                if (!firstName.val()) {
+                    $('#firstname').html(firstName.attr('placeholder'));
+                } else {
+                    $('#firstname').html(firstName.val());
+                }
+            });
+
+            lastName.on('input', function () {
+                if (!lastName.val()) {
+                    $('#lastname').html(lastName.attr('placeholder'));
+                } else {
+                    $('#lastname').html(lastName.val());
+                }
+            });
+
+            $('#btn-delete-photo').hover(function () {
+                $('#span-trash').css({
+                    transform: 'rotate(-45deg)',
+                    transition: 'transform 250ms'
+                });
+            });
+
+            $('#btn-delete-photo').mouseleave(function () {
+                $('#span-trash').css({
+                    transform: 'rotate(0deg)',
+                    transition: 'transform 250ms'
+                });
+            });
+
+            $('#btn-delete-photo').click(function () {
+                $(this).prop('disabled', true);
+                Swal.mixin({
+                    customClass: {
+                        confirmButton: 'btn btn-sm btn-danger mr-2',
+                        cancelButton: 'btn btn-sm btn-falcon-secondary'
+                    },
+                    buttonsStyling: false
+                }).fire({
+                    title: 'Da li biste želeli da obrišete profilnu sliku?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Obriši sliku',
+                    cancelButtonText: 'Odustani'
+                }).then((result) => {
+                    $('#span-trash').css({
+                        transform: 'rotate(0deg)',
+                        transition: 'transform 250ms'
+                    });
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("DeleteProfilePhoto", "Account", new { Area = "" })',
+                            success: function (response) {
+                                if (response.success === true) {
+                                    $('.img-holder').fadeOut('fast', function () {
+                                        $(this).html('<i class="text-primary fas fa-spinner fa-spin no-tick" style="margin-top:42% !important;"></i>')
+                                            .fadeIn(800, function () {
+                                                $(this).fadeOut(800, function () {
+                                                    toastr[response.severity](response.body, response.title);
+                                                    $(this).html(`<img class="d-inline-block" src="" alt="${profilePhotoAlt}" id="output" />`);
+                                                    var image = document.getElementById("output");
+                                                    image.src = response.path;
+
+                                                    $(this).fadeIn('slow');
+                                                    inputImage.prop('readonly', false);
+
+                                                    @*click listener must also be included here*@
+                                                    $(image).click(function () {
+                                                        inputImage.click();
+                                                    });
+                                                });
+
+                                                $('#btn-delete-photo')
+                                                    .removeClass('pointer-on-hover')
+                                                    .attr('title', 'Nemate profilnu sliku.')
+                                                    .fadeTo(5, 0.5)
+                                                    .off('click');
+                                            });
+                                    });
+                                } else {
+                                    $('#btn-delete-photo').prop('disabled', false);
+                                    toastr[response.severity](response.body, response.title);
+                                }
+                            },
+                            error: function (response) {
+                                $('#btn-delete-photo').prop('disabled', false);
+                                toastr['error']('Profilna slika nije obrisana. Molimo pokušajte ponovo.', 'Došlo je do greške');
+                            }
+                        })
+                    } else $('#btn-delete-photo').prop('disabled', false);
+                })
+            });
+
+            $('#btn-delete-account').click(function (event) {
+                event.preventDefault();
+                Swal.mixin({
+                    customClass: {
+                        confirmButton: 'btn btn-sm btn-danger mr-2',
+                        cancelButton: 'btn btn-sm btn-falcon-secondary'
+                    },
+                    buttonsStyling: false
+                }).fire({
+                    title: '<div class="swal-title">Da li ste sigurni da želite obrisati svoj nalog?</div>',
+                    html:
+                        'Brisanjem naloga uklanjaju se:' +
+                        '<ul class="list-unstyled mb-4">' +
+                        '<li>Lični podaci</li>' +
+                        '<li>Podaci vezani za Vaš nalog</li>' +
+                        '<li>Kontakt podaci</li>' +
+                        '<li>Dosadašnje aktivnosti</li>' +
+                        '</ul>' +
+                        '<br/>' +
+                        '<label for="password" class="confirm-password">Potvrda lozinke</label>' +
+                        '<div class="input-group">' +
+                        '<div class="input-group-prepend">' +
+                        '<span class="input-group-text"><i class="fal fa-lock fa-fw"></i></span>' +
+                        '</div>' +
+                        '<input id="password" class="form-control" placeholder="Unesite lozinku" type="password" />' +
+                        '</div>'
+                        ,
+                    icon: 'error',
+                    footer: '<small class="text-center">Nastavkom, slažete se sa našom <a href="@Url.Action("Privacy", "Home")" target="_blank">politikom privatnosti</a> i <a href="@Url.Action("TermsOfService", "Home")" target="_blank">uslovima korišćenja</a>.</small>',
+                    inputAttributes: {
+                        autocapitalize: 'off'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Obriši nalog',
+                    cancelButtonText: 'Odustani',
+                    showLoaderOnConfirm: true,
+                    preConfirm: function () {
+                        try {
+                            if (!$('input[type=password]').val()) throw new Error("Potvrda lozinke je obavezna.");
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("DeleteAccount", "Account")',
+                                data: { 'password': $('input[type=password]').val() },
+                                success: function (response) {
+                                    if (response.success === true) {
+                                        Swal.fire({
+                                            title: response.title,
+                                            text: response.body,
+                                            icon: response.severity
+                                        }).then((result => {
+                                            window.location.href = '@Url.Action("Index", "Home")';
+                                        }))
+                                    }
+                                    else {
+                                        if (response.redirectUrl) window.location.href = response.redirectUrl;
+                                        else if (response.hasWebCredit === true) {
+                                            Swal.mixin({
+                                                customClass: {
+                                                    confirmButton: 'btn btn-sm btn-danger mr-2',
+                                                    cancelButton: 'btn btn-sm btn-falcon-secondary'
+                                                },
+                                                buttonsStyling: false
+                                            }).fire({
+                                                title: response.title,
+                                                text: response.body,
+                                                icon: response.severity,
+                                                confirmButtonText: 'Korisnička podrška',
+                                                showCancelButton: true,
+                                                cancelButtonText: 'Odustani'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    sessionStorage.setItem('requestedAccountDeletionHasWebCredit', 'true');
+                                                    window.location.href = response.customerSupportUrl;
+                                                }
+                                            })
+                                        }
+                                        else Swal.fire({
+                                            title: response.title,
+                                            text: response.body,
+                                            icon: response.severity
+                                        });
+                                    }
+                                }
+                            })
+                        }
+                        catch (error) {
+                            Swal.showValidationMessage(error);
+                        }
+                    }
+                })
+            });
+
+            function ElementIsValid(element) {
+                return profileForm.validate().element($(element));
+            }
+
+            function FormIsValid() {
+                const fileExtensionValid = FileExtensionValid(inputImage);
+                const inputImageValid = ElementIsValid(inputImage);
+                const firstNameValid = ElementIsValid(firstName);
+                const lastNameValid = ElementIsValid(lastName);
+                const phoneNumberValid = ElementIsValid(phoneNumber);
+                const yearOfBirthValid = ElementIsValid(yearOfBirth);
+
+                return (fileExtensionValid && inputImageValid && firstNameValid &&
+                    lastNameValid && phoneNumberValid &&
+                    yearOfBirthValid);
+            }
+
+            function EnableInputs() {
+                submit.prop('disabled', false);
+                firstName.prop('readonly', false);
+                lastName.prop('readonly', false);
+                phoneNumber.prop('readonly', false);
+            }
+
+            function DisableInputs() {
+                submit.prop('disabled', true);
+                firstName.prop('readonly', true);
+                lastName.prop('readonly', true);
+                phoneNumber.prop('readonly', true);
+            }
+
+            function HandleError(title, body, severity) {
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                    toastr[severity](body, title)
+                })
+                .promise()
+                .done(function () {
+                    setTimeout(function () {
+                        submitText.fadeOut('fast', function () {
+                            $(this).html(submitTextUnchanged).fadeIn('slow');
+                            EnableInputs();
+                        });
+                    }, 1300)
+                })
+            }
+        });
+    </script>
+}

@@ -1,0 +1,39 @@
+﻿@model WebApplication9.PartialViewModels.CountdownPartialViewModel
+
+@using Framework.Helpers.ExtensionMethods
+
+@Html.PartialSectionScripts(
+    @<script>
+        $(document).ready(function () {
+            let status = $('#status-' + '@Model.CountdownId');
+            var countDownDate = new Date(moment("@Model.StartTime").valueOf());
+
+            var x = setInterval(function () {
+                var now = (new Date()).getTime();
+
+                var distance = countDownDate - now;
+
+                if (distance < 0) {
+                    if (status.hasClass('badge-soft-warning')) {
+                        status.removeClass('badge-soft-warning');
+                        status.addClass('badge-soft-primary');
+
+                        if (!status.has('i.fas.fa-spinner.fa-spin').length)
+                            status.html('<i class="fas fa-spinner fa-spin mr-1 no-tick"></i>Konsultacije u toku');
+                    }
+
+                    var finished = new Date(moment("@Model.EndTime").valueOf());
+
+                    if (new Date() >= finished) {
+                        clearInterval(x);
+
+                        if (status.hasClass('badge-soft-primary')) {
+                            status.removeClass('badge-soft-primary');
+                            status.addClass('badge-soft-success');
+                            status.html('<i class="fas fa-check mr-1"></i>Konsultacije završene');
+                        }
+                    }
+                }
+            }, 1000);
+        });
+    </script>)

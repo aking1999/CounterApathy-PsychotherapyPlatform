@@ -1,0 +1,93 @@
+﻿@using Framework.Models
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var _therapistFee = Configuration.GetSection("TherapistFee").Get<TherapistFee>();
+}
+
+<div class="card pt-1 mb-3">
+    <div class="card-header pb-0">
+        <h4 class="text-center mb-0 text-primary">Česta pitanja o naplati seanse</h4>
+    </div>
+    <div class="card-body pb-0">
+        <div class="accordion">
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako da naplatim održanu seansu?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                <strong>Manuelna naplata:</strong> Nakon završetka svake seanse, na
+                                <a asp-area="Therapist" asp-controller="Sessions" asp-action="BookedSessions" target="_blank">stranici sa zakazanim seansama</a>,
+                                klikom na
+                                <button class="btn btn-mini btn-info"
+                                        data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title=""
+                                        data-original-title="Detalji seanse">
+                                    <i class="far fa-eye m-0"></i>
+                                </button>
+                                prelazite na stranicu sa detaljima te seanse, gde klikom na dugme
+                                <button class="btn btn-success btn-sm">Naplati</button>, sredstva se
+                                dodaju na Vaš nalog na platformi.
+                            </p>
+                            <p>
+                                <strong>Automatska naplata:</strong> U slučaju da je prošlo 24h od završetka seanse, a Vi niste izvršili manuelnu naplatu seanse,
+                                sistem će automatski dodati sredstva na Vaš nalog na platformi.
+                            </p>
+                            <p>
+                                Kada naplatite seansu, sredstva se dodaju na Vaš nalog i čuvaju se do kada ne odlučite da
+                                ta sredstva isplatite na svoj bankovni račun. Stanje svojih sredstava možete pogledati na
+                                <a asp-area="Therapist" asp-controller="Account" asp-action="Profile" target="_blank">svojoj profilnoj stranici</a>,
+                                ispod stavke "Sredstva / zarada".
+                            </p>
+                            <p class="mb-0">
+                                Platforma uzima @_therapistFee.PercentageAmount% provizije na cenu seanse po svakoj naplati završene seanse.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako da mi se sredstva isplate sa naloga na račun?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                Isplata sredstava sa naloga se može izvršiti na
+                                <a asp-area="Therapist" asp-controller="Withdrawals" asp-action="Withdraw" target="_blank">stranici za isplatu sredstava</a>.
+                                <br />
+                                Sredstva će biti isplaćena na Vaš račun u banci i stižu u roku od 1 do 14 dana.
+                            </p>
+                            <p class="mb-0">
+                                Minimalna suma za isplatu je 3500 RSD.
+                                <br />
+                                Isplata sredstava sa naloga se može zahtevati na svakih nedelju dana.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer text-center">
+        <small>
+            <i class="far fa-info-circle text-info mr-2"></i>Imate dodatna pitanja?
+            Kontaktirajte <a asp-area="Therapist" asp-controller="Account" asp-action="Support">podršku za terapeute</a>.
+        </small>
+    </div>
+</div>

@@ -1,0 +1,234 @@
+﻿@model List<TherapistCardViewModel>
+@using Framework.Helpers.ExtensionMethods
+@using WebApplication9.ViewModels
+@using WebApplication9.PartialViewModels
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor ContextAccessor
+@{
+    ViewData.SetTitle("Licencirani psihoterapeuti");
+    ViewData.SetMetaDescription("Zakažite seansu sa psihoterapeutom i napravite personalizovan plan " +
+        "za postizanje svojih ciljeva.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var techniquesLinks = new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>();
+    ((List<DataTransferObjects.ViewModels.Client.PsychotherapyTechniqueListItem>)ViewBag.techniques).ForEach(tech => techniquesLinks.Add(new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "psihoterapijska-tehnika", tech.Id, tech.Name)));
+    var specialtiesLinks = new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>();
+    ((List<DataTransferObjects.ViewModels.Client.SpecialtyListItem>)ViewBag.specialties).ForEach(spec => specialtiesLinks.Add(new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "specijalnost", spec.Id, spec.Name)));
+}
+
+@section StyleSheets {
+    <link rel="canonical" href="@Url.Action("All", "Therapists", new { filter = "", predicate = "" }, ContextAccessor.HttpContext.Request.Scheme)" />
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-users fa-sm",
+        "text-info",
+        "Psihoterapeuti",
+        "Iskustva klijenata Vas interesuju? " +
+        $"Pročitajte dosadašnja <a href='{Url.Action("PsychotherapistsExperiences", "Therapists")}'>iskustva sa psihoterapije</a>."))
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavFilter.cshtml",
+    new WebApplication9.WidgetViewModels.NavFilterWithClearWidgetViewModel("",
+        "",
+        "Therapists",
+        "All",
+        new List<WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel>()
+        {
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("bymostbooked", false, "far fa-fire-alt", "text-orange", "Najzakazivaniji u poslednjih", "most-booked-dropdown", "bymostbooked", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>(){
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "najzakazivaniji", "7", "1 nedelja"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "najzakazivaniji", "14", "2 nedelje"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "najzakazivaniji", "30", "1 mesec"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "najzakazivaniji", "60", "2 meseca"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "najzakazivaniji", "180", "6 meseci"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "najzakazivaniji", "365", "1 godina"),
+            }),
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("bytechnique", false, "far fa-magic", "text-pink", "Psihoterapijska tehnika", "technique-dropdown", "bytechnique", techniquesLinks),
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("byspecialty", false, "far fa-book", "text-primary", "Specijalnost", "specialty-dropdown", "byspecialty", specialtiesLinks),
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("byrating", false, "far fa-star", "text-warning", "Ocena", "rating-dropdown", "byrating", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>()
+            {
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "ocena", "više-ka-niže", "Više ka niže"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "ocena", "niže-ka-više", "Niže ka više")
+            }),
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("byprice", false, "far fa-usd-circle", "text-success", "Cena", "price-dropdown", "byprice", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>()
+            {
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "cena", "više-ka-niže", "Više ka niže"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Therapists", "All", "cena", "niže-ka-više", "Niže ka više")
+            })
+        }))
+
+
+@if (Model != null && Model.Any())
+{
+    <div class="row mb-3">
+        @foreach (var therapist in Model)
+        {
+            var profileUrl = Url.PsychotherapistPublicProfileUrlWithName(therapist.Id, therapist.FirstName, therapist.LastName);
+            <div class="col-lg-4 mt-3">
+                <div class="card h-100 no-tick card-span">
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="avatar mb-3">
+                            <a href="@profileUrl">
+                                <img src="@therapist.ProfilePhoto"
+                                     class="d-inline-block rounded-circle"
+                                     alt="Psihoterapeut @therapist.FirstName @therapist.LastName"
+                                     style="width:5.5rem;height:5.5rem;"
+                                     loading="lazy" />
+                            </a>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div>
+                                <a class="text-1000" href="@profileUrl">
+                                    <h4 class="fs-0 mb-3">
+                                        @therapist.FirstName @therapist.LastName<small class="fas fa-badge-check text-primary ml-1 no-tick" data-toggle="tooltip" data-placement="bottom" title="Psihoterapeut verifikovan" data-fa-transform="shrink-4 down-2"></small>
+                                    </h4>
+                                </a>
+                                <span class="fs--1">
+                                    @if (!string.IsNullOrWhiteSpace(therapist.PsychotherapyTechniqueNamesForDisplay))
+                                    {
+                                        <span data-profile-url="@profileUrl" class="techniques-for-display" style="line-height:inherit">@therapist.PsychotherapyTechniqueNamesForDisplay</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-soft-secondary"><i class="far fa-times mr-2"></i>Nema psihoterapijsku tehniku</span>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center mt-2 mb-1 pb-1">
+                            <div class="col-auto">
+                                <span class="fs--1">
+                                    @if (!string.IsNullOrWhiteSpace(therapist.SpecialtyNamesForDisplay))
+                                    {
+                                        <span data-profile-url="@profileUrl" class="specialties-for-display" style="line-height:inherit">@therapist.SpecialtyNamesForDisplay</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-soft-secondary"><i class="far fa-times mr-2"></i>Nema specijalnost</span>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(therapist.SessionPrice))
+                        {
+                            <div class="row justify-content-center">
+                                <span class="badge badge-pill badge-soft-success mt-2">@therapist.SessionPrice</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row justify-content-center">
+                                <span class="badge badge-pill badge-soft-warning mt-2">Trenutno nema seanse</span>
+                            </div>
+                        }
+                        @if (therapist.Rating > 0)
+                        {
+                            <div class="mt-3">
+                                @await Html.PartialAsync("_RenderStars", therapist.Rating)
+                            </div>
+                        }
+                        <div class="mt-auto">
+                            <a onclick="sessionStorage.setItem('showCalendarTab', 'true')"
+                               href='@profileUrl'
+                               class="btn btn-sm btn-success mt-3 border-0">
+                                <i class="far fa-calendar-plus mr-2"></i>Zakaži seansu
+                            </a>
+                            @if (therapist.HasUpcomingConsultation)
+                            { 
+                                <button data-therapist-id="@therapist.Id"
+                                        class="btn-therapist-free-consultations btn btn-sm btn-soft-primary mt-3 border-0"
+                                        type="button"
+                                        style="opacity: 1 !important;">
+                                    <span class="btn-therapist-free-consultations-text">Besplatne konsultacije</span>
+                                </button>
+                            }
+                        </div>
+                        <div class="row fs--1">
+                            <div class="col-4">
+                                <div class="mt-3">
+                                    <p class="text-secondary mb-0">@therapist.NumberOfBookedSessions</p>
+                                    <p class="mb-0 text-muted">Održane seanse</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mt-3">
+                                    <p class="text-secondary mb-0">@therapist.NumberOfUniqueClients</p>
+                                    <p class="mb-0 text-muted">Klijenti</p>
+                                </div>
+                            </div>
+                            <div class="col-4" role="button" data-toggle="modal" data-target="#contact-methods-@therapist.Id">
+                                <div class="mt-3">
+                                    <p class="text-secondary mb-0">
+                                        @therapist.ContactMethods.Count
+                                        <i class="far fa-link fa-xs text-primary"></i>
+                                    </p>
+                                    <p class="mb-0 text-muted">Kontakt metode</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end col -->
+            @await Html.PartialAsync("_ContactMethodsModal", new ContactMethodsModalPartialViewModel
+            {
+                TherapistId = therapist.Id,
+                ContactMethods = therapist.ContactMethods
+            })
+        }
+        <!-- end row -->
+    </div>
+}
+else
+{
+    @await Html.TryPartialAsync("~/Views/Shared/ErrorPages/PartialViews/_NotFound404.cshtml", new DataTransferObjects.PartialViewModels.NotFoundPartialViewModel
+    {
+        HolderClasses = "my-3",
+        Title = "Traženi terapeuti nisu trenutno dostupni",
+        Body = $"Nijedan terapeut nije trenutno dostupan ili ste izabrali kriterijume za pretragu koje nijedan terapeut ne ispunjava.",
+        IncludeSupportInfo = true,
+        PrimaryButtonText = "<i class='far fa-users mr-2'></i>Pogledajte terapeute",
+        PrimaryButtonClasses = "btn btn-primary btn-block mt-3",
+        PrimaryButtonUrl = Url.AllPsychotherapistsUrl(),
+        SecondaryButtonText = "<i class='far fa-home mr-2'></i>Početna",
+        SecondaryButtonClasses = "btn btn-outline-primary btn-block mt-3",
+        SecondaryButtonUrl = Url.Action("Index", "Home")
+    })
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/FAQs/ClientAndAnonymous/_SessionsBookingFAQ.cshtml")
+
+@section Scripts {
+    @if (Model != null && Model.Any(c => c.HasUpcomingConsultation))
+    { 
+        <script async>
+            var getConsultationsUrl = '@Url.Action("GetConsultations", "Consultations", new { Area = "" })';
+        </script>
+        <script async src="~/js/free-consultations-setup.js"></script>
+    }
+    <script async src="~/js/accordion-setup.js"></script>
+    <script>
+        $(document).ready(function () {
+            let techniquesForDisplay = $('.techniques-for-display');
+            let specialtiesForDisplay = $('.specialties-for-display');
+
+            if (techniquesForDisplay.length) {
+                techniquesForDisplay.each(function (index, element) {
+                        let nodeElement = $(element);
+                        if (nodeElement.html().length > 35) {
+                            nodeElement.html(nodeElement.html().substring(0, 35));
+                        }
+                        nodeElement.append(`... <a href="${nodeElement.attr('data-profile-url')}" onclick="sessionStorage.setItem('showSkillsTab', 'true')" type="button" class="text-decoration-none text-primary">više</a>`)
+                })
+            }
+
+            if (specialtiesForDisplay.length) {
+                specialtiesForDisplay.each(function (index, element) {
+                        let nodeElement = $(element);
+                        if (nodeElement.html().length > 35) {
+                            nodeElement.html(nodeElement.html().substring(0, 35));
+                        }
+                        nodeElement.append(`... <a href="${nodeElement.attr('data-profile-url')}" onclick="sessionStorage.setItem('showSkillsTab', 'true')" type="button" class="text-decoration-none text-primary">više</a>`)
+                })
+            }
+        });
+    </script>
+}

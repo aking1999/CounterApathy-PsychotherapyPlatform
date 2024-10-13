@@ -1,0 +1,124 @@
+﻿@model bool
+@using Framework.Helpers.ExtensionMethods
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    ViewData.SetTitle("Povezivanje bankovnog računa");
+    ViewData.SetMetaDescription("Povežite terapeutski nalog sa dinarskim bankovnim računom kako biste primali isplate (u dinarima) sa platforme na svoj bankovni račun.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("far fa-university fa-sm",
+        "text-700",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription(),
+        "col-12"))
+
+@if (!Model)
+{
+    <div class="row justify-content-center">
+        <div class="col-10 col-sm-6 col-md-5 col-lg-4 col-xl-3">
+            <div class="card card-span">
+                <div class="card-body">
+                    <img class="card-img-top border-bottom" src="~/images/content-images/stripe.svg" alt="stripe logo" />
+                    <div class="row flex-center">
+                        <div class="col-7 col-sm-8 mx-auto">
+                            <div class="row flex-center">
+                                <div class="mx-auto">
+                                    <div class="pt-1 mt-4">
+                                        <div class="media align-items-center pb-1 mb-3">
+                                            <i class="fad fa-check-circle fa-fw mr-2 no-tick" style="color:#635BFF"></i>
+                                            <div class="media-body">
+                                                <h6 class="mb-0">Automatska isplata sredstava</h6>
+                                            </div>
+                                        </div>
+                                        <div class="media align-items-center pb-1 mb-3">
+                                            <i class="fad fa-check-circle fa-fw mr-2 no-tick" style="color:#635BFF"></i>
+                                            <div class="media-body">
+                                                <h6 class="mb-0">Dodavanje dinarskih instrukcija za isplate</h6>
+                                            </div>
+                                        </div>
+                                        <div class="media align-items-center pb-1 mb-3">
+                                            <i class="fad fa-check-circle fa-fw mr-2 no-tick" style="color:#635BFF"></i>
+                                            <div class="media-body">
+                                                <h6 class="mb-0">Isplata u dinarima</h6>
+                                            </div>
+                                        </div>
+                                        <div class="media align-items-center pb-1 mb-3">
+                                            <i class="fad fa-check-circle fa-fw mr-2 no-tick" style="color:#635BFF"></i>
+                                            <div class="media-body">
+                                                <h6 class="mb-0">Isplata na dinarski bankovni račun</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-2 text-center">
+                        <button id="setup-payment-gateway"
+                                type="button"
+                                class="btn btn-purple px-2 rounded-pill mb-md-auto mt-md-1">
+                            <span id="setup-payment-gateway-text">&nbsp;Povežite bankovni račun&nbsp;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.PartialSectionScripts(@<script> const stripeAccountSetupUrl = '@Url.Action("PaymentGatewaySetup", "Withdrawals", new { Area = "Therapist" })'; </script>)
+    @Html.PartialSectionScripts(@<script src="~/js/therapist/setup-payment-gateway.js"></script>)
+}
+else
+{
+    <div class="row justify-content-center px-2">
+        <div class="card">
+            <div class="card-body">
+                <div class="media">
+                    <i class="fal fa-university fa-8x pt-3"></i>
+                    <div class="media-body position-relative pl-3">
+                        <p class="font-weight-medium mb-0 pb-1">
+                            <span class="text-1000 text-nowrap">
+                                Bankovni račun<span class='badge badge-soft-success text-success badge-pill ml-2'><i class='fas fa-check mr-1'></i>Povezan</span>
+                            </span>
+                        </p>
+                        <p class="mt-2 d-none d-md-inline-block" style="width: 380px;">
+                            Sredstva sad možete slati sa Vašeg @appName naloga na Vaš Stripe
+                            nalog, odakle se automatski prosleđuju na Vaš dinarski bankovni račun i ležu
+                            u roku od 1-14 radnih dana.
+                        </p>
+                        <p class="mt-2 d-md-none mr-3 mr-sm-0">
+                            Sredstva sad možete slati sa Vašeg @appName naloga na Vaš Stripe
+                            nalog, odakle se automatski prosleđuju na Vaš dinarski bankovni račun i ležu
+                            u roku od 1-14 radnih dana.
+                        </p>
+                        <div class="row">
+                            <a class="btn-stripe-account btn btn-sm btn-purple mx-2" asp-area="Therapist" asp-controller="Withdrawals" asp-action="StripeAccount">
+                                <span id="btn-stripe-account-text">Stripe nalog</span>
+                            </a>
+                            <a class="btn btn-sm btn-falcon-primary" asp-area="Therapist" asp-controller="Account" asp-action="Profile"><i class="far fa-user mr-2"></i>Profil</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.PartialSectionScripts(
+        @<script>
+             const btnStripe = $('.btn-stripe-account');
+             btnStripe.click(function () {
+                 $(this).addClass('disabled');
+                 const btnText = $('#btn-stripe-account-text');
+                 const width = $(this).width();
+                 const height = $(this).height();
+                 btnText.fadeOut('fast', function () {
+                     $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                     btnStripe.width(width);
+                     btnStripe.height(height);
+                 })
+             });
+        </script>)
+}

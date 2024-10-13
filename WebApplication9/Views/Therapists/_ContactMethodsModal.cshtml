@@ -1,0 +1,48 @@
+﻿@model WebApplication9.PartialViewModels.ContactMethodsModalPartialViewModel
+
+<div id="contact-methods-@Model.TherapistId"
+     data-toggle="modal"
+     class="modal fade p-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content border">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title text-center mx-auto">Kontakt metode</h5>
+                <button type="button" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvori">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body pb-0">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-info d-flex align-items-center" role="alert">
+                            <i class="fal fa-info-circle fa-lg mr-2"></i>
+                            <div class="text-center m-auto">
+                                Ovaj psihoterapeut održava seanse na sledeće načine:
+                            </div>
+                        </div>
+                        @if (Model.ContactMethods != null && Model.ContactMethods.Any())
+                        {
+                            @foreach (var contactMethod in Model.ContactMethods)
+                            {
+                                <div class="my-2">
+                                    <i class="@contactMethod.Icon fa-fw mr-2" style="color:@contactMethod.Color"></i>@contactMethod.Name
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-secondary mb-0">Ovaj psihoterapeut trenutno nema kontakt metode.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Zatvori</button>
+            </div>
+        </div>
+    </div>
+</div>

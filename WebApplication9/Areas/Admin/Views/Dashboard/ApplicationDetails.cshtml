@@ -1,0 +1,576 @@
+﻿@model WebApplication9.Areas.Admin.ViewModels.ApplicationDetailsViewModel
+@using Framework.Helpers.ExtensionMethods
+@{
+    ViewData.SetTitle($"Detalji aplikacije");
+    ViewData.SetMetaDescription($"Stranica za upravljanje aplikacijom #{Model.TherapistApplicationId}");
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+
+@section StyleSheets {
+<link rel="stylesheet" href="~/dashboard/application-details.css" />
+<link rel="stylesheet" href="~/country-codes-phone-input/intlTelInput.min.css" />
+<link rel="stylesheet" href="~/country-codes-phone-input/demo.css" />
+<link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<script src="~/country-codes-phone-input/intlTelInput.min.js"></script>
+<script id="wwwroot-utils" src="~/country-codes-phone-input/utils.js"></script>
+<script src="~/sweet-alert2/sweetalert2.min.js"></script>
+<script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("far fa-paste fa-sm",
+        "text-info",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+<div class="row">
+    <div class="col-12 col-lg-4 mb-3 mb-lg-0">
+        <div class="card h-100">
+            <div class="card-body no-tick">
+                <div class="account-settings">
+                    <div class="user-profile">
+                        <div class="user-avatar">
+                            <div class="img-holder avatar">
+                                <img class="d-inline-block"
+                                     src="@Model.ProfilePhoto"
+                                     alt="profilna slika od klijenta @Model.FirstName @Model.LastName" />
+                            </div>
+                        </div>
+                        <h5 class="font-weight-normal text-secondary mb-2">@Model.FirstName @Model.LastName</h5>
+                        @if (Model.UnderSupervision)
+                        {
+                            <h6 class="mb-3 text-500">Psihoterapeut pod supervizijom</h6>
+                        }
+                        else
+                        {
+                            <h6 class="mb-3 text-500">Psihoterapeut</h6>
+                        }
+                        @if(!string.IsNullOrWhiteSpace(Model.PastCompanies) && Model.PastCompanies.Contains("[PRAVNO LICE]"))
+                        { 
+                            <h6 class="my-3">[PRAVNO LICE]</h6>
+                        }
+                        <div id="application-status">
+                            @if (Model.Accepted == 0)
+                            {
+                                <button id="btn-accept" class="btn btn-sm btn-outline-success">
+                                    <span id="btn-accept-text">&nbsp;Prihvatite&nbsp;</span>
+                                </button>
+                                <button id="btn-reject" class="btn btn-sm btn-outline-danger">
+                                    <span id="btn-reject-text">&nbsp;Odbijte&nbsp;</span>
+                                </button>
+                            }
+                            else
+                            {
+                                if (Model.Accepted == 1)
+                                {
+                                    <span class="badge badge-soft-success"><i class="fas fa-check mr-1"></i>Prihvaćeno</span>
+                                }
+                                else if (Model.Accepted == -1)
+                                {
+                                    <span class="badge badge-soft-danger"><i class="fas fa-times mr-1"></i>Odbijeno</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-soft-secondary"><i class="fas fa-ban mr-1"></i>Nedefinisano</span>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header border-bottom-0">
+                <h5 class="mb-0 text-primary fs-1">Lični podaci</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="FirstName"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                                </div>
+                                <input asp-for="FirstName"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="LastName"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                                </div>
+                                <input asp-for="LastName"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="Email"></label>
+                            @Html.Raw(Model.EmailConfirmed ?
+                                "<span class='ml-1 badge badge-soft-success badge-pill'><i class='fas fa-check mr-1'></i>Verifikovano</span>" :
+                                "<span class='ml-1 badge badge-soft-danger badge-pill'><i class='fas fa-times mr-1'></i>Neverifikovano</span>"
+                                )
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-envelope fa-fw"></i></span>
+                                </div>
+                                <input asp-for="Email"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="PhoneNumber"></label>
+                            <div class="input-group">
+                                <input id="phone-number"
+                                       asp-for="PhoneNumber"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="YearOfBirth"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-calendar fa-fw"></i></span>
+                                </div>
+                                <input asp-for="YearOfBirth"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="Gender"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-venus-mars fa-fw"></i></span>
+                                </div>
+                                <input asp-for="Gender"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="WebCredit"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-usd-circle fa-fw"></i></span>
+                                </div>
+                                <input asp-for="WebCredit"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="ApplicationDate"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-calendar fa-fw"></i></span>
+                                </div>
+                                <input asp-for="ApplicationDate"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-3">
+            <div class="card-header border-bottom-0">
+                <h5 class="mb-0 text-primary fs-1">Adresa</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="Street"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-road fa-fw"></i></span>
+                                </div>
+                                <input asp-for="Street"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="HouseNumber"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-house fa-fw"></i></span>
+                                </div>
+                                <input asp-for="HouseNumber"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="City"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-city fa-fw"></i></span>
+                                </div>
+                                <input asp-for="City"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="PostalCode"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-mailbox fa-fw"></i></span>
+                                </div>
+                                <input asp-for="PostalCode"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="Country"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-globe-europe fa-fw"></i></span>
+                                </div>
+                                <input asp-for="Country"
+                                       class="form-control"
+                                       disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header border-bottom-0">
+                <h5 class="mb-0 text-primary fs-1">Edukacija i veštine</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="University"></label>
+                            <div class="text-900 border p-2 rounded-medium" style="border-width:2px !important">
+                                @(!string.IsNullOrWhiteSpace(Model.University) ? Model.University : "Nema.")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="PastCompanies"></label>
+                            <div class="text-900 border p-2 rounded-medium" style="border-width:2px !important">
+                                @(!string.IsNullOrWhiteSpace(Model.PastCompanies) ? Model.PastCompanies : "Nema.")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <label asp-for="PsychotherapyTechniques"></label>
+                        <div class="form-group">
+                            <ul class="list-group">
+                                @if (Model.PsychotherapyTechniques != null && Model.PsychotherapyTechniques.Count > 0)
+                                {
+                                    foreach (var technique in Model.PsychotherapyTechniques)
+                                    {
+                                        <li class="list-group-item border-0">
+                                            <div data-toggle="set-color-and-background-color"
+                                                 data-color="@technique.Color"
+                                                 class="text-center p-2 rounded-soft d-inline-block"
+                                                 style="width:2.7rem !important; height:2.6rem !important;">
+                                                <i class="@technique.Icon fa-lg fa-fw align-middle"></i>
+                                            </div>
+                                            <h6 class="d-inline-block mb-0 ml-2">@technique.Name</h6>
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li class="list-group-item">
+                                        <center class="mb-0 text-secondary">Nema psihoterapijsku tehniku</center>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <label asp-for="Specialities"></label>
+                        <div class="form-group">
+                            <ul class="list-group">
+                                @if (Model.Specialities != null && Model.Specialities.Any())
+                                {
+                                    foreach (var specialty in Model.Specialities)
+                                    {
+                                        <li class="list-group-item border-0">
+                                            <div data-toggle="set-color-and-background-color"
+                                                 data-color="@specialty.Color"
+                                                 class="text-center p-2 rounded-soft d-inline-block"
+                                                 style="width:2.7rem !important; height: 2.6rem !important;">
+                                                <i class="@specialty.Icon fa-lg fa-fw align-middle"></i>
+                                            </div>
+                                            <h6 class="d-inline-block mb-0 ml-2">@specialty.Name</h6>
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li class="list-group-item">
+                                        <center class="mb-0 text-secondary">Nema specijalnost</center>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        let btnAccept = $('#btn-accept');
+        let btnAcceptText = $('#btn-accept-text');
+        let btnReject = $('#btn-reject');
+        let btnRejectText = $('#btn-reject-text');
+
+        window.intlTelInput(document.querySelector("#phone-number"), {
+            formatOnDisplay: true,
+            separateDialCode: true,
+            initialCountry: "rs",
+            nationalMode: false,
+            placeholderNumberType: "MOBILE",
+            preferredCountries: ["rs"],
+            utilsScript: document.getElementById("wwwroot-utils").href
+        });
+
+        btnAccept.click(function () {
+            let btnAcceptTextUnchanged = $(this).find('#btn-accept-text').html();
+            btnAccept.attr('disabled', true);
+            btnReject.attr('disabled', true);
+            let width = btnAccept.width();
+            let height = btnAccept.height();
+
+            Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-sm btn-success mr-2',
+                    cancelButton: 'btn btn-sm btn-falcon-secondary'
+                },
+                buttonsStyling: false
+            }).fire({
+                title: 'Da li ste sigurni da želite prihvatiti aplikaciju terapeuta?',
+                icon: 'question',
+                confirmButtonText: 'Prihvati',
+                showCancelButton: true,
+                cancelButtonText: 'Poništi'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    btnAcceptText.fadeOut('fast', function () {
+                        $(this).html('<i class="text-primary fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                        btnAccept.width(width);
+                        btnAccept.height(height);
+                    });
+
+                    setTimeout(function () {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("AcceptApplication", "Dashboard", new { Area = "Admin" })',
+                            data: { userId: '@Model.UserId' },
+                            success: function (response) {
+                                if (response.success === true) {
+                                    btnAcceptText.fadeOut('fast', function () {
+                                        $(this).html('<i class="text-success fas fa-check"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                Swal.fire({
+                                                    title: response.title,
+                                                    text: response.body,
+                                                    icon: 'success',
+                                                    confirmButtonColor: '#00d27a',
+                                                    confirmButtonText: 'Ok'
+                                                }).then((result => {
+                                                    $('#application-status').fadeOut('fast', function () {
+                                                        $('#application-status').html('<span class="badge badge-soft-success"><i class="fas fa-check mr-1"></i>Prihvaćeno</span>').fadeIn('800');
+                                                    })
+                                                }));
+                                            }, 600);
+                                        });
+                                    })
+                                } else {
+                                    btnAcceptText.fadeOut('fast', function () {
+                                        $(this).html('<i class="text-danger fas fa-times"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                Swal.fire(
+                                                    response.title,
+                                                    '',
+                                                    'error'
+                                                ).then((result => {
+                                                    btnAcceptText.fadeOut('fast', function () {
+                                                        $(this).html(btnAcceptTextUnchanged).fadeIn('slow');
+                                                        btnAccept.attr('disabled', false);
+                                                        btnReject.attr('disabled', false);
+                                                    })
+                                                }));
+                                            }, 600)
+                                        })
+                                    })
+                                }
+                            },
+                            error: function () {
+                                btnAcceptText.fadeOut('fast', function () {
+                                    $(this).html('<i class="text-danger fas fa-times"></i>').fadeIn('slow', function () {
+                                        setTimeout(function () {
+                                            Swal.fire(
+                                                'Došlo je do greške',
+                                                'Molimo osvežite stranicu i pokušajte ponovo.',
+                                                'error'
+                                            ).then((result => {
+                                                btnAcceptText.fadeOut('fast', function () {
+                                                    $(this).html(btnAcceptTextUnchanged).fadeIn('slow');
+                                                    btnAccept.attr('disabled', false);
+                                                    btnReject.attr('disabled', false);
+                                                })
+                                            }));
+                                        }, 800)
+                                    })
+                                })
+                            }
+                        })
+                    }, 1200)
+                } else {
+                    btnAccept.attr('disabled', false);
+                    btnReject.attr('disabled', false);
+                }
+            });
+        });
+
+        btnReject.click(function () {
+            let btnRejectTextUnchanged = $(this).find('#btn-reject-text').html();
+            btnAccept.attr('disabled', true);
+            btnReject.attr('disabled', true);
+            let width = btnReject.width();
+            let height = btnReject.height();
+
+            Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-sm btn-danger mr-2',
+                    cancelButton: 'btn btn-sm btn-falcon-secondary'
+                },
+                buttonsStyling: false
+            }).fire({
+                title: 'Da li ste sigurni da želite odbiti aplikaciju terapeuta?',
+                icon: 'question',
+                confirmButtonText: 'Odbij',
+                showCancelButton: true,
+                cancelButtonText: 'Poništi'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    btnRejectText.fadeOut('fast', function () {
+                        $(this).html('<i class="text-primary fas fa-spinner fa-spin"></i>').fadeIn('slow');
+                        btnReject.width(width);
+                        btnReject.height(height);
+                    });
+
+                    setTimeout(function () {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("RejectApplication", "Dashboard", new { Area = "Admin" })',
+                            data: { userId: '@Model.UserId' },
+                            success: function (response) {
+                                if (response.success) {
+                                    btnRejectText.fadeOut('fast', function () {
+                                        $(this).html('<i class="text-success fas fa-check"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                Swal.fire(
+                                                    response.title,
+                                                    response.body,
+                                                    'success'
+                                                ).then((result => {
+                                                    $('#application-status').fadeOut('fast', function () {
+                                                        $('#application-status').html('<span class="badge badge-soft-danger"><i class="fas fa-times mr-1"></i>Odbijeno</span>').fadeIn('800');
+                                                    })
+                                                }));
+                                            }, 800);
+                                        });
+                                    })
+                                } else {
+                                    btnRejectText.fadeOut('fast', function () {
+                                        $(this).html('<i class="text-danger fas fa-times"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                Swal.fire(
+                                                    response.title,
+                                                    '',
+                                                    'error'
+                                                ).then((result => {
+                                                    btnRejectText.fadeOut('fast', function () {
+                                                        $(this).html(btnRejectTextUnchanged).fadeIn('slow');
+                                                        btnAccept.attr('disabled', false);
+                                                        btnReject.attr('disabled', false);
+                                                    })
+                                                }));
+                                            }, 800)
+                                        })
+                                    })
+                                }
+                            },
+                            error: function () {
+                                btnRejectText.fadeOut('fast', function () {
+                                    $(this).html('<i class="text-danger fas fa-times"></i>').fadeIn('slow', function () {
+                                        setTimeout(function () {
+                                            Swal.fire(
+                                                'Došlo je do greške',
+                                                'Molimo osvežite stranicu i pokušajte ponovo.',
+                                                'error'
+                                            ).then((result => {
+                                                btnRejectText.fadeOut('fast', function () {
+                                                    $(this).html(btnRejectTextUnchanged).fadeIn('slow');
+                                                    btnAccept.attr('disabled', false);
+                                                    btnReject.attr('disabled', false);
+                                                })
+                                            }));
+                                        }, 800)
+                                    })
+                                })
+                            }
+                        })
+                    }, 1200)
+                } else {
+                    btnAccept.attr('disabled', false);
+                    btnReject.attr('disabled', false);
+                }
+            });
+        });
+    });
+</script>
+
+

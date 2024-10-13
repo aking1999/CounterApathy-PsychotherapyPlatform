@@ -1,0 +1,469 @@
+﻿@model WebApplication9.Areas.Admin.ViewModels.AdminDashboardViewModel
+@using Framework.Helpers.ExtensionMethods
+@{
+    ViewData.SetTitle("Komandna tabla");
+    ViewData.SetMetaDescription("");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#00d27a"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="far fa-chart-line fa-fw fa-lg align-middle"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">Ukupni prihodi</h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs-3 text-700"
+                             data-countup='{"endValue":@Model.TotalEarnings, "suffix":" RSD"}'>
+                            0
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#e62e52"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="far fa-chart-line-down fa-fw fa-lg align-middle"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">Ukupni rashodi</h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs-3 text-700"
+                             data-countup='{"endValue":@Model.TotalExpenses, "suffix":" RSD"}'>
+                            0
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#00d27a"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="far fa-dollar-sign fa-fw fa-lg align-middle"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">Ukupan profit</h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs-3 text-700"
+                             data-countup='{"endValue":@Model.TotalProfit, "suffix":" RSD"}'>
+                            0
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block fa-stack fa-sm"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#00d27a"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="fal fa-calendar fa-stack-2x" style="top: 0.45rem!important;"></i>
+                    <i class="far fa-dollar-sign fa-stack-1x fa-inverse" style="top: 0.71rem!important;"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">
+                    Nedeljna zarada
+                    <span class="ml-1 text-400"
+                          data-toggle="tooltip"
+                          data-placement="bottom"
+                          title="Izračunato prema zakazivanjima u toku prošle nedelje">
+                        <span class="far fa-question-circle fa-fw"></span>
+                    </span>
+                </h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs--2">
+                            <div class="d-flex flex-between-center mb-1">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-circle fa-xs text-success mr-2"></i>
+                                    <span>Prihodi: <span data-countup='{"endValue":@Model.EarningsDuringPeriod, "suffix":" RSD"}'>0</span></span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-between-center mb-1">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-circle fa-xs text-danger mr-2"></i>
+                                    <span>
+                                        Rashodi: <span data-countup='{"endValue":@Model.ExpensesDuringPeriod, "suffix":" RSD"}'>0</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-between-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-circle fa-xs text-success mr-2"></i>
+                                    <span>Profit: <span data-countup='{"endValue":@Model.ProfitDuringPeriod, "suffix":" RSD"}'>0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#00d27a"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="fal fa-calendar-alt fa-fw fa-lg align-middle"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">Seanse</h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs--2">
+                            <div class="d-flex flex-between-center mb-1">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-circle fa-xs text-success mr-2"></i>
+                                    <span>Dodato: @Model.SessionsCount</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-between-center mb-1">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-circle fa-xs text-danger mr-2"></i>
+                                    <span>
+                                        Zakazano: @Model.BookedSessionsCount
+                                        <a class="text-nowrap"
+                                           asp-area="Admin" asp-controller="Dashboard" asp-action="BookedSessions">
+                                            Sve<span class="fas fa-angle-right ml-1" data-fa-transform="down-1"></span>
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-between-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-circle fa-xs text-primary mr-2"></i>
+                                    <span>Odnos: @(Model.SessionsCount > 0 ? ((Model.BookedSessionsCount / Model.SessionsCount) * 100).ToString("#.#") : "0")%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#ffa700"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="far fa-star fa-fw fa-lg align-middle"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">
+                    Ocene
+                    @if (Model.RatingIsPending)
+                    {
+                        <span class="ml-1 text-400"
+                              data-toggle="tooltip"
+                              data-placement="bottom"
+                              title="Ocene na čekanju: @Model.PendingRatingCount">
+                            <i class="far fa-exclamation-circle text-danger fa-fw"></i>
+                        </span>
+                    }
+                </h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-end">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs-3 text-700 mb-1"
+                             data-countup='{"endValue":@Model.RatingsCount}'>
+                            0
+                        </div>
+                    </div>
+                </div>
+                <a class="fs--1 text-nowrap"
+                   asp-area="Admin" asp-controller="Dashboard" asp-action="PendingRatings">
+                    Sve ocene<span class="fas fa-angle-right ml-1" data-fa-transform="down-1"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#34a4ff"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="fal fa-credit-card fa-fw fa-lg align-middle"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">
+                    Isplate
+                    @if (Model.WithdrawalIsPending)
+                    {
+                        <span class="ml-1 text-400"
+                              data-toggle="tooltip"
+                              data-placement="bottom"
+                              title="Isplate na čekanju: @Model.PendingWithdrawalCount">
+                            <i class="far fa-exclamation-circle text-danger fa-fw"></i>
+                        </span>
+                    }
+                </h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-end">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs-3 text-700 mb-1"
+                             data-countup='{"endValue":@Model.WithdrawalsCount}'>
+                            0
+                        </div>
+                    </div>
+                </div>
+                <a class="fs--1 text-nowrap"
+                   asp-area="Admin" asp-controller="Dashboard" asp-action="Withdrawals">
+                    Sve isplate<span class="fas fa-angle-right ml-1" data-fa-transform="down-1"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#27bcfd"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="far fa-paste fa-fw fa-lg align-middle"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">
+                    Aplikacije
+                    @if (Model.ApplicationIsPending)
+                    {
+                        <span class="ml-1 text-400"
+                              data-toggle="tooltip"
+                              data-placement="bottom"
+                              title="Aplikacije na čekanju: @Model.PendingApplicationCount">
+                            <i class="far fa-exclamation-circle text-danger fa-fw"></i>
+                        </span>
+                    }
+                </h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-end">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs-3 text-700 mb-1"
+                             data-countup='{"endValue":@Model.ApplicationsCount}'>
+                            0
+                        </div>
+                    </div>
+                </div>
+                <a class="fs--1 text-nowrap"
+                   asp-area="Admin" asp-controller="Dashboard" asp-action="Applications">
+                    Sve aplikacije<span class="fas fa-angle-right ml-1" data-fa-transform="down-1"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex mb-4 mt-5">
+    <div class="text-center rounded-pill d-inline-block"
+         data-toggle="set-color-and-background-color"
+         data-color="#34a4ff"
+         style="width: 2rem !important; height: 2rem !important;">
+        <i class="far fa-analytics fs-0 align-bottom"></i>
+    </div>
+    <div class="col">
+        <h5 class="mb-0 text-primary position-relative">
+            <span class="bg-200 dark__bg-1100 pr-3">Statistika o sredstvima klijenata</span>
+            <span class="border position-absolute top-50 translate-middle-y w-100 start-0 z-index--1"></span>
+        </h5>
+        <p class="fs--1 mb-0">Dopune Veb kredita, potrošnje, transakcije.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#00d27a"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="far fa-usd-circle fa-fw fa-lg align-middle"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">
+                    Ukupan Veb kredit
+                    <span class="ml-1 text-400"
+                          data-toggle="tooltip"
+                          data-placement="bottom"
+                          title="Izračunato prema zbiru ukupnog trenutnog nepotrošenog Veb kredita svih klijenata.">
+                        <span class="far fa-question-circle fa-fw"></span>
+                    </span>
+                </h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs-3 text-700"
+                             data-countup='{"endValue":@Model.TotalUnusedClientWebCredit, "suffix":" RSD"}'>
+                            0
+                        </div>
+                    </div>
+                </div>
+                <a class="fs--1 text-nowrap"
+                   asp-area="Admin" asp-controller="Dashboard" asp-action="AddWebCredit">
+                    Dodaj Veb kredit<span class="fas fa-angle-right ml-1" data-fa-transform="down-1"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#34a4ff"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="far fa-exchange-alt fa-fw fa-lg align-middle"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">Transakcije klijenata</h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs-3 text-700"
+                             data-countup='{"endValue":@Model.ClientsWebCreditLogsCount}'>
+                            0
+                        </div>
+                    </div>
+                </div>
+                <a class="fs--1 text-nowrap"
+                   asp-area="Admin" asp-controller="Dashboard" asp-action="WebCreditLogs">
+                    Sve transakcije<span class="fas fa-angle-right ml-1" data-fa-transform="down-1"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex mb-4 mt-5">
+    <div class="text-center rounded-pill d-inline-block"
+         data-toggle="set-color-and-background-color"
+         data-color="#34a4ff"
+         style="width: 2rem !important; height: 2rem !important;">
+        <i class="far fa-analytics fs-0 align-bottom"></i>
+    </div>
+    <div class="col">
+        <h5 class="mb-0 text-primary position-relative">
+            <span class="bg-200 dark__bg-1100 pr-3">Statistika o sredstvima terapeuta</span>
+            <span class="border position-absolute top-50 translate-middle-y w-100 start-0 z-index--1"></span>
+        </h5>
+        <p class="fs--1 mb-0">Zarade, potrošnje, isplate, transakcije.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#00d27a"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="far fa-money-bill-alt fa-fw fa-lg align-middle"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">
+                    Ukupna zarada
+                    <span class="ml-1 text-400"
+                          data-toggle="tooltip"
+                          data-placement="bottom"
+                          title="Izračunato prema zbiru ukupne zarade od seansi i ostalih usluga svih terapeuta, ali koja još nije isplaćena sa platforme.">
+                        <span class="far fa-question-circle fa-fw"></span>
+                    </span>
+                </h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs-3 text-700"
+                             data-countup='{"endValue":@Model.TotalUnusedTherapistsEarnings, "suffix":" RSD"}'>
+                            0
+                        </div>
+                    </div>
+                </div>
+                @*<a class="fs--1 text-nowrap"
+                   asp-area="Admin" asp-controller="Dashboard" asp-action="AddWebCredit">
+                    Dodaj Veb kredit<span class="fas fa-angle-right ml-1" data-fa-transform="down-1"></span>
+                </a>*@
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-md-100">
+            <div class="card-header pb-0" style="padding-top: 1.25rem!important;">
+                <div class="text-center p-2 rounded-soft d-inline-block"
+                     data-toggle="set-color-and-background-color"
+                     data-color="#34a4ff"
+                     style="width: 2.7rem !important; height: 2.6rem !important;">
+                    <i class="far fa-exchange-alt fa-fw fa-lg align-middle"></i>
+                </div>
+                <h6 class="text-1000 mb-0 ml-2 d-inline-block">Transakcije terapeuta</h6>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div class="row justify-content-between">
+                    <div class="col-auto align-self-end">
+                        <div class="fs-3 text-700"
+                             data-countup='{"endValue":@Model.TherapistsEarningsLogsCount}'>
+                            0
+                        </div>
+                    </div>
+                </div>
+                @*<a class="fs--1 text-nowrap"
+                   asp-area="Admin" asp-controller="Dashboard" asp-action="WebCreditLogs">
+                    Sve transakcije<span class="fas fa-angle-right ml-1" data-fa-transform="down-1"></span>
+                </a>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/countUp.umd.js"></script>
+    @*<script src="~/js/echarts.min.js"></script>*@
+    <script>
+        $(document).ready(function () {
+            document.querySelectorAll('[data-countup]').forEach((node) => {
+                const { endValue, ...options } = JSON.parse($(node).attr('data-countup'));
+                const c = new countUp.CountUp(node, endValue, {
+                    duration: 4,
+                    ...options
+                });
+                if (!c.error) {
+                    c.start();
+                } else {
+                    throw new Error('CountUp error');
+                }
+            });
+        })
+    </script>
+} 

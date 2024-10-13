@@ -1,0 +1,298 @@
+﻿@model List<DataTransferObjects.ViewModels.Client.TherapistShowcaseViewModel>
+@using Framework.Helpers.ExtensionMethods
+@{
+    ViewData.SetTitle("Besplatne psihoterapijske konsultacije");
+    ViewData.SetMetaDescription("");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <style>
+        .mb-2-5rem {
+            margin-bottom: 2.5rem !important;
+        }
+    </style>
+}
+
+<section class="d-flex align-items-center" style="margin-bottom: -50px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-6 align-self-center text-center text-md-left" style="z-index: 2 !important;">
+                <h1 class="text-primary mt-3 mt-md-0 no-tick font-weight-medium">Besplatne psihoterapijske konsultacije</h1>
+                <h2 class="fs-1 mt-4 mb-2-5rem">
+                    Zakažite besplatne konsultacije sa psihoterapeutom.
+                </h2>
+                <button id="btn-free-consultation-learn-more" class="btn btn-primary mb-2 mb-sm-0 mb-md-2 mb-lg-0 rounded-pill scrollto">
+                    Saznajte više
+                </button>
+            </div>
+            <div class="col-12 col-md-6 align-self-center">
+                <div class="avatar">
+                    <img src="~/custom-site-layout/images/psychotherapy-session.png" alt="psihoterapijska seansa" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="free-consultation-services" class="pt-0 pb-5">
+    <div class="container container-fluid">
+        <h2 class="text-center text-800">Besplatne konsultacije</h2>
+        <div class="heading-underline"></div>
+        <p class="mb-0">
+            Razmišljate li o psihoterapiji, ali želite da se uverite da je ona pravi izbor za Vas?
+            Prvi korak je uzbudljiv, ali i pomalo zastrašujuć.
+            <br />
+            Zato Vam možemo ponuditi <strong>besplatne 15-minutne konsultacije</strong> sa našim iskusnim i saosećajnim psihoterapeutima.
+            <br />
+            Iskoristite ovu priliku ne samo da upoznate naše terapeute, već i da se uverite da su pravi izbor na Vašem putu ka mentalnom zdravlju.
+        </p>
+        <div class="row text-center mt-5">
+            <div class="col-12">
+                <h2 class="text-center text-800">Zašto da zakažete besplatne psihoterapijske konsultacije?</h2>
+                <div class="heading-underline"></div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card h-100 card-span">
+                    <div class="card-body d-flex flex-column">
+                        <div class="card-img-top mb-3 d-flex justify-content-center">
+                            <div class="d-flex flex-center rounded-circle"
+                                 data-toggle="set-color-and-background-color"
+                                 data-color="#27bcfd"
+                                 style="width: 8rem; height: 8rem;">
+                                <i class="ca-icon-human-wave fa-4x mb-2"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title my-md-auto">
+                            Upoznajte svog terapeuta
+                        </h5>
+                        <p class="mt-3 mb-0">
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card h-100 card-span">
+                    <div class="card-body d-flex flex-column">
+                        <div class="card-img-top mb-3 d-flex justify-content-center">
+                            <div class="d-flex flex-center rounded-circle"
+                                 data-toggle="set-color-and-background-color"
+                                 data-color="#00d27a"
+                                 style="width: 8rem; height: 8rem;">
+                                <i class="ca-icon-water-lily fa-4x"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title my-md-auto">
+                            Osetite energiju i atmosferu
+                        </h5>
+                        <p class="mt-3 mb-0">
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card h-100 card-span">
+                    <div class="card-body d-flex flex-column">
+                        <div class="card-img-top mb-3 d-flex justify-content-center">
+                            <div class="d-flex flex-center rounded-circle"
+                                 data-toggle="set-color-and-background-color"
+                                 data-color="#34a4ff"
+                                 style="width: 8rem; height: 8rem;">
+                                <i class="fal fa-comments-alt fa-4x"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title my-md-auto">
+                            Razgovarajte o svojim očekivanjima
+                        </h5>
+                        <p class="mt-3 mb-0">
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card h-100 card-span">
+                    <div class="card-body d-flex flex-column">
+                        <div class="card-img-top mb-3 d-flex justify-content-center">
+                            <div class="d-flex flex-center rounded-circle"
+                                 data-toggle="set-color-and-background-color"
+                                 data-color="#34a4ff"
+                                 style="width: 8rem; height: 8rem;">
+                                <i class="fal fa-search fa-4x"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title my-md-auto">
+                            Istražite terapijske tehnike
+                        </h5>
+                        <p class="mt-3 mb-0">
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card h-100 card-span">
+                    <div class="card-body d-flex flex-column">
+                        <div class="card-img-top mb-3 d-flex justify-content-center">
+                            <div class="d-flex flex-center rounded-circle"
+                                 data-toggle="set-color-and-background-color"
+                                 data-color="#ffa700"
+                                 style="width: 8rem; height: 8rem;">
+                                <i class="fal fa-lightbulb-on fa-4x"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title my-md-auto">
+                            Razvijte svoj plan uključenja
+                        </h5>
+                        <p class="mt-3 mb-0">
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card h-100 card-span">
+                    <div class="card-body d-flex flex-column">
+                        <div class="card-img-top mb-3 d-flex justify-content-center">
+                            <div class="d-flex flex-center rounded-circle"
+                                 data-toggle="set-color-and-background-color"
+                                 data-color="#34a4ff"
+                                 style="width: 8rem; height: 8rem;">
+                                <i class="fal fa-bullseye-arrow fa-4x"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title my-md-auto">
+                            Pomoću terapeuta odredite svoje ciljeve
+                        </h5>
+                        <p class="mt-3 mb-0">
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card h-100 card-span">
+                    <div class="card-body d-flex flex-column">
+                        <div class="card-img-top mb-3 d-flex justify-content-center">
+                            <div class="d-flex flex-center rounded-circle"
+                                 data-toggle="set-color-and-background-color"
+                                 data-color="#34a4ff"
+                                 style="width: 8rem; height: 8rem;">
+                                <i class="fal fa-user fa-4x"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title my-md-auto">
+                            Kreirajte svoj personalizovani pristup
+                        </h5>
+                        <p class="mt-3 mb-0">
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card h-100 card-span">
+                    <div class="card-body d-flex flex-column">
+                        <div class="card-img-top mb-3 d-flex justify-content-center">
+                            <div class="d-flex flex-center rounded-circle"
+                                 data-toggle="set-color-and-background-color"
+                                 data-color="#ff679b"
+                                 style="width: 8rem; height: 8rem;">
+                                <i class="fal fa-hand-holding-heart fa-4x"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title my-md-auto">
+                            Primite početni savet i vođstvo
+                        </h5>
+                        <p class="mt-3 mb-0">
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="pt-1 pb-0">
+    <h2 class="text-center text-800">Psihoterapeuti koji nude besplatne konsultacije</h2>
+    <div class="heading-underline"></div>
+    <div class="container container-fluid">
+        @if (Model != null && Model.Any())
+        {
+            <div class="row">
+                @foreach (var therapist in Model)
+                {
+                    <div class="col-6 col-sm-4 col-md-3 mb-3">
+                        <div class="card h-100 card-span">
+                            <div class="card-body p-3 d-flex flex-column">
+                                <div class="card-img-top d-flex justify-content-start">
+                                    <div class="avatar avatar-2xl mr-2">
+                                        <img style="border: 2px solid white !important; min-width: 2.5rem !important;"
+                                             class="rounded-circle"
+                                             src="~/images/user-images/@therapist.ProfilePhotoPath"
+                                             alt="Psihoterapeut @therapist.FirstName @therapist.LastName"
+                                             loading="lazy" />
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <h6 class="mb-0">
+                                            <a class="text-1000" href="@Url.PsychotherapistPublicProfileUrlWithName(therapist.Id, therapist.FirstName, therapist.LastName)">
+                                                @therapist.FirstName @therapist.LastName
+                                            </a>
+                                            <i data-toggle="tooltip"
+                                               data-placement="bottom"
+                                               title="Psihoterapeut verifikovan"
+                                               class='fas fa-badge-check text-primary ml-1 position-absolute'
+                                               style="margin-top: 0.1rem !important;">
+                                            </i>
+                                        </h6>
+                                    </div>
+                                </div>
+                                <button data-therapist-id="@therapist.Id"
+                                        class="btn-therapist-free-consultations btn btn-sm btn-soft-primary ml-0 ml-md-0 ml-xl-5 mt-2 mt-xl-0"
+                                        type="button"
+                                        style="opacity: 1 !important;">
+                                    <span class="btn-therapist-free-consultations-text">Zakaži konsultacije</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p>trenutno nema bla bla pogledajte psihoterapeute</p>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    @if (Model != null && Model.Any())
+    {
+        <script async>
+            var getConsultationsUrl = '@Url.Action("GetConsultations", "Consultations", new { Area = "" })';
+        </script>
+        <script async src="~/js/free-consultations-setup.js"></script>
+        <script async>
+            $(document).ready(function () {
+                $('main').removeClass('pb-3');
+            })
+        </script>
+    }
+    <script async>
+        $(document).ready(function () {
+            $('#home-section').removeClass('px-2 px-lg-0');
+            $('#container-main').removeClass('container');
+            $('#container-main').addClass('px-2 px-lg-0');
+            $('#footer').addClass('px-2 px-lg-0');
+
+            $('#btn-free-consultation-learn-more').click(function () {
+                $('html, body').animate({
+                    scrollTop: $("#free-consultation-services").offset().top
+                }, 1000);
+            })
+        })
+    </script>
+}
+

@@ -1,0 +1,295 @@
+﻿@model WebApplication9.Areas.Therapist.ViewModels.TherapistAccountSetupViewModel
+
+@using Framework.Helpers
+@using Framework.Helpers.ExtensionMethods
+
+@{
+    ViewData.SetTitle("Podešavanje terapeutskog naloga");
+    ViewData.SetMetaDescription("Podesite Vaš terapeutski nalog kako biste otključali pune potencijale koje " +
+        "nudimo našim terapeutima.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/fontawesome/css/font-awesome-animation.min.css" />
+    <link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-wrench faa-wrench animated fa-sm",
+        "text-primary",
+        ViewData.GetTitle(),
+        "Pre nego što nastavite, podesite Vaš nov terapeutski nalog.",
+        "col-12",
+        "Imate pitanje? " +
+        $"Kontaktirajte <a href='{Url.Action("Support", "Account", new { Area = "Therapist" })}'>podršku za terapeute</a>."))
+
+<div class="row d-flex justify-content-center">
+    <button type="button"
+            class="btn btn-lg btn-primary mt-1"
+            data-toggle="modal"
+            data-target="#setup-modal">
+        Započnite podešavanje naloga
+    </button>
+</div>
+
+<div id="setup-modal"
+     data-toggle="modal"
+     data-backdrop="static"
+     data-keyboard="false"
+     class="modal fade p-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title mx-auto">@ViewData.GetTitle()</h5>
+                <button id="dismiss-modal-times" type="button" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvorite">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="setup-form" autocomplete="off">
+                @Html.AntiForgeryToken()
+                <div class="modal-body pb-0">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="Chosen_ContactMethodsIds"></label>
+                                <a href="javascript://"
+                                   class="form-group ml-2 no-tick"
+                                   data-toggle="popover"
+                                   data-placement="bottom"
+                                   title="Šta su kontakt metode i zašto ih birate?"
+                                   data-content="Kontakt metode su načini kojima želite održavati seanse koje klijenti zakazuju sa Vama. Prilikom zakazivanja seanse sa Vama, klijentu se prikazuje lista opcija sa koje bira gde želi da seansa bude održana. <strong>Za izbor biće mu prikazane samo one opcije koje ste Vi odredili</strong>.<br /><br />Ukoliko imate nejasnoća, kontaktirajte <a href='@Url.Action("Support", "Account", new { Area = "Therapist" })' target='_blank'>podršku za terapeute</a>."
+                                   data-html="true">
+                                    <i class="fas fa-question-circle text-info"></i>
+                                </a>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-address-book fa-fw"></i></span>
+                                    </div>
+                                    <select asp-for="Chosen_ContactMethodsIds"
+                                            data-dropup-auto="false"
+                                            class="selectpicker form-control"
+                                            multiple data-live-search="true"
+                                            title="Kontakt metode"
+                                            data-selected-text-format="count"
+                                            data-size="5">
+                                        @if (Model.ToChooseFrom_ContactMethods.Any())
+                                        {
+                                            foreach (var contactMethod in Model.ToChooseFrom_ContactMethods)
+                                            {
+                                                var concat = Helper.GetObjectIconAndNameAndColor(contactMethod.Text);
+
+                                                <option value="@contactMethod.Value" data-content="<i class='@concat[0] fa-fw mr-2' style='color:@concat[2];'></i>@concat[1]">
+                                                    @concat[1]
+                                                </option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="" disabled>
+                                                Kontakt metode nedostupne.
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                <span>
+                                    <span asp-validation-for="Chosen_ContactMethodsIds" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="About"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-address-card fa-fw"></i></span>
+                                    </div>
+                                    <textarea asp-for="About"
+                                              class="form-control"
+                                              rows="4">
+                                    </textarea>
+                                </div>
+                                <span>
+                                    <span asp-validation-for="About" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <center>
+                                    <p class="mb-0"><i class="far fa-info-circle mr-2"></i>Ove podatke možete menjati kasnije sa Vaše profilne stranice.</p>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" id="submit" class="btn btn-sm btn-primary"><span id="submit-text">&nbsp;Sačuvaj&nbsp;</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/multiselect/bootstrap-select.min.js"></script>
+    <script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            let submit = $('#submit');
+            let submitText = $('#submit-text');
+            let submitTextUnchanged = submitText.html();
+            let setupForm = $('#setup-form');
+            let modalDismissTimes = $('#dismiss-modal-times')
+            let about = $('#About');
+            let methods = $("#Chosen_ContactMethodsIds");
+
+            $('#account-setup-modal').modal('show');
+
+            function MethodsDropdownHighlighter() {
+                let methodsParent = methods.closest('div');
+
+                if (methods.hasClass('is-valid')) {
+                    methodsParent.removeClass('is-invalid');
+                    methodsParent.addClass('is-valid');
+                } else if (methods.hasClass('is-invalid')) {
+                    methodsParent.removeClass('is-valid');
+                    methodsParent.addClass('is-invalid');
+                }
+            }
+
+            methods.change(function () {
+                let atLeastOneSelected = false;
+                $('#Chosen_ContactMethodsIds > option').each(function () {
+                    if ($(this).is(':selected'))
+                        atLeastOneSelected = true;
+                });
+
+                if (atLeastOneSelected) {
+                    methods.closest('div').removeClass('is-invalid');
+                    methods.closest('div').addClass('is-valid');
+                }
+                else {
+                    methods.closest('div').removeClass('is-valid');
+                    methods.closest('div').addClass('is-invalid');
+                }
+            });
+
+            submit.click(function () {
+                DisableInputs();
+                let width = submit.width();
+                let height = submit.height();
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                    submit.width(width);
+                    submit.height(height);
+                })
+
+                setTimeout(function () {
+                    if (FormIsValid()) {
+                        let formData = new FormData(setupForm.get(0));
+                        formData.append('accSetupVm.Chosen_ContactMethodsIds', methods.val());
+                        formData.append('accSetupVm.About', about.val());
+
+                        $.ajax({
+                            url: '@Url.Action("AccountSetup", "Account", new { Area = "Therapist" })',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            headers: {
+                                'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                            },
+                            success: function (response) {
+                                if (response.success === true) {
+                                    submitText.fadeOut('fast', function () {
+                                        $(this).html('<i class="ca-lightgreen fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                $('#setup-modal').modal('hide');
+                                                Swal.mixin({
+                                                    customClass: {
+                                                        confirmButton: 'btn btn-sm btn-success mr-2',
+                                                        cancelButton: 'btn btn-sm btn-falcon-secondary'
+                                                    },
+                                                    buttonsStyling: false
+                                                }).fire({
+                                                    title: response.title,
+                                                    text: response.body,
+                                                    icon: response.severity,
+                                                    confirmButtonText: 'Povežite bankovni račun',
+                                                    showCancelButton: true,
+                                                    cancelButtonText: 'Kasnije'
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        window.location.href = response.redirectUrlPrimary
+                                                    } else {
+                                                        window.location.href = response.redirectUrlSecondary
+                                                    }
+                                                })
+                                            }, 600)
+                                        })
+                                    })
+                                } else {
+                                    if (response.redirectUrl) window.location.href = response.redirectUrl;
+                                    else HandleError(response.title, response.body, response.severity);
+                                }
+                            },
+                            error: function (response) {
+                                HandleError('Došlo je do greške', 'Molimo osvežite stranicu i pokušajte ponovo ili kontaktirajte podršku za terapeute.', 'error');
+                            }
+                        });
+                    } else HandleError('Popunite sva obavezna polja', '', 'info');
+                }, 1200)
+            });
+
+            function ElementIsValid(element) {
+                return setupForm.validate().element($(element));
+            }
+
+            function FormIsValid() {
+                let methodsValid = ElementIsValid(methods);
+                let aboutValid = ElementIsValid(about);
+
+                MethodsDropdownHighlighter();
+
+                return (methodsValid && aboutValid);
+            }
+
+            function EnableInputs() {
+                submit.prop('disabled', false);
+                about.prop('readonly', false);
+                modalDismissTimes.prop('disabled', false);
+            }
+
+            function DisableInputs() {
+                submit.prop('disabled', true);
+                about.prop('readonly', true);
+                modalDismissTimes.prop('disabled', true);
+            }
+
+            function HandleError(toastTitle, toastBody, toastSeverity) {
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                    toastr[toastSeverity](toastBody, toastTitle)
+                })
+                .promise()
+                .done(function () {
+                    setTimeout(function () {
+                        submitText.fadeOut('fast', function () {
+                            $(this).html(submitTextUnchanged).fadeIn('slow');
+                            EnableInputs();
+                        })
+                    }, 1300)
+                })
+            }
+        });
+    </script>
+}

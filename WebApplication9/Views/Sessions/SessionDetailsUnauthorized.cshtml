@@ -1,0 +1,352 @@
+﻿@model DataTransferObjects.ViewModels.Client.BookedSessionAddRatingViewModel
+@using static Framework.Providers.ContactMethodsProvider
+@using Framework.Helpers.ExtensionMethods
+@inject Framework.Interfaces.IDateTimeHelper DateHelper
+@{
+    ViewData.SetTitle("Detalji zakazane seanse");
+    ViewData.SetMetaDescription($"Na ovoj stranici se nalaze detalji o zakazanoj seansi #{Model.BookingId}.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/star-rating/star-rating.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-receipt fa-sm",
+        "text-info",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row justify-content-between align-items-center">
+            <div class="col-md">
+                <h5 class="mb-2 mb-md-0 text-secondary">ID zakazivanja #@Model.BookingId</h5>
+            </div>
+            <div class="col-auto">
+                @*<button class="btn btn-falcon-default btn-sm mr-2 mb-2 mb-sm-0" type="button"><i class="fas fa-arrow-down mr-1"></i>Download (.pdf)</button>*@
+                <button class="btn btn-falcon-info btn-sm"
+                        type="button"
+                        onclick="window.print()">
+                    <i class="fas fa-print mr-2"></i>Odštampaj
+                </button>
+                @*<button class="btn btn-falcon-success btn-sm mb-2 mb-sm-0" type="button"><i class="fas fa-dollar-sign mr-1"></i>Receive Payment</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+@if (!Model.SessionEnded)
+{
+    if (Model.ContactMethod.Id != InPerson.Id)
+    {
+        <div class="alert alert-pink" role="alert">
+            <center>
+                @if (!string.IsNullOrWhiteSpace(Model.InviteLink))
+                {
+                    var httpsInviteLink = Model.InviteLink.StartsWith("https://") ? Model.InviteLink : $"https://{Model.InviteLink}";
+                    <div>
+                        <i class="far fa-link text-primary mr-2"></i>@Model.ContactMethod.Name link za pristup:
+                        <p class="text-primary my-3 text-break">@Model.InviteLink</p>
+                        <a class="btn btn-sm mb-3 btn-primary" href="@httpsInviteLink" target="_blank" rel="noreferrer, nofollow"><i class="far fa-rocket-launch mr-2"></i>Pokreni @Model.ContactMethod.Name seansu</a>
+                        <br />
+                        <small><i class="far fa-info-circle text-info mr-2"></i>Na vreme početka seanse, kliknite na dugme za pokretanje.</small>
+                        <br />
+                        <small><i class="far fa-info-circle text-info mr-2"></i>Ako dugme odozgo ne radi, kopirajte i nalepite pristupni link u pretraživač.</small>
+                    </div>
+                }
+                else
+                {
+                    var requiredTimeEarlier = Model.StartTime.Subtract(new TimeSpan(4, 0, 0));
+
+                    <div>
+                        <p>
+                            Početak seanse: @DateHelper.DateStringFromDateTime(Model.StartTime), u @DateHelper.TimeStringFromDateTime(Model.StartTime)h.
+                        </p>
+                        <p>
+                            Najkasnije 4 sata pre početka seanse, odnosno datuma @DateHelper.DateStringFromDateTime(requiredTimeEarlier),
+                            u @DateHelper.TimeStringFromDateTime(requiredTimeEarlier)h, @Model.ContactMethod.Name link za pristup seansi biće prikazan ovde.
+                            Takodje, jedna kopija linka biće poslata na @Model.ClientEmail.
+                        </p>
+                        Za pristup seansi putem računara, pročitajte <a asp-area="" asp-controller="Guides" asp-action="JoinGoogleMeetByComputer" target="_blank">uputstvo za pristup putem računara</a>.
+                        <br />
+                        Za pristup seansi putem mobilnog telefona, pročitajte <a asp-area="" asp-controller="Guides" asp-action="JoinGoogleMeetByPhone" target="_blank">uputstvo za pristup putem mobilnog telefona</a>.
+                    </div>
+                }
+            </center>
+        </div>
+    }
+    else
+    {
+        var requiredTimeEarlier = Model.StartTime.Subtract(new TimeSpan(0, 5, 0));
+
+        <div class="alert alert-pink" role="alert">
+            <center>
+                <p>
+                    <i class="far fa-location-circle text-primary mr-2"></i>Adresa terapeuta:<br />
+                    @Model.TherapistFirstName @Model.TherapistLastName,
+                    @Model.TherapistStreet @Model.TherapistHouseNumber,
+                    @Model.TherapistCity @Model.TherapistPostalCode, @Model.TherapistCountry<br />
+                    <a class="text-pink" href="mailto:@Model.TherapistEmail">@Model.TherapistEmail</a><br />
+                    <a class="text-pink" href="tel:@Model.TherapistPhoneNumber">@Model.TherapistPhoneNumber</a>
+                </p>
+                <strong>
+                    Molimo da na adresu terapeuta dođete 5 minuta pre
+                    početka seanse, odnosno datuma @DateHelper.DateStringFromDateTime(requiredTimeEarlier),
+                    u @DateHelper.TimeStringFromDateTime(requiredTimeEarlier)h.
+                </strong>
+            </center>
+        </div>
+    }
+}
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row text-center d-sm-flex justify-content-sm-center">
+            <div class="col-sm-6 text-sm-left">
+                <div class="avatar avatar-5xl">
+                    <img src="@Model.ProfilePhoto"
+                         class="rounded-circle d-inline-block"
+                         alt="Psihoterapeut @Model.TherapistFirstName @Model.TherapistLastName">
+                </div>
+            </div>
+            <div class="col text-sm-right mt-3 mt-sm-0">
+                <h4 class="mb-3 text-secondary">Psihoterapeut</h4>
+                <p class="fs--1 mb-0 text-black">@Model.TherapistFirstName @Model.TherapistLastName</p>
+                <p class="fs--1 mb-0"><i class="far fa-envelope text-info mr-2"></i><a href="mailto:@Model.TherapistEmail">@Model.TherapistEmail</a></p>
+                <p class="fs--1 mb-0"><i class="far fa-phone text-success mr-2"></i><a href="tel:@Model.TherapistPhoneNumber">@Model.TherapistPhoneNumber</a></p>
+                <p class="fs--1 mb-0">@Model.TherapistStreet @Model.TherapistHouseNumber, @Model.TherapistCity @Model.TherapistPostalCode, @Model.TherapistCountry</p>
+                <div class="row">
+                    <div class="col-12 text-center text-sm-right">
+                        <a onclick="sessionStorage.setItem('showCalendarTab', 'true')"
+                           href="@Url.PsychotherapistPublicProfileUrlWithName(Model.TherapistId, Model.TherapistFirstName, Model.TherapistLastName)"
+                           class="btn btn-sm btn-success mt-2">
+                            <i class="far fa-calendar-plus mr-2"></i>Zakaži dodatne seanse
+                        </a>
+                        <a href='@Url.PsychotherapistPublicProfileUrlWithName(Model.TherapistId, Model.TherapistFirstName, Model.TherapistLastName)'
+                           class="btn btn-sm btn-soft-info mt-2"
+                           data-toggle="tooltip"
+                           data-placement="bottom"
+                           title="Profil">
+                            <i class="far fa-user mr-2"></i>Profil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row justify-content-center justify-content-md-between">
+            <div class="col mb-3">
+                <h4 class="mb-3 text-secondary">Klijent</h4>
+                <p class="fs--1 mb-0">@Model.ClientFirstName @Model.ClientLastName</p>
+                <p class="fs--1 mb-0"><i class="far fa-envelope text-info fa-fw mr-2"></i>@Model.ClientEmail</p>
+                <p class="fs--1 mb-0">
+                    <i class="far fa-phone text-success fa-fw mr-1"></i>
+                    @if (!string.IsNullOrWhiteSpace(Model.ClientPhoneNumber))
+                    {
+                        @Model.ClientPhoneNumber
+                    }
+                    else
+                    {
+                        <text>Broj telefona nije dodat.</text>
+                    }
+                </p>
+            </div>
+            <div class="col-sm-auto ml-md-auto d-flex align-items-center">
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless fs--1 mb-0">
+                        <tbody class="text-secondary">
+                            <tr>
+                                <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-calendar-check fa-fw text-success mr-2"></i>Datum zakazivanja:</th>
+                                <td class="text-sm-left pl-0 pl-md-3 text-secondary">@DateHelper.DateTimeStringFromDateTime(Model.BookingDate)h</td>
+                            </tr>
+                            @if (Model.EndTime.Day > Model.StartTime.Day)
+                            {
+                                <tr>
+                                    <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-calendar fa-fw text-success mr-2"></i>Datum seanse:</th>
+                                    <td class="text-sm-left pl-0 pl-md-3 text-secondary">
+                                        @DateHelper.DateTimeStringFromDateTime(Model.StartTime)h &minus; @DateHelper.DateTimeStringFromDateTime(Model.EndTime)h
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-calendar fa-fw text-success mr-2"></i>Datum seanse:</th>
+                                    <td class="text-sm-left pl-0 pl-md-3 text-secondary">@DateHelper.DateStringFromDateTime(Model.StartTime)</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-clock fa-fw text-success mr-2"></i>Vreme seanse:</th>
+                                    <td class="text-sm-left pl-0 pl-md-3 text-secondary">
+                                        @DateHelper.TimeStringFromDateTime(Model.StartTime)h &minus; @DateHelper.TimeStringFromDateTime(Model.EndTime)h
+                                    </td>
+                                </tr>
+                            }
+                            <tr>
+                                <th class="text-sm-left pl-0 pl-md-3 text-secondary"><i class="far fa-stopwatch text-primary fa-fw mr-2"></i>Trajanje seanse:</th>
+                                <td class="text-sm-left pl-0 pl-md-3 text-secondary">
+                                    @{
+                                        var dateDiff = Model.EndTime - Model.StartTime;
+                                        var dateDiffFormatted = $"{dateDiff.Hours} sati, {dateDiff.Minutes} minuta";
+                                        if (dateDiff.Days > 0) dateDiffFormatted = $"{dateDiff.Days} dana, {dateDiffFormatted}"; 
+                                    }
+                                    @dateDiffFormatted
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pl-0 pl-md-3" colspan="2">
+                                    <span id="status" class="badge badge-soft-warning d-block w-100"><i class="fas fa-stream mr-1"></i>Na čekanju</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pl-0 pl-md-3" colspan="2">
+                                    <strong id="badge-countdown" class="badge badge-soft-info d-block w-100">
+                                        Počinje za:
+                                        <span id="countdown" class="ml-1"></span>
+                                    </strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive mt-3 fs--1">
+            <table class="table table-striped border-bottom">
+                <thead>
+                    <tr class="bg-primary text-white">
+                        <th class="border-0 text-center align-middle">Usluga</th>
+                        <th class="border-0 text-center align-middle">Tip</th>
+                        <th class="border-0 text-center align-middle">Kontakt metoda</th>
+                        <th class="border-0 text-center align-middle">Ocena</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fs--1 align-middle text-center">
+                            <h6 class="mb-0 text-nowrap">Seansa</h6>
+                        </td>
+                        <td class="fs--1 align-middle text-center">
+                            @{
+                                var sessionTypeText = string.Empty;
+                                var sessionTypeIcon = string.Empty;
+
+                                if (Model.Type == 0)
+                                {
+                                    sessionTypeText = "Individualna seansa";
+                                    sessionTypeIcon = "fa-user";
+                                }
+                                else
+                                {
+                                    sessionTypeText = "Grupna seansa";
+                                    sessionTypeIcon = "fa-user-friends";
+                                } 
+                            }
+                            <i class="far @sessionTypeIcon mr-1" style="color: #0000FF"></i>@sessionTypeText
+                        </td>
+                        <td class="fs--1 align-middle text-center">
+                            <i class="@Model.ContactMethod.Icon mr-1" style="color: @Model.ContactMethod.Color"></i>@Model.ContactMethod.Name
+                        </td>
+                        <td id="session-stars-holder-@Model.BookingId" class="align-middle text-center">
+                            @if (Model.Rating.HasRating)
+                            {
+                                <span id="rendered-stars" class="d-none"></span>
+                                @await Html.TryPartialAsync("~/Views/Shared/_RenderStars.cshtml", Model.Rating.StarsRating)
+                            }
+                            else
+                            {
+                                @await Html.TryPartialAsync("~/Views/Shared/_RenderRateSessionButtonUnauthorized.cshtml", Model)
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="row no-gutters justify-content-end">
+                <div class="col-auto">
+                    <table class="table table-sm table-borderless fs--1 text-right">
+                        <tr>
+                            <th class="text-900">Cena seanse:</th>
+                            <td class="font-weight-semi-bold text-success">RSD @Model.Price</td>
+                        </tr>
+                        <tr class="border-top border-2x font-weight-bold text-900">
+                            <th>Ukupno:</th>
+                            <td class="text-success">RSD @Model.Price</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer py-3 border-top-0">
+        <div class="text-center">
+            <a class="btn btn-falcon-danger btn-sm"
+               href='@Url.Action("BookedSessions", "Sessions")'>
+                Nazad
+            </a>
+        </div>
+    </div>
+</div>
+
+@await Html.TryPartialAsync("~/Views/Shared/FAQs/ClientAndAnonymous/_SessionsBookingFAQ.cshtml")
+@await Html.TryPartialAsync("~/Views/Shared/FAQs/ClientAndAnonymous/_PsychotherapistReviewsFAQ.cshtml")
+
+@section Scripts {
+    <script src="~/year-picker/moment.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script async src="~/js/accordion-setup.js"></script>
+    <script async src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+    <script>
+    $(document).ready(function () {
+        let badgeCountdown = $('#badge-countdown');
+        let status = $('#status');
+        let countdown = $("#countdown");
+        let countDownDate = new Date(moment("@DateHelper.ConvertDateTimeToDateTimeStringISO(Model.StartTime)").valueOf());
+        var x = setInterval(function () {
+            var distance = countDownDate - ((new Date()).getTime()); //now
+
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdown.html(days + "d " + hours + "h " + minutes + "m " + seconds + "s ");
+
+            if (distance < 0) {
+                //clearInterval(x);
+
+                if (status.hasClass('badge-soft-warning')) {
+                    status.removeClass('badge-soft-warning');
+                    status.addClass('badge-soft-primary');
+
+                    if (!status.has('i.fa-spinner.fa-spin').length)
+                        status.html('<i class="fas fa-spinner fa-spin mr-1 no-tick"></i>Seansa u toku');
+                }
+
+                var finished = new Date(moment("@DateHelper.ConvertDateTimeToDateTimeStringISO(Model.EndTime)").valueOf());
+
+                if (new Date() >= finished) {
+                    clearInterval(x);
+                    badgeCountdown.html("<i class='far fa-star mr-1'></i>Čeka ocenu klijenta")
+
+                    if ($('#rendered-stars').length)
+                        badgeCountdown.remove();
+
+                    if (status.hasClass('badge-soft-primary')) {
+                        status.removeClass('badge-soft-primary');
+                        status.addClass('badge-soft-success');
+                        status.html('<i class="fas fa-check mr-1"></i>Seansa završena');
+                    }
+                } else {
+                    if (!$('strong.badge i.fa-play').length)
+                        badgeCountdown.html("<i class='far fa-play mr-1'></i>Seansa počela");
+                }
+            }
+        }, 1000);
+    });
+    </script>
+}
+
+

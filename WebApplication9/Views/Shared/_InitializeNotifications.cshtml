@@ -1,0 +1,13 @@
+﻿@using Framework.Helpers.ExtensionMethods;
+
+@Html.PartialSectionScripts(
+    @<script src="~/microsoft/signalr/dist/browser/signalr.js"></script>)
+
+@Html.PartialSectionScripts(
+    @<script>
+        var url = '@await Url.GetNotificationsUrlBasedOnRole()';
+        var notificationHubUrl = '/@Framework.Notifications.NotificationHub.Url';
+    </script>)
+
+@Html.PartialSectionScripts(
+    @<script src="~/notification/notifications.js"></script>)

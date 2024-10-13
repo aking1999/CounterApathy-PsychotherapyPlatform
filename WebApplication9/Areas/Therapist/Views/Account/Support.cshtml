@@ -1,0 +1,404 @@
+﻿@model DataTransferObjects.ViewModels.Therapist.TherapistSupportViewModel
+@using Framework.Helpers
+@using Framework.Helpers.ExtensionMethods
+@using WebApplication9.SharedPartialViewModels
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+
+    ViewData.SetTitle("Podrška za terapeute");
+    ViewData.SetMetaDescription("Kontaktirajte naš tim za podršku terapeutima ukoliko imate pitanja, " +
+        $"ideje ili povratne informacije u vezi sa našim uslugama ovde na {appName}.com. " +
+        "Rado bismo pomogli u svemu što Vam je potrebno!");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+    <link rel="stylesheet" href="~/notification-center/notification-center.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+}
+
+<div class="row">
+    @await Html.TryPartialAsync("~/Views/Shared/Menues/_SideMenu.cshtml",
+        new SideMenuPartialViewModel("fal fa-info-circle", "Centar za pomoć", "text-info",
+            new List<SideMenuItemPartialViewModel>()
+            {
+                new SideMenuItemPartialViewModel("", null, "Home", "About", "fal fa-address-card fa-fw text-info", "O nama"),
+                new SideMenuItemPartialViewModel("", null, "Consultations", "Index", "fal fa-comments-alt fa-fw text-primary", "Besplatne konsultacije"),
+                new SideMenuItemPartialViewModel("", null, "Guides", "BookingRoadmap", "fal fa-calendar-check fa-fw text-success", "Lako zakažite seansu"),
+                new SideMenuItemPartialViewModel("", null, "Therapists", "PsychotherapistsExperiences", "fal fa-star fa-fw text-warning", "Iskustva sa psihoterapije"),
+                //new SideMenuItemPartialViewModel("", null, "Home", "EasySiteNavigation", "fal fa-map-marked fa-fw text-info", "Easy site navigation"),
+                new SideMenuItemPartialViewModel("", null, "Home", "FAQ", "fal fa-question fa-fw text-info", "Česta pitanja"),
+                new SideMenuItemPartialViewModel("", null, "Guides", "All", "fal fa-book-open fa-fw text-primary", "Uputstva za terapeute"),
+                new SideMenuItemPartialViewModel("", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi korišćenja"),
+                new SideMenuItemPartialViewModel("", null, "Home", "TherapistsTerms", "fal fa-scroll fa-fw text-primary", "Uslovi za terapeute"),
+                new SideMenuItemPartialViewModel("", null, "Home", "Privacy", "fal fa-shield fa-fw text-primary", "Politika privatnosti"),
+                new SideMenuItemPartialViewModel("active", "Therapist", "Account", "Support", "fal fa-headset fa-fw text-orange", "Podrška za terapeute")
+            }))
+    <div class="col-lg-9">
+        <div class="row">
+            <div class="col-12 col-lg-7">
+                <div class="card h-100">
+                    <div class="card-header border-bottom-0">
+                        <h5 class="mb-0 text-secondary fs-1"><i class="fal fa-headset fa-fw text-orange mr-2 no-tick"></i>Podrška za terapeute</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="ticket-form" autocomplete="off">
+                            @Html.AntiForgeryToken()
+                            <div class="form-group">
+                                <label asp-for="Chosen_TopicId"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-question fa-fw"></i></span>
+                                    </div>
+                                    <select asp-for="Chosen_TopicId"
+                                            data-dropup-auto="false"
+                                            class="selectpicker form-control"
+                                            data-live-search="true"
+                                            title="Izaberite temu"
+                                            data-size="4">
+                                        @if (Model.ToChooseFrom_Topics.Any())
+                                        {
+                                            foreach (var topic in Model.ToChooseFrom_Topics)
+                                            {
+                                                var concat = Helper.GetObjectIconAndNameAndColor(topic.Text);
+
+                                                <option value="@topic.Value" data-content="<i class='@concat[0] fa-fw mr-2' style='color:@concat[2];'></i>@concat[1]">
+                                                    @concat[1]
+                                                </option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="" disabled>Teme nisu dostupne.</option>
+                                        }
+                                    </select>
+                                </div>
+                                <span>
+                                    <span asp-validation-for="Chosen_TopicId" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-lg-6">
+                                    <div class="form-group">
+                                        <label asp-for="FirstName"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                                            </div>
+                                            <input asp-for="FirstName"
+                                                   class="form-control" />
+                                        </div>
+                                        <span>
+                                            <span asp-validation-for="FirstName" class="invalid-feedback"></span>
+                                            <br />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="form-group">
+                                        <label asp-for="LastName"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                                            </div>
+                                            <input asp-for="LastName"
+                                                   class="form-control" />
+                                        </div>
+                                        <span>
+                                            <span asp-validation-for="LastName" class="invalid-feedback"></span>
+                                            <br />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label asp-for="Email"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fal fa-envelope fa-fw"></i></span>
+                                            </div>
+                                            <input asp-for="Email"
+                                                   class="form-control" />
+                                        </div>
+                                        <span>
+                                            <span asp-validation-for="Email" class="invalid-feedback"></span>
+                                            <br />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label asp-for="Text"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fal fa-bars fa-fw"></i></span>
+                                            </div>
+                                            <textarea asp-for="Text"
+                                                      class="form-control"
+                                                      rows="3">
+                                                    </textarea>
+                                        </div>
+                                        <span>
+                                            <span asp-validation-for="Text" class="invalid-feedback"></span>
+                                            <br />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="text-right">
+                                        <button type="button"
+                                                id="btn-submit"
+                                                class="btn btn-sm btn-primary">
+                                            <span id="btn-submit-text">&nbsp;Pošalji&nbsp;</span>
+                                        </button>
+                                    </div>
+                                    <div class="border-dotted-bottom-4 my-4"></div>
+                                    <div class="mt-3 notranslate">Support for therapists / podrška za terapeute:</div>
+                                    <ul class="mb-0">
+                                        <li class="mt-3 notranslate"><a class="text-decoration-none" href="mailto:@($"therapists@{appName}.com")">@($"therapists@{appName}.com")</a></li>
+                                        <li class="mt-3 notranslate"><a class="text-decoration-none" href="mailto:@($"terapeuti@{appName}.com")">@($"terapeuti@{appName}.com")</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-5 mt-3 mt-lg-0">
+                <div class="card h-100">
+                    <div class="card-header border-bottom-0 pb-0">
+                        <h5 class="mb-0 text-secondary fs-1"><i class="fal fa-address-book fa-fw text-primary mr-2 no-tick"></i>Naši kontakt podaci</h5>
+                    </div>
+                    <div class="card-body notranslate">
+                        <img src="~/images/content-images/flags/offices.png" alt="kontakt imejlovi" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script async src="~/multiselect/bootstrap-select.min.js"></script>
+    <script async src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+    <script async>
+        $(document).ready(function () {
+            let submit = $('#btn-submit');
+            let submitText = $('#btn-submit-text');
+            let submitTextUnchanged = submitText.html();
+            let ticketForm = $('#ticket-form');
+            let text = $('#Text');
+            let topic = $('#Chosen_TopicId');
+            const requestAccountDeletionId = '@Framework.Providers.TherapistSupportTicketTopicsProvider.RequestAccountDeletion.Id';
+
+            if (sessionStorage.getItem('requestedAccountDeletionHasEarnings') === 'true') {
+                if ($(`#Chosen_TopicId option[value='${requestAccountDeletionId}']`).length)
+                    topic.val(`${requestAccountDeletionId}`).change();
+                sessionStorage.removeItem('requestedAccountDeletionHasEarnings');
+            }
+
+            $('#FirstName')
+                .add('#LastName')
+                .add('#Email')
+                .prop('readonly', true);
+
+            function TopicDropdownHighlighter() {
+                let topicParent = topic.closest('div');
+
+                if (topic.hasClass('is-valid')) {
+                    topicParent.removeClass('is-invalid');
+                    topicParent.addClass('is-valid');
+                } else if (topic.hasClass('is-invalid')) {
+                    topicParent.removeClass('is-valid');
+                    topicParent.addClass('is-invalid');
+                }
+            }
+
+            topic.change(function () {
+                let atLeastOneSelected = false;
+
+                $('#Chosen_TopicId > option').each(function () {
+                    if ($(this).is(':selected'))
+                        atLeastOneSelected = true;
+                });
+
+                if (atLeastOneSelected) {
+                    $(this).closest('div').removeClass('is-invalid');
+                    $(this).closest('div').addClass('is-valid');
+                } else {
+                    $(this).closest('div').removeClass('is-valid');
+                    $(this).closest('div').addClass('is-invalid');
+                }
+            })
+
+            submit.click(function () {
+                DisableInputs();
+                let width = submit.width();
+                let height = submit.height();
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                    submit.width(width);
+                    submit.height(height);
+                })
+
+                setTimeout(function () {
+                    if (FormIsValid()) {
+                        let formData = new FormData(ticketForm.get(0));
+                        formData.append('support.Text', text.val());
+                        formData.append('support.Chosen_TopicId', topic.val());
+
+                        $.ajax({
+                            url: '@Url.Action("Support", "Account", new { Area = "Therapist" })',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            headers: {
+                                'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    submitText.fadeOut('fast', function () {
+                                        $(this).html('<i class="ca-lightgreen fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                Swal.fire({
+                                                    title: response.title,
+                                                    text: response.body,
+                                                    icon: response.severity,
+                                                    confirmButtonColor: '#00d27a',
+                                                    confirmButtonText: 'U redu'
+                                                }).then(() => {
+                                                    window.location.href = response.redirectUrl
+                                                });
+                                            }, 600)
+                                        })
+                                    })
+                                }
+                                else if (response.redirectUrl) window.location.href = response.redirectUrl;
+                                else if (response.accountDeletionAlreadyRequested === true) {
+                                    HandleError();
+                                    Swal.fire(
+                                        response.title,
+                                        response.body,
+                                        response.severity
+                                    );
+                                }
+                                else if (response.hasEarnings === true) {
+                                    HandleError();
+                                    Swal.mixin({
+                                        customClass: {
+                                            confirmButton: 'btn btn-sm btn-success mr-2',
+                                            cancelButton: 'btn btn-sm btn-falcon-secondary'
+                                        },
+                                        buttonsStyling: false
+                                    }).fire({
+                                        title: response.title,
+                                        text: response.body,
+                                        icon: response.severity,
+                                        confirmButtonText: 'Isplata sredstava',
+                                        showCancelButton: true,
+                                        cancelButtonText: 'Odustani'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) window.location.href = response.withdrawUrl;
+                                    });
+                                } else if (response.hasBookedSessions === true) {
+                                    HandleError();
+                                    Swal.mixin({
+                                        customClass: {
+                                            confirmButton: 'btn btn-sm btn-success mr-2',
+                                            cancelButton: 'btn btn-sm btn-falcon-secondary'
+                                        },
+                                        buttonsStyling: false
+                                    }).fire({
+                                        title: response.title,
+                                        text: response.body,
+                                        icon: response.severity,
+                                        confirmButtonText: 'Zakazane seanse',
+                                        showCancelButton: true,
+                                        cancelButtonText: 'Odustani'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) window.location.href = response.allBookedSessionsUrl;
+                                    });
+                                } else if (response.hasActiveSessions === true) {
+                                    HandleError();
+                                    Swal.mixin({
+                                        customClass: {
+                                            confirmButton: 'btn btn-sm btn-success mr-2',
+                                            cancelButton: 'btn btn-sm btn-falcon-secondary'
+                                        },
+                                        buttonsStyling: false
+                                    }).fire({
+                                        title: response.title,
+                                        text: response.body,
+                                        icon: response.severity,
+                                        confirmButtonText: 'Aktivne seanse',
+                                        showCancelButton: true,
+                                        cancelButtonText: 'Odustani'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) window.location.href = response.allSessionsUrl;
+                                    });
+                                } else {
+                                    HandleError();
+                                    toastr[response.severity](response.body, response.title)
+                                }
+                            },
+                            error: function () {
+                                HandleError();
+                                toastr['error']('Molimo osvežite stranicu i pokušajte ponovo.', 'Došlo je do greške')
+                            }
+                        })
+                    } else {
+                        HandleError();
+                        toastr['info']('', 'Popunite sva obavezna polja')
+                    }
+                }, 1200)
+            });
+
+            function ElementIsValid(element) {
+                return ticketForm.validate().element($(element));
+            }
+
+            function FormIsValid() {
+                const textValid = ElementIsValid(text);
+                const topicValid = ElementIsValid(topic);
+
+                TopicDropdownHighlighter();
+
+                return (textValid && topicValid);
+            }
+
+            function EnableInputs() {
+                submit.prop('disabled', false);
+                text.prop('readonly', false);
+            }
+
+            function DisableInputs() {
+                submit.prop('disabled', true);
+                text.prop('readonly', true);
+            }
+
+            function HandleError() {
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                    
+                })
+                .promise()
+                .done(function () {
+                    setTimeout(function () {
+                        submitText.fadeOut('fast', function () {
+                            $(this).html(submitTextUnchanged).fadeIn('slow');
+                            EnableInputs();
+                        });
+                    }, 1300)
+                });
+            }
+        })
+    </script>
+}

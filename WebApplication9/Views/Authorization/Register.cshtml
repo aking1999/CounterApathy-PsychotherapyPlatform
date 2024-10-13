@@ -1,0 +1,262 @@
+﻿@model WebApplication9.ViewModels.RegisterInputViewModel
+
+@using Framework.Helpers.ExtensionMethods
+
+@{
+    ViewData.SetTitle("Registracija");
+    ViewData.SetMetaDescription("Pridružite se CounterApathy platformi i pronađite pravog psihoterapeuta za Vas. " +
+        "Naša platforma povezuje Vas sa licenciranim i iskusnim stručnjacima koji " +
+        "Vam pružaju potrebnu podršku. Registrujte se sada i započnite svoj put ka boljem mentalnom zdravlju.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/css/multi-step-form.css" />
+    <link rel="stylesheet" href="~/country-codes-phone-input/intlTelInput.min.css" />
+    <link rel="stylesheet" href="~/country-codes-phone-input/demo.css" />
+    <style>
+        .btn:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+    </style>
+    <script src="~/country-codes-phone-input/intlTelInput.min.js"></script>
+    <script id="wwwroot-utils" src="~/country-codes-phone-input/utils.js"></script>
+    @*<link rel="stylesheet" href="~/slider-captcha/slidercaptcha.min.css" />*@
+}
+
+<div id="main" style="min-height: 70vh;">
+    <div class="container-ms">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <h2 class="text-center">Registracija</h2>
+        <div class="progress-bar-ms">
+            <div class="step">
+                <p>Ime</p>
+                <div class="bullet">
+                    <span>1</span>
+                </div>
+                <div class="check fas fa-check"></div>
+            </div>
+            <div class="step">
+                <p>Kontakt</p>
+                <div class="bullet">
+                    <span>2</span>
+                </div>
+                <div class="check fas fa-check"></div>
+            </div>
+            <div class="step">
+                <p>Bezbednost</p>
+                <div class="bullet">
+                    <span>3</span>
+                </div>
+                <div class="check fas fa-check"></div>
+            </div>
+            <div class="step">
+                <p>Uslovi</p>
+                <div class="bullet">
+                    <span>4</span>
+                </div>
+                <div class="check fas fa-check"></div>
+            </div>
+        </div>
+        <div class="form-outer">
+            <form id="register-form" asp-area="" asp-controller="Authorization" asp-action="Register" method="post" autocomplete="off">
+                @Html.AntiForgeryToken()
+                <div class="page slide-page">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <h6 class="mb-3 text-primary text-center">Lični podaci</h6>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend no-tick">
+                                <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                            </div>
+                            <input asp-for="FirstName" class="form-control form-control-lg" tabindex="-1" />
+                        </div>
+                        <span asp-validation-for="FirstName" class="invalid-feedback"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend no-tick">
+                                <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                            </div>
+                            <input asp-for="LastName" class="form-control form-control-lg" tabindex="-1" />
+                        </div>
+                        <span asp-validation-for="LastName" class="invalid-feedback"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <button class="firstNext next btn btn-primary btn-block btn-lg" tabindex="-1"><span id="btnFirstNextText">Nastavi</span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="page">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <h6 class="mb-3 text-primary text-center">Kontakt podaci</h6>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend no-tick">
+                                <span class="input-group-text"><i class="fal fa-envelope fa-fw"></i></span>
+                            </div>
+                            <input asp-for="Email" class="form-control form-control-lg" tabindex="-1" />
+                        </div>
+                        <span asp-validation-for="Email" class="invalid-feedback"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input asp-for="PhoneNumber" class="form-control form-control-lg" tabindex="-1" />
+                        </div>
+                        <span asp-validation-for="PhoneNumber" class="invalid-feedback"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <button class="prev-1 prev border-0 text-secondary btn-block btn-lg" tabindex="-1"><span id="btnPrev1Text">Nazad</span></button>
+                        </div>
+                        <div class="col-6">
+                            <button class="next-1 next btn btn-primary btn-block btn-lg" tabindex="-1"><span id="btnNext1Text">Nastavi</span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="page">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <h6 class="mb-3 text-primary text-center">Lozinka</h6>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div id="show-password" class="input-group-prepend no-tick" role="button">
+                                <span class="input-group-text"><i id="lock-icon" class="fal fa-lock fa-fw"></i></span>
+                            </div>
+                            <input asp-for="Password" class="form-control form-control-lg" tabindex="-1" />
+                        </div>
+                        <span asp-validation-for="Password" class="invalid-feedback"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div id="show-confirm-password" class="input-group-prepend no-tick" role="button">
+                                <span class="input-group-text"><i id="lock-icon-confirm" class="fal fa-lock fa-fw"></i></span>
+                            </div>
+                            <input asp-for="ConfirmPassword" class="form-control form-control-lg" tabindex="-1" />
+                        </div>
+                        <span asp-validation-for="ConfirmPassword" class="invalid-feedback"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                            <button class="prev-2 prev border-0 text-secondary btn-block btn-lg" tabindex="-1"><span id="btnPrev2Text">Nazad</span></button>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                            <button class="next-2 next btn btn-primary btn-block btn-lg" tabindex="-1"><span id="btnNext2Text">Nastavi</span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="page">
+                    <h6 class="mb-2 text-primary text-center">Uslovi korišćenja</h6>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" asp-for="TermsOfService" tabindex="-1" required>
+                            <label class="custom-control-label text-left" asp-for="TermsOfService" tabindex="-1">
+                                Čekiranjem, slažete se sa našim
+                                <a asp-area="" asp-controller="Home" asp-action="TermsOfService" tabindex="-1" target="_blank">uslovima korišćenja</a>.
+                            </label>
+                            <span asp-validation-for="TermsOfService" class="invalid-feedback"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" asp-for="PrivacyPolicy" tabindex="-1" required>
+                            <label class="custom-control-label text-left" asp-for="PrivacyPolicy" tabindex="-1">
+                                Čekiranjem, slažete se sa našom
+                                <a asp-area="" asp-controller="Home" asp-action="Privacy" tabindex="-1" target="_blank">politikom privatnosti</a>.
+                            </label>
+                            <span asp-validation-for="PrivacyPolicy" class="invalid-feedback"></span>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <button class="prev-3 prev border-0 text-secondary btn-block btn-lg" tabindex="-1"><span id="btnPrev3Text">Nazad</span></button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-primary btn-block btn-lg submit" tabindex="-1"><span id="btnSubmitText">Završi</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <p class="mb-0 mt-1 text-center">
+            <small>Već imate nalog? <a asp-controller="Authorization" asp-action="SignIn" tabindex="-1" target="_blank">Ulogujte se</a>.</small>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('footer').remove();
+            $('main').removeClass('pb-3');
+
+            $('#TermsOfService').rules('add', {
+                required: true,
+                messages: {
+                    required: "Polje je obavezno."
+                }
+            });
+
+            $('#PrivacyPolicy').rules('add', {
+                required: true,
+                messages: {
+                    required: "Polje je obavezno."
+                }
+            });
+
+            window.intlTelInput(document.querySelector("#PhoneNumber"), {
+                formatOnDisplay: true,
+                separateDialCode: true,
+                initialCountry: "rs",
+                nationalMode: false,
+                placeholderNumberType: "MOBILE",
+                onlyCountries: ["rs"],
+                utilsScript: document.getElementById("wwwroot-utils").href
+            });
+
+            $('#show-password').click(function () {
+                let lockIcon = $('#lock-icon');
+                let inputPass = $('#Password');
+                let width = lockIcon.width();
+                let height = lockIcon.height();
+
+                inputPass.attr('type', function (index, attr) {
+                    return attr == 'text' ? 'password' : 'text'
+                });
+
+                lockIcon.fadeOut('fast', function () {
+                    $(this).toggleClass('fa-lock')
+                        .toggleClass('fa-unlock')
+                        .width(width)
+                        .height(height)
+                        .fadeIn('fast');
+                })
+            });
+
+            $('#show-confirm-password').click(function () {
+                let lockIcon = $('#lock-icon-confirm');
+                let inputPass = $('#ConfirmPassword');
+                let width = lockIcon.width();
+                let height = lockIcon.height();
+
+                inputPass.attr('type', function (index, attr) {
+                    return attr == 'text' ? 'password' : 'text'
+                });
+
+                lockIcon.fadeOut('fast', function () {
+                    $(this).toggleClass('fa-lock')
+                        .toggleClass('fa-unlock')
+                        .width(width)
+                        .height(height)
+                        .fadeIn('fast');
+                })
+            });
+        })
+    </script>
+    <script src="~/js/anonymous/register.js"></script>
+}

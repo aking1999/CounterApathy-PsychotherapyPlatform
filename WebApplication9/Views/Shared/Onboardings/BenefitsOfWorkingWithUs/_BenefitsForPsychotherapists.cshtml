@@ -1,0 +1,338 @@
+﻿@using Framework.Helpers.ExtensionMethods
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+    var appNameSrb = Configuration.GetSection("Application:AppNameSrb")?.Value;
+}
+
+<link rel="stylesheet" href="~/css/onboarding.css" />
+
+<div id="benefits-of-working-psychotherapists-modal"
+     class="modal fade p-0"
+     data-backdrop="static"
+     data-keyboard="false"
+     data-toggle="modal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog d-flex justify-content-center modal-dialog-centered" role="document">
+        <div class="modal-content border-0" style="width: auto !important; background-color: transparent !important;">
+            <div class="walkthrough show reveal">
+                <div class="walkthrough-pagination">
+                    <a class="dot active"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                    <a class="dot"></a>
+                </div>
+                <div class="walkthrough-body">
+                    <ul class="screens animate">
+                        <li class="screen active">
+                            <div class="symbol logo">
+                                <img class="logo"
+                                     src="~/images/content-images/onboarding/handshake-icon.png"
+                                     alt="rukovanje" />
+                            </div>
+                            <h3 class="text-white">
+                                Benefiti rada sa nama
+                                <br />
+                            </h3>
+                            <p>
+                                @*u par kratkih koraka*@
+                                Želeli bismo da Vam kroz kratku prezentaciju predstavimo benefite
+                                koje imaju naši psihoterapeuti radom na CounterApathy platformi.
+                            </p>
+                        </li>
+                        <li class="screen">
+                            <div class="symbol money">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/money_icon_1.png"
+                                     alt="novčić 1" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/money_icon_2.png"
+                                     alt="novčić 2" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/money_icon_3.png"
+                                     alt="novčić 3" />
+                            </div>
+                            <h3 class="text-white">
+                                Veći novčani prihod
+                                <br />
+                            </h3>
+                            <p>
+                                Povećajte svoj prihod i razvijte svoju praksu povezivanjem sa više klijenata na platformi, bez ikakvih početnih troškova.
+                            </p>
+                        </li>
+                        <li class="screen">
+                            <div class="symbol user-honor">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/user_icon.png"
+                                     alt="klijent" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/honor_icon.png"
+                                     alt="medalja" />
+                            </div>
+                            <h3 class="text-white">
+                                Izgradnja portfolia
+                                <br />
+                            </h3>
+                            <p>
+                                Prikažite svoje dosadašnje veštine i rad, čime gradite Vaš lični portfolio
+                                koji će pomoći da privučete prave klijente za Vašu praksu.
+                            </p>
+                        </li>
+                        <li class="screen">
+                            <div class="symbol people-connect">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/people_connect_icon_2.png"
+                                     alt="povezani klijenti" />
+                            </div>
+                            <h3 class="text-white">
+                                Povezivanje sa klijentima
+                                <br />
+                            </h3>
+                            <p>
+                                Proširite krug i povežite se sa klijentima koji traže baš Vašu stručnost.
+                            </p>
+                        </li>
+                        <li class="screen">
+                            <div class="symbol calendar-session-booking">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/calendar_book_session_icon.png"
+                                     alt="kalendar sa psihoterapijskim seansama za zakazivanje" />
+                            </div>
+                            <h3 class="text-white">
+                                Lako dodavanje termina i zakazivanje seansi
+                                <br />
+                            </h3>
+                            <p>
+                                Kroz samo par klikova, možete dodavati seanse u terminima koji Vam odgovaraju.
+                                Isto tako, klijenti mogu, kroz par klikova zakazivati Vaše seanse.
+                            </p>
+                        </li>
+                        <li class="screen">
+                            <div class="symbol stars">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/star_icon_1.png"
+                                     alt="zvezdica 1 za iskustvo sa psihoterapije" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/star_icon_2.png"
+                                     alt="zvezdica 2 za iskustvo sa psihoterapije" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/star_icon_3.png"
+                                     alt="zvezdica 3 za iskustvo sa psihoterapije" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/star_icon_4.png"
+                                     alt="zvezdica 4 za iskustvo sa psihoterapije" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/star_icon_5.png"
+                                     alt="zvezdica 5 za iskustvo sa psihoterapije" />
+                            </div>
+                            <h3 class="text-white">
+                                Izgradnja reputacije
+                                <br />
+                            </h3>
+                            <p>
+                                @*Prikažite svoje veštine da privučete prave klijente za Vašu praksu.*@
+                                Ocene klijenata na platformi Vam pomažu u izgradnji reputacije i unapredjenju načina rada,
+                                rezultirajući većim brojem klijenata.
+                            </p>
+                        </li>
+                        <li class="screen">
+                            <div class="symbol network">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/network.png"
+                                     alt="Umrežavanje i networking psihoterapeuta" />
+                            </div>
+                            <h3 class="text-white">
+                                Izgradnja poslovnih odnosa (networking)
+                                <br />
+                            </h3>
+                            <p>
+                                Pridruživanje zajednici kolega profesionalaca Vam pomaže u izgradnji poslovnih odnosa,
+                                koji donose dugoročne koristi u vidu referenci i saradnji.
+                            </p>
+                        </li>
+
+                        <li class="screen">
+                            <div class="symbol professional-email">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/envelope.png"
+                                     alt="profesionalan imejl za psihoterapeute" />
+                            </div>
+                            <h3 class="text-white">
+                                Dodeljivanje profesionalnog imejla
+                                <br />
+                            </h3>
+                            <p>
+                                Terapeutima dodeljujemo profesionalne imejlove oblika:
+                                <span class="badge badge-soft-primary" style="padding-left: 3px !important;padding-right: 3px !important;">@($"ime.prezime@{appName}.com")</span>
+                                <br />
+                                Korišćenje profesionalnog imejla sa specijalnim domenom pospešuje
+                                izgradnju reputacije i profesionalnog imidža.
+                                <span class="badge badge-soft-secondary badge-pill">Uskoro</span>
+                            </p>
+                        </li>
+
+                        <li class="screen">
+                            <div class="symbol email-signature">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/email-signature.png"
+                                     alt="profesionalan imejl potpis za psihoterapeute" />
+                            </div>
+                            <h3 class="text-white">
+                                Izrada profesionalnog imejl potpisa
+                                <br />
+                            </h3>
+                            <p>
+                                Terapeutima izradjujemo digitalne imejl potpise.
+                                Benefiti korišćenja su: profesionalizam, izgradnja poslovnog ugleda,
+                                marketing i konzistentnost izgleda imejlova.
+                                <span class="badge badge-soft-secondary badge-pill">Uskoro</span>
+                            </p>
+                        </li>
+
+                        <li class="screen">
+                            <div class="symbol bars">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/bar_icon_axis.png"
+                                     alt="analitički grafik 1" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/bar_icon_3.png"
+                                     alt="analitički grafik 2" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/bar_icon_2.png"
+                                     alt="analitički grafik 3" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/bar_icon_1.png"
+                                     alt="analitički grafik 4" />
+                            </div>
+                            <h3 class="text-white">
+                                Analitika
+                                <br />
+                            </h3>
+                            <p>
+                                Pružamo alate za analitiku, vodjenje evidencija i generisanje različitih
+                                izveštaja koji Vam pomažu u radu.
+                                <span class="badge badge-soft-secondary badge-pill">Uskoro</span>
+                            </p>
+                        </li>
+                        <li class="screen">
+                            <div class="symbol files">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/file_icon_1.png"
+                                     alt="psihoterapijski izveštaj 1" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/file_icon_2.png"
+                                     alt="psihoterapijski izveštaj 2" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/file_icon_3.png"
+                                     alt="psihoterapijski izveštaj 3" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/file_icon_4.png"
+                                     alt="psihoterapijski izveštaj 4" />
+                            </div>
+                            <h3 class="text-white">
+                                Marketing
+                                <br />
+                            </h3>
+                            <p>
+                                Radimo marketing umesto Vas, što Vam oslobadja vreme i finansijska sredstva,
+                                te omogućava da se fokusirate na svoje klijente.
+                            </p>
+                        </li>
+
+                        <li class="screen">
+                            <div class="symbol leaderboard">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/leaderboard.png"
+                                     alt="rang lista psihoterapeuta" />
+                            </div>
+                            <h3 class="text-white">
+                                Podsticaji i dodatni benefiti za najbolje terapeute
+                                <br />
+                            </h3>
+                            <p>
+                                Svakog meseca vršimo reviziju učinka svih terapeuta i
+                                onima sa najboljim rezultatima, nudimo dodatne povlastice na
+                                platformi u vidu promocija i popusta za naredni mesec.
+                                <span class="badge badge-soft-secondary badge-pill">Uskoro</span>
+                            </p>
+                        </li>
+
+                        <li class="screen">
+                            <div class="symbol comm">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/comm_icon_1.png"
+                                     alt="podrška za terapeute 1" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/comm_icon_2.png"
+                                     alt="podrška za terapeute 2" />
+                            </div>
+                            <h3 class="text-white">
+                                Tehnička podrška
+                                <br />
+                            </h3>
+                            <p>
+                                Terapeutima nudimo specijalan oblik tehničke podrške. Popunjavanjem formulara,
+                                možete nam postaviti pitanja i sugestije.
+                                Takodje, ukoliko postoji potreba, možete zahtevati i onlajn sastanke za rešavanje tehničkih problema.
+                            </p>
+                        </li>
+                        <li class="screen">
+                            <div class="symbol improvement">
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/improvement_icon.png"
+                                     alt="skaliranje i napredak @appName (@appNameSrb) platforme za psihoterapiju 1" />
+                                <img class="icon"
+                                     src="~/images/content-images/onboarding/arrow_icon.png"
+                                     alt="skaliranje i napredak @appName (@appNameSrb) platforme za psihoterapiju 2" />
+                            </div>
+                            <h3 class="text-white">
+                                Unapredjenje platforme
+                                <br />
+                            </h3>
+                            <p>
+                                Planiramo skaliranje platforme dodavanjem novih funkcionalnosti i
+                                unapredjenjem postojećih, kroz prikupljanje povratnih informacija korisnika.
+                            </p>
+                        </li>
+                    </ul>
+                    <button class="prev-screen">
+                        <i class="icon-angle-left fas fa-chevron-left"></i>
+                    </button>
+                    <button class="next-screen">
+                        <i class="icon-angle-right fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="walkthrough-footer">
+                    <button class="button next-screen">Sledeće</button>
+                    <button class="button finish" id="close-walkthrough" disabled>Kraj</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.PartialSectionScripts(
+    @<script>
+         $(document).ready(function () {
+             $('#close-walkthrough').click(function () {
+                 $('#benefits-of-working-psychotherapists-modal').modal('hide');
+             })
+         });
+    </script>
+)
+
+@Html.PartialSectionScripts(@<script src="~/js/onboarding.js"></script>)

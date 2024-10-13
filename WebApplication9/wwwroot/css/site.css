@@ -1,0 +1,218 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+/*
+    @font-face {
+    font-family: Roboto;
+    font-weight: 700;
+    src: url(../font/roboto/Roboto-Bold.eot);
+    src: url(../font/roboto/Roboto-Bold.eot?#iefix) format("embedded-opentype"), url(../font/roboto/Roboto-Bold.woff2) format("woff2"), url(../font/roboto/Roboto-Bold.woff) format("woff"), url(../font/roboto/Roboto-Bold.ttf) format("truetype")
+}
+
+body {
+    font-family: "Roboto", sans-serif;
+    font-weight: 300
+}
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+    padding-right: 0 !important;
+}
+
+/*.input-group input {
+    border-left: none !important;
+}*/
+
+/*.input-group-prepend,
+.input-group-prepend + input {
+    box-shadow: none;
+}*/
+
+.pointer-on-hover:hover {
+  cursor: pointer;
+}
+
+.no-after::after {
+  display: none !important;
+}
+
+button:disabled {
+  cursor: not-allowed !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.cursor-pointer:hover {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.no-tick {
+  caret-color: transparent;
+}
+
+/* !!! ovo sam novo dodao da scroll uvek bude vidljiv, ako bude
+    problema, da skinem
+*/
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.box-shadow {
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px; /* Vertically center the text there */
+}
+
+#output:hover {
+  cursor: pointer;
+  border-radius: 50%;
+  border-color: red;
+}
+
+.custom-file:hover {
+  cursor: pointer;
+}
+
+.account-settings .user-profile {
+  margin: 0 0 1rem 0;
+  padding-bottom: 1rem;
+  text-align: center;
+}
+
+.account-settings .user-profile .user-avatar {
+  margin: 0 0 1rem 0;
+}
+
+.account-settings .user-profile .user-avatar img {
+  width: 6.125rem;
+  height: 6.125rem;
+  border-radius: 50%;
+}
+
+.account-settings .user-profile .user-avatar .img-holder {
+  width: 6.125rem;
+  height: 6.125rem;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.account-settings .about {
+  margin: 2rem 0 0 0;
+  text-align: center;
+}
+
+.account-settings .about h5 {
+  margin: 0 0 15px 0;
+  color: #007ae1;
+}
+
+.account-settings .about p {
+  font-size: 0.825rem;
+}
+
+.check-animation-svg {
+  display: block;
+  height: 3rem;
+  width: 3rem;
+  color: var(--success);
+  /* SVG path use currentColor to inherit this */
+}
+
+.check-animation-circle {
+  stroke-dasharray: 76;
+  stroke-dashoffset: 76;
+  animation: draw-check 1s forwards;
+}
+
+.check-animation-tick {
+  stroke-dasharray: 18;
+  stroke-dashoffset: 18;
+  animation: draw-check 1s forwards 1s;
+}
+
+@keyframes draw-check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.heading-underline {
+    display: block;
+    width: 80px;
+    height: 3px;
+    background: var(--border);
+    margin: 1rem auto 1.5rem auto;
+}
+
+/*.btn:focus {
+    outline: none !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+}*/

@@ -1,0 +1,290 @@
+﻿/*body {
+    font-family: "Roboto", sans-serif;
+    background: #e6e9ed;
+    min-height: 100vh;
+    position: relative;
+}*/
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+.notification-text {
+    /*font-family: 'Fredoka One', sans-serif !important;*/
+    font-size: 0.9em;
+    margin-bottom: 0 !important;
+}
+
+.notification-ui a:after {
+    display: none;
+}
+
+.notification-ui_icon {
+    position: relative;
+}
+
+    .notification-ui_icon .unread-notification {
+        display: inline-block;
+        height: 7px;
+        width: 7px;
+        border-radius: 7px;
+        background-color: #66bb6a;
+        position: absolute !important;
+        top: 7px !important;
+        left: 12px !important;
+    }
+
+@media (min-width: 900px) {
+    .notification-ui_icon .unread-notification {
+        left: 20px;
+    }
+}
+
+.notification-ui_dd {
+    padding: 0;
+    border-radius: 10px;
+    -webkit-box-shadow: 0px 8px 20px -5px rgba(0,0,0,0.81);
+    -moz-box-shadow: 0px 8px 20px -5px rgba(0,0,0,0.81);
+    box-shadow: 0px 8px 20px -5px rgba(0,0,0,0.81);
+    border: 0;
+    max-width: 400px;
+    /* upravo dodajem */
+    position: absolute !important;
+}
+
+@media (min-width: 900px) {
+    .notification-ui_dd {
+        min-width: 400px;
+        position: absolute !important;
+        left: -192px !important;
+        top: 55px !important;
+    }
+}
+
+.notification-ui_dd:after {
+    content: "";
+    position: absolute !important;
+    top: -30px;
+    left: calc(50% - 7px) !important;
+    border-top: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 15px solid #fff;
+    border-left: 15px solid transparent;
+}
+
+.notification-ui_dd .notification-ui_dd-header {
+    border-bottom: 1px solid #ddd;
+    padding: 1rem;
+}
+
+    .notification-ui_dd .notification-ui_dd-header h3 {
+        margin-bottom: 0;
+    }
+
+.notification-ui_dd .notification-ui_dd-content {
+    max-height: 25rem;
+    overflow: auto;
+}
+
+.notification-list {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    padding: 1.25rem;
+    /*margin: 0 1.563rem;*/
+    align-items: center;
+    /*justify-content: center;*/
+}
+
+.notification-list--unread {
+    position: relative;
+}
+
+    .notification-list--unread:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        /*left: -25px;*/
+        left: 0;
+        height: calc(100% + 1px);
+        border-left: 2px solid var(--info);
+        border-radius: 0.75rem;
+    }
+
+.notification-list--read:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -25px;
+    height: calc(100% + 1px);
+    border-left: 2px solid inherit;
+}
+
+.notification-list .notification-list_icon img {
+    height: 48px;
+    width: 48px;
+    border-radius: 50px;
+    margin-right: 20px;
+}
+
+/* !!! ovo sam ja dodao*/
+.notification-list .notification-list_icon i {
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.notification-list .notification-list_detail p {
+    margin-bottom: 5px;
+    line-height: 1.2;
+    /*padding-right: 1rem;*/
+}
+
+.notification-list_feature-icon {
+    margin-left: auto;
+}
+
+.notification-list .notification-list_feature-icon img {
+    height: 48px;
+    width: 48px;
+    border-radius: 5px;
+    margin-left: 20px;
+}
+
+.notification-list .notification-list_feature-icon p {
+    height: 4.75rem;
+    width: 6.6rem;
+    justify-content: end;
+}
+
+.notification-ui_dd-content a {
+    color: inherit; /* blue colors for links too */
+    text-decoration: inherit; /* no underline */
+}
+
+    .notification-ui_dd-content a:hover {
+        color: inherit; /* blue colors for links too */
+        text-decoration: inherit; /* no underline */
+    }
+
+.fade-in {
+    opacity: 1;
+    animation-name: fadeInOpacity;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
+    animation-duration: 0.2s;
+}
+
+@keyframes fadeInOpacity {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.fade-out {
+    opacity: 0;
+    animation-name: fadeOutOpacity;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
+    animation-duration: 0.2s;
+}
+
+@keyframes fadeOutOpacity {
+    100% {
+        opacity: 1;
+    }
+
+    0% {
+        opacity: 0;
+    }
+}
+
+.notification {
+    display: inline-block;
+    position: relative;
+    border-radius: 0.2em;
+    font-size: 1em;
+}
+
+    .notification::before,
+    .notification::after {
+        color: black;
+        /*text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);*/
+    }
+
+    .notification::before {
+        display: block;
+        font-family: "Font Awesome 5 Pro";
+        content: "\f0f3";
+        transform-origin: top center;
+    }
+
+    .notification::after {
+        font-size: 0.7em;
+        font-weight: 700;
+        position: absolute;
+        top: -8px;
+        right: -9px;
+        padding: 0.15rem 0.25rem;
+        line-height: 100%;
+        border: 2px #fff solid;
+        border-radius: 60px;
+        /* !!! ovo je ona malo tamnija zelena #06b909*/
+        background: #05f215;
+        opacity: 0;
+        content: attr(data-count);
+        opacity: 0;
+        transform: scale(0.5);
+        transition: transform, opacity;
+        transition-duration: 0.3s;
+        transition-timing-function: ease-out;
+    }
+
+    .notification.notify::before {
+        animation: ring 1.5s ease !important;
+    }
+
+    .notification.show-count::after {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+@keyframes ring {
+    0% {
+        transform: rotate(35deg);
+    }
+
+    12.5% {
+        transform: rotate(-30deg);
+    }
+
+    25% {
+        transform: rotate(25deg);
+    }
+
+    37.5% {
+        transform: rotate(-20deg);
+    }
+
+    50% {
+        transform: rotate(15deg);
+    }
+
+    62.5% {
+        transform: rotate(-10deg);
+    }
+
+    75% {
+        transform: rotate(5deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}

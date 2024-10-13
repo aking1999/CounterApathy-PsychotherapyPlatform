@@ -1,0 +1,115 @@
+@font-face {
+    font-family: 'icomoon';
+    src: url('/fonts/counter-apathy/ca-icon-human-wave/icomoon.eot?viyg4r');
+    src: url('/fonts/counter-apathy/ca-icon-human-wave/icomoon.eot?viyg4r#iefix') format('embedded-opentype'),
+        url('/fonts/counter-apathy/ca-icon-human-wave/icomoon.ttf?viyg4r') format('truetype'),
+        url('/fonts/counter-apathy/ca-icon-human-wave/icomoon.woff?viyg4r') format('woff'),
+        url('/fonts/counter-apathy/ca-icon-human-wave/icomoon.svg?viyg4r#icomoon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+  font-family: 'icomoon';
+  src:  url('/fonts/counter-apathy/ca-icon-google-meet/icomoon.eot?n997x9');
+  src:  url('/fonts/counter-apathy/ca-icon-google-meet/icomoon.eot?n997x9#iefix') format('embedded-opentype'),
+    url('/fonts/counter-apathy/ca-icon-google-meet/icomoon.ttf?n997x9') format('truetype'),
+    url('/fonts/counter-apathy/ca-icon-google-meet/icomoon.woff?n997x9') format('woff'),
+    url('/fonts/counter-apathy/ca-icon-google-meet/ca-icon-google-meet.svg?n997x9#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'icomoon';
+  src:  url('/fonts/counter-apathy/ca-icon-heart-head/icomoon.eot?lg7uuu');
+  src:  url('/fonts/counter-apathy/ca-icon-heart-head/icomoon.eot?lg7uuu#iefix') format('embedded-opentype'),
+    url('/fonts/counter-apathy/ca-icon-heart-head/icomoon.ttf?lg7uuu') format('truetype'),
+    url('/fonts/counter-apathy/ca-icon-heart-head/icomoon.woff?lg7uuu') format('woff'),
+    url('/fonts/counter-apathy/ca-icon-heart-head/icomoon.svg?lg7uuu#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'icomoon';
+  src:  url('/fonts/counter-apathy/ca-icon-water-lily/icomoon.eot?g5w3ze');
+  src:  url('/fonts/counter-apathy/ca-icon-water-lily/icomoon.eot?g5w3ze#iefix') format('embedded-opentype'),
+    url('/fonts/counter-apathy/ca-icon-water-lily/icomoon.ttf?g5w3ze') format('truetype'),
+    url('/fonts/counter-apathy/ca-icon-water-lily/icomoon.woff?g5w3ze') format('woff'),
+    url('/fonts/counter-apathy/ca-icon-water-lily/icomoon.svg?g5w3ze#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+    font-family: 'icomoon';
+    src: url('/fonts/counter-apathy/ca-icon-chat-heart/icomoon.eot?nrp48j');
+    src: url('/fonts/counter-apathy/ca-icon-chat-heart/icomoon.eot?nrp48j#iefix') format('embedded-opentype'),
+         url('/fonts/counter-apathy/ca-icon-chat-heart/icomoon.ttf?nrp48j') format('truetype'),
+         url('/fonts/counter-apathy/ca-icon-chat-heart/icomoon.woff?nrp48j') format('woff'),
+         url('/fonts/counter-apathy/ca-icon-chat-heart/icomoon.svg?nrp48j#icomoon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+  font-family: 'icomoon';
+  src:  url('/fonts/counter-apathy/ca-icon-man-assertive/icomoon.eot?ulh7bz');
+  src:  url('/fonts/counter-apathy/ca-icon-man-assertive/icomoon.eot?ulh7bz#iefix') format('embedded-opentype'),
+    url('/fonts/counter-apathy/ca-icon-man-assertive/icomoon.ttf?ulh7bz') format('truetype'),
+    url('/fonts/counter-apathy/ca-icon-man-assertive/icomoon.woff?ulh7bz') format('woff'),
+    url('/fonts/counter-apathy/ca-icon-man-assertive/icomoon.svg?ulh7bz#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+
+[class^="ca-icon-"], [class*=" ca-icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  text-rendering: auto;
+  /*line-height: 1;*/
+  display: inline-block;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ca-icon-human-wave:before {
+    content: "\e111";
+}
+
+.ca-icon-chat-heart:before {
+    content: "\e900";
+}
+
+.ca-icon-man-assertive:before {
+    content: "\e901";
+    font-size: 1.5rem;
+}
+
+
+.ca-icon-heart-head:before {
+    content: "\e902";
+}
+
+.ca-icon-water-lily:before {
+    content: "\e903";
+}
+
+.ca-icon-google-meet:before {
+  content: "\e908";
+}

@@ -1,0 +1,351 @@
+﻿@using Framework.Helpers.ExtensionMethods
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+}
+
+<style>
+    .accordion li {
+        padding-bottom: 0.5rem;
+    }
+
+    .accordion li:last-child {
+        padding-bottom: 0;
+    }
+</style>
+
+<div class="card pt-1 mb-3">
+    <div class="card-header pb-0">
+        <h4 class="text-center mb-0 text-primary">Česta pitanja o @appName</h4>
+    </div>
+    <div class="card-body pb-0">
+        <div class="accordion">
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Šta je @appName?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                @appName (srp. <em>@Configuration.GetSection("Application:AppNameSrb")?.Value</em>)
+                                je platforma koja Vam pomaže u pronalasku odgovarajućeg psihoterapeuta.
+                                Imamo tim stručnih licenciranih zdravstvenih radnika koji su obučeni da
+                                pomognu pojedincima u suočavanju i radu na emocionalnim,
+                                bihejvioralnim i mentalnim izazovima.
+                            </p>
+                            <p class="mb-0">
+                                <span class="fa-stack">
+                                    <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                    <i class="far fa-star fa-stack-1x text-warning"></i>
+                                </span>
+                                Cilj nam je da pružimo pristupačnu i odgovarajuću mentalnu podršku onima koji je trebaju.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Ko su naši psihoterapeuti?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                <a href="@Url.AllPsychotherapistsUrl()">
+                                    Psihoterapeuti na
+                                    @appName
+                                </a> su
+                                eksperti koji veruju u važnost mentalnog zdravlja i
+                                strastveno su posvećeni pomaganju ljudima u prevazilaženju izazova i vodjenju bogatijeg života.
+                                Oni su saosećajni, puni razumevanja i bez osude, te će raditi sa Vama kako biste
+                                zajedno razvili personalizovan plan tretmana koji će se baviti Vašim specifičnim potrebama i ciljevima.
+                            </p>
+                            <p class="mb-0">
+                                <span class="fa-stack">
+                                    <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                    <i class="far fa-star fa-stack-1x text-warning"></i>
+                                </span>
+                                Ako tražite podršku i savete u Vašem putu ka boljem mentalnom zdravlju,
+                                psihoterapeuti na @appName su tu da Vam pomognu svaki korak puta.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Šta naši terapeuti nude klijentima iz oblasti psihoterapije?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                <span class="badge badge-soft-primary p-2 mb-2"><i class="far fa-book fa-lg fa-fw mr-2"></i>Specijalnosti</span>
+                                <br />
+                                Naši terapeuti nude širok spektar specijalnosti iz različitih oblasti psihoterapije, kao što su anksioznost,
+                                bipolarni poremećaj, burnout, depresija, fobije, gubitak i tuga, izolacija i samoća, komunikacijske veštine,
+                                kontrola besa, lični razvoj, nagle promene raspoloženja, nasilje u porodici,
+                                opsesivno kompulsivni poremećaj (eng. <em>OCD</em>), panični napadi, partnerski odnosi,
+                                poremećaj ishrane, poremećaj spavanja, posttraumatski stresni poremećaj (eng. <em>PTSD</em>),
+                                prokrastinacija, samopouzdanje, samopovredjivanje, seksualno zlostavljanje,
+                                strah od bliskosti, stres, sukobi u porodici, traume, zavisnost, životne krize i zlostavljanje.
+                            </p>
+                            <p class="mb-0">
+                                <span class="badge badge-soft-pink p-2 mb-2"><i class="far fa-magic fa-lg fa-fw mr-2"></i>Psihoterapijske tehnike</span>
+                                <br />
+                                Naši terapeuti nude različite psihoterapijske tehnike i modalitete,
+                                uključujući asertivni trening, bihejvioralnu terapiju, dijalektičko-bihejvioralnu terapiju,
+                                Geštalt, humanističku terapiju, kognitivno-bihejvioralnu terapiju,
+                                psihoanalizu, psihodinamsku terapiju, racionalno-emotivno-bihejvioralnu terapiju (REBT),
+                                sistemsku porodičnu terapiju i mindfulness terapiju (terapija zasnovana na svesnosti).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako su naši psihoterapeuti verifikovani?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                <span class="badge badge-soft-warning p-2 mb-2"><i class="far fa-award fa-lg fa-fw mr-2"></i>Potrebne licence</span>
+                                <br />
+                                Psihoterapeuti na @appName su licencirani, obučeni, iskusni i akreditovani
+                                eksperti za mentalno zdravlje sa profesionalnom obukom koja odgovara standardima sledećih organizacija:
+                                <a href="https://savezpsihoterapeuta.org/sdps/" target="_blank" rel="noreferrer, nofollow">Savez društava psihoterapeuta Srbije SDPS</a>,
+                                <a href="https://www.ukons.org.rs/sr/" target="_blank" rel="noreferrer, nofollow">Udruženje konstruktivista Srbije UKS</a>,
+                                <a href="https://www.europsyche.org/ecp/about-ecp/" target="_blank" rel="noreferrer, nofollow">Evropski sertifikat za psihoterapiju ESP</a>.
+                            </p>
+                            <p class="mb-0">
+                                <span class="badge badge-soft-primary p-2 mb-2"><i class="far fa-graduation-cap fa-lg fa-fw mr-2"></i>Obuka</span>
+                                <br />
+                                Naši psihoterapeuti su obučeni u različitim terapijskim pristupima i stručni
+                                su u prilagodjavanju svog pristupa jedinstvenim potrebama svakog klijenta.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Koje kontakt metode sa psihoterapeutima nudi @appName?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                <span class="badge badge-soft-info p-2 mb-2"><i class="far fa-address-book fa-lg fa-fw mr-2"></i>Kontakt metode</span>
+                                <br />
+                                @appName platforma omogućava svakom terapeutu da odredi
+                                na koji način želi da klijenti prisustvuju njegovim
+                                seansama, <strong>online i/ili lično.</strong>
+                            </p>
+                            <p>
+                                <span class="badge badge-soft-info p-2 mb-2">
+                                    <i class="far fa-eye fa-lg fa-fw mr-2"></i>Pregled kontakt metoda terapeuta
+                                </span>
+                                <br />
+                                Kontakt metode svakog terapeuta možete videti na <a href="@Url.AllPsychotherapistsUrl()" target="_blank">stranici za pregled psihoterapeuta</a>,
+                                klikom na dugme "Kontakt metode".
+                            </p>
+                            <p class="mb-0">
+                                <span class="badge badge-soft-info p-2 mb-2"><i class="far fa-hand-pointer fa-lg fa-fw mr-2"></i>Izbor kontakt metode</span>
+                                <br />
+                                Kontakt metodu birate prilikom zakazivanja seanse. Za izbor će Vam biti prikazane one kontakt metode koje je
+                                terapeut unapred odredio.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako funkcionišu online seanse?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                Online seanse se odvijaju preko Google Meet aplikacije.
+                                <br />
+                                Kada zakažete Google Meet seansu stiže Vam imejl sa potvrdom o zakazivanju.
+                                <br />
+                                Zatim, sledeći imejl sa linkom za pristup seansi biće Vam poslat
+                                <strong>najkasnije 4 sata pre početka seanse</strong>.
+                            </p>
+                            Za pristup seansi putem računara, pročitajte <a asp-area="" asp-controller="Guides" asp-action="JoinGoogleMeetByComputer" target="_blank">uputstvo za pristup putem računara</a>.
+                            <br />
+                            Za pristup seansi putem mobilnog telefona, pročitajte <a asp-area="" asp-controller="Guides" asp-action="JoinGoogleMeetByPhone" target="_blank">uputstvo za pristup putem mobilnog telefona</a>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako funkcionišu lične seanse?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Kada zakažete ličnu seansu stiže Vam imejl sa potvrdom o zakazivanju.
+                            <br />
+                            Zatim, na dan održavanja seanse, <strong>5 minuta pre samog početka</strong>,
+                            budite na adresi terapeuta.
+                            <br />
+                            Adresa terapeuta biće prikazana u toku zakazivanja.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Da li se cena seanse razlikuje u zavisnosti od toga da li je seansa lično ili online?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Cena je ista za ličnu i online seansu i nju terapeut sam određuje.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="card shadow-none border-bottom accordion-item">
+            <div class="card-header py-0">
+                <button class="btn btn-link text-decoration-none btn-block py-2 px-0 text-left" data-toggle="collapse">
+                    <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                    <span class="font-weight-medium text-sans-serif text-900">
+                        Kako da platim seansu koju hoću da zakažem?
+                    </span>
+                </button>
+            </div>
+            <div class="collapse">
+                <div class="card-body pt-2">
+                    <div class="pl-4">
+                        <div class="alert alert-pink text-center" role="alert">
+                            <p>
+                                Sve cene na @appName platformi su izražene u RSD.
+                                <br />
+                                Da biste platili bilo koju uslugu (na primer zakazali seansu),
+                                neophodno je da na svom nalogu imate Veb kredita u visini cene te usluge.
+                            </p>
+                            <strong>1 RSD = 1 Veb kredit</strong>
+                        </div>
+                        Da biste dopunili Veb kredit na svom nalogu:
+                        <ol>
+                            <li><a asp-controller="Authorization" asp-action="SignIn" target="_blank">Ulogujte se</a>.</li>
+                            <li>
+                                Idite na <a asp-controller="Account" asp-action="AddWebCredit" target="_blank">stanicu za dopunu Veb kredita</a>
+                                i putem bilo koje opcije, dopunite kredit na svom nalogu.
+                            </li>
+                            <li>
+                                Nakon što dopunite Veb kredit,
+                                seansu možete zakazati i platiti [Veb kreditom] u par jednostavnih koraka koji su objašnjeni na
+                                <a asp-controller="Guides" asp-action="BookingRoadmap" target="_blank">stranici za lako zakazivanje seansi</a>.
+                            </li>
+                        </ol>
+                        <p class="mb-0">
+                            <span class="fa-stack">
+                                <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                <i class="far fa-star fa-stack-1x text-warning"></i>
+                            </span>
+                            Nepotrošeni Veb kredit ostaje na <a asp-controller="Account" asp-action="Profile" target="_blank">Vašem nalogu</a>
+                            i možete ga iskoristiti za zakazivanje narednih seansi.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+            <div class="card shadow-none accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako mogu da zakažem i platim seansu?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Seansu možete zakazati i platiti u 3 koraka koji su objašnjeni na
+                            <a asp-controller="Guides" asp-action="BookingRoadmap" target="_blank">stranici za lako zakazivanje seansi</a>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="card shadow-none accordion-item">
+            <div class="card-header py-0">
+                <button class="btn btn-link text-decoration-none btn-block py-2 px-0 text-left" data-toggle="collapse">
+                    <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                    <span class="font-weight-medium text-sans-serif text-900">
+                        Ima li nekih dodatnih troškova prilikom zakazivanja seanse?
+                    </span>
+                </button>
+            </div>
+            <div class="collapse">
+                <div class="card-body pt-2">
+                    <div class="pl-4">
+                        <p class="mb-0">
+                            Platforma ne naplaćuje proviziju klijentima i nema dodatnih troškova prilikom zakazivanja seanse.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+        </div>
+    </div>
+    <div class="card-footer text-center">
+        <small>
+            <i class="far fa-info-circle text-info mr-2"></i>Imate dodatna pitanja? Pogledajte
+            <a asp-controller="Home" asp-action="FAQ">ostala česta pitanja</a>,
+            <a asp-controller="Guides" asp-action="All">uputstva</a> i
+            <a asp-controller="Home" asp-action="Privacy">politiku privatnosti</a>.
+        </small>
+    </div>
+</div>

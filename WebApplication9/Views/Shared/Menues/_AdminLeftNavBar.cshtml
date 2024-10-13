@@ -1,0 +1,70 @@
+﻿@using Framework.Helpers.ExtensionMethods
+
+<link rel="stylesheet" href="~/css/left-side-nav-bar.css" />
+
+<div class="sidebar" id="leftsidebar">
+    <div class="logo-details">
+        @*<i class="icon"></i>*@
+        <div class="logo_name">CounterApathy</div>
+        <i tabindex="1" class="fal fa-bars no-tick" id="btn"></i>
+    </div>
+    <ul class="nav-list pl-0">
+        @*<li>
+            <i class="bx bx-search"></i>
+            <input type="text" placeholder="Admin Search..." />
+            <span class="tooltip">Search</span>
+        </li>*@
+        <li>
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Dashboard">
+                <i class="fal fa-chart-bar text-primary"></i>
+                <span class="links_name">Komandna tabla</span>
+            </a>
+            <span class="tooltip">Komandna tabla</span>
+        </li>
+        <li>
+            <a asp-area="Admin" asp-controller="Account" asp-action="Profile">
+                <i class="fal fa-user text-primary"></i>
+                <span class="links_name">Profile</span>
+            </a>
+            <span class="tooltip">Profile</span>
+        </li>
+        @*<li>
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Main">
+                <i class="fal fa-chart-bar"></i>
+                <span class="links_name">Dashboard</span>
+            </a>
+            <span class="tooltip">Dashboard</span>
+        </li>*@
+        <li>
+            <a asp-area="Admin" asp-controller="Notifications" asp-action="All">
+                <i class="fal fa-bells text-danger"></i>
+                <span class="links_name">Notification center</span>
+            </a>
+            <span class="tooltip">Notification center</span>
+        </li>
+        @*<li>
+            <a asp-area="Admin" asp-controller="Settings" asp-action="Main">
+                <i class="fal fa-cog"></i>
+                <span class="links_name">Settings</span>
+            </a>
+            <span class="tooltip">Settings</span>
+        </li>*@
+        <li class="profile">
+            @*<div class="profile-details">
+                <img src="@await Html.RenderUserProfilePhotoOrDefaultPhoto(User, UserManager)" alt="profileImg" style="border-radius:20px" />
+                <div class="name_job">
+                    <div class="job">Client</div>
+                </div>
+            </div>
+            <i class="bx bx-log-out" id="log_out"></i>*@
+
+            <a role="button" id="href-sign-out">
+                <i class="fal fa-sign-out-alt text-primary"></i>
+                <span class="links_name">Sign out</span>
+            </a>
+            <span class="tooltip">Sign out</span>
+        </li>
+    </ul>
+</div>
+
+@Html.PartialSectionScripts(@<script async src="~/js/left-side-nav-bar.js"></script>)

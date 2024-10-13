@@ -1,0 +1,196 @@
+﻿@model WebApplication9.ViewModels.LoginInputViewModel
+@using Framework.Helpers.ExtensionMethods
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    ViewData.SetTitle("Logovanje");
+    ViewData.SetMetaDescription("Dobrodošli na CounterApathy, " +
+        "platformu za psihoterapiju koja Vam pomaže u pronalaženju licenciranog i stručnog psihoterapeuta prema Vašim potrebama. " +
+        "Ulogujte se na svoj nalog sada i napravite prvi korak ka pronalaženju podrške " +
+        "i potrebne motivacije za postizanje Vaših ciljeva.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/css/sign-in.css" />
+    <style>
+        .container #sign-in-holder {
+            height: 81vh;
+        }
+
+        .line-height-normal {
+            line-height: normal !important;
+        }
+    </style>
+    @*<link rel="stylesheet" href="~/slider-captcha/slidercaptcha.min.css" />*@
+}
+
+<div class="container px-0">
+    <div class="row flex-center" id="sign-in-holder">
+        <div class="col-12">
+            <div class="d-flex flex-center" style="flex-wrap: wrap !important;">
+                <div class="col-12 col-sm-6 col-md-5 d-md-flex justify-content-md-end mr-md-3 px-0">
+                    <div class="">
+                        <h1 class="display-2 font-weight-medium mb-3 no-tick text-center text-md-left d-none d-xl-inline-block text-primary">
+                            @Configuration.GetSection("Application:AppName")?.Value
+                        </h1>
+                        <h1 class="font-weight-medium no-tick text-center text-md-left d-xl-none text-primary">
+                            @Configuration.GetSection("Application:AppName")?.Value
+                        </h1>
+                        <p class="text-secondary h5 mb-5 font-weight-normal text-center text-md-left d-none d-xl-inline-block">
+                            Personalizovana psihoterapija prema tvojim ciljevima.
+                        </p>
+                        <p class="text-secondary mb-sm-3 mb-md-5 font-weight-normal text-center text-md-left d-xl-none">
+                            Personalizovana psihoterapija prema tvojim ciljevima.
+                        </p>
+                    </div>
+                </div>@*col-7 col-md-4 col-lg-3 col-xl-4*@
+                <div class="ml-md-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="card card-form">
+                        <div class="card-body p-4">
+                            <form id="sign-in-form" asp-area="" asp-controller="Authorization" asp-action="SignIn" asp-route-returnUrl="@Model.ReturnUrl" autocomplete="off" method="post">
+                                @Html.AntiForgeryToken()
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend no-tick">
+                                            <span class="input-group-text"><i class="fal fa-envelope fa-fw"></i></span>
+                                        </div>
+                                        <input asp-for="Email" class="form-control form-control-lg">
+                                    </div>
+                                    <span asp-validation-for="Email" class="invalid-feedback"></span>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div id="show-password" class="input-group-prepend no-tick" role="button">
+                                            <span class="input-group-text"><i id="lock-icon" class="fal fa-lock fa-fw"></i></span>
+                                        </div>
+                                        <input asp-for="Password" class="form-control form-control-lg">
+                                    </div>
+                                    <span asp-validation-for="Password" class="invalid-feedback"></span>
+                                </div>
+                                <div class="text-center">
+                                    <button id="btn-submit"
+                                            type="button"
+                                            class="outline-none btn btn-primary btn-lg btn-block no-tick">
+                                        <span id="btn-submit-text" style="font-size:1.1rem">Uloguj se</span>
+                                    </button>
+                                    <a class="mt-3 text-center p-0 btn btn-link" asp-controller="Authorization" asp-action="ForgotPassword">Zaboravili ste lozinku?</a>
+                                </div>
+                                <hr class="mt-3 mb-4 border">
+                                <div class="px-3 px-sm-4">
+                                    <button id="btn-register"
+                                            type="button"
+                                            class="btn btn-success btn-lg btn-block">
+                                        <span style="font-size:1.1rem">Kreirajte nalog</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('footer').remove();
+            $('main').removeClass('pb-3');
+            $('#nav-card-main').css('z-index', 2);
+            let submit = $('#btn-submit');
+            let submitText = $('#btn-submit-text');
+            let submitTextUnchanged = submitText.html();
+            let register = $('#btn-register');
+            let email = $('#Email');
+            let password = $('#Password');
+            let signInForm = $('#sign-in-form');
+
+            $('#show-password').click(function () {
+                let lockIcon = $('#lock-icon');
+                let width = lockIcon.width();
+                let height = lockIcon.height();
+
+                password.attr('type', function (index, attr) {
+                    return attr == 'text' ? 'password' : 'text'
+                });
+
+                lockIcon.fadeOut('fast', function () {
+                    $(this).toggleClass('fa-lock')
+                        .toggleClass('fa-unlock')
+                        .width(width)
+                        .height(height)
+                        .fadeIn('fast');
+                })
+            });
+
+            submit.click(function () {
+                DisableInputs();
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin"></i>').fadeIn('slow');
+                })
+
+                setTimeout(function () {
+                    if (FormIsValid()) {
+                        submitText.fadeOut('fast', function () {
+                            $(this).html('<i class="ca-lightgreen fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                setTimeout(function () {
+                                    signInForm.submit();
+                                }, 600);
+                            });
+                        })
+                    } else HandleError('Popunite sva obavezna polja', '', 'info')
+                }, 600)
+            })
+
+            register.click(function () {
+                window.location.href = '@Url.Action("Register", "Authorization", new { Area = "" })'
+            })
+
+            function ElementIsValid(element) {
+                return signInForm.validate().element($(element));
+            }
+
+            function FormIsValid() {
+                const emailValid = ElementIsValid(email);
+                const passwordValid = ElementIsValid(password);
+
+                return (emailValid && passwordValid);
+            }
+
+            function EnableInputs() {
+                submit.prop('disabled', false);
+                register.prop('disabled', false);
+                email.prop('readonly', false);
+                password.prop('readonly', false);
+            }
+
+            function DisableInputs() {
+                submit.prop('disabled', true);
+                register.prop('disabled', true);
+                email.prop('readonly', true);
+                password.prop('readonly', true);
+            }
+
+            function HandleError(title, body, severity) {
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                    toastr[severity](body, title)
+                })
+                .promise()
+                .done(function () {
+                    setTimeout(function () {
+                        submitText.fadeOut('fast', function () {
+                            $(this).html(submitTextUnchanged).fadeIn('slow');
+                            EnableInputs();
+                        });
+                    }, 600)
+                })
+            }
+        })
+    </script>
+    @*<script src="~/slider-captcha/longbow.slidercaptcha.js"></script>*@
+}

@@ -1,0 +1,83 @@
+﻿@using Framework.Helpers.ExtensionMethods
+
+<div class="card pt-1 mb-3">
+    <div class="card-header pb-0">
+        <h4 class="text-center mb-0 text-primary">Česta pitanja o psihoterapeutima</h4>
+    </div>
+    <div class="card-body">
+        <div class="accordion">
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Da li mogu pretražiti psihoterapeute?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p class="mb-0">
+                                Na <a href="@Url.AllPsychotherapistsUrl()">stranici za pregled psihoterapeuta</a>,
+                                iznad slika psihoterapeuta, nalazi se navigacioni meni sa kriterijumima za pretragu.
+                            </p>
+                            <p class="mb-0">
+                                <span class="fa-stack">
+                                    <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                    <i class="far fa-star fa-stack-1x text-warning"></i>
+                                </span>
+                                Detaljnije o svakom psihoterapeutu možete pročitati klikom na njegovo ime ili sliku.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Da li je moja privatnost zaštićena?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                <strong>Vaša privatnost je sve vreme zaštićena.</strong>
+                                <br />
+                                Kada zakažete seansu, platforma garantuje da ni u kom trenutku neće Vaše lične podatke prikazati javno.
+                                Terapeutu sa kojim zakazujete seansu biće prikazani samo ime (ili alijas), prezime (ili alijas), telefon i imejl.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Da li će moj razgovor sa terapeutom biti poverljiv?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Etički kodeks poverljivosti <a rel="noreferrer nofollow noopener" href="https://savezpsihoterapeuta.org/eticki-kodeks/" target="_blank">Saveza društava psihoterapeuta Srbije (SDPS)</a> i
+                            <a rel="noreferrer nofollow noopener" href="https://www.europsyche.org/quality-standards/eap-guidelines/statement-of-ethical-principles/" target="_blank">Evropskog udruženja za psihoterapiju (EAP)</a>
+                            je regulativa po kojoj se psihoterapeuti moraju voditi.
+                            <br />
+                            Glavna odgovornost psihoterapeuta je da poštuje poverljivost informacija koje saznaje o klijentima tokom terapijskih seansi.
+                            Stoga, psihoterapeuti su dužni da čuvaju sve informacije o klijentima sigurno i da ih ne
+                            otkrivaju nikom drugom bez dozvole klijenta.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

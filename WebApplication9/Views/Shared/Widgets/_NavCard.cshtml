@@ -1,0 +1,27 @@
+﻿@model WebApplication9.WidgetViewModels.NavCardWidgetViewModel
+
+@{ 
+    var marginBottom = "mb-0";
+    if (Model.HasAdditionalInfo)
+        marginBottom = "mb-3";
+}
+
+<div class="card mb-3">
+    <div class="bg-holder d-none d-lg-block bg-card" style="background-image: url('/images/content-images/corner-4.png');">
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="@Model.BootstrapColsClass">
+                <h2 class="text-secondary h5 mb-0"><i class="@Model.FontAwesomeIcon @Model.IconBootstrapColorClass mr-2 no-tick"></i>@Model.PrimaryHeader</h2>
+                <p class="mt-2 @marginBottom" style="font-size:0.9rem!important">@Html.Raw(Model.SecondaryHeader)</p>
+                @if (Model.HasAdditionalInfo)
+                {
+                    <p class="mb-0" style="font-size:0.9rem!important">@Html.Raw(Model.AdditionalInfo)</p>
+                    @*<a class="btn btn-link pl-0 btn-sm" href="@Model.LinkHref" target="_blank">
+                        @Model.LinkText
+                    </a>*@
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+﻿@model WebApplication9.PartialViewModels.CountdownPartialViewModel
+@using Framework.Helpers.ExtensionMethods
+
+<p class="mb-0"><strong class="badge badge-soft-info" id="badge-@Model.CountdownId">Počinje za:<span id="countdown-@Model.CountdownId" class="ml-1"></span></strong></p>
+
+@Html.PartialSectionScripts(
+    @<script>
+        $(document).ready(function () {
+            var countDownDate = new Date(moment("@Model.StartTime").valueOf());
+
+            var x = setInterval(function () {
+                let badgeCountdown = $('#badge-' + '@Model.CountdownId');
+                let countdown = $('#countdown-' + '@Model.CountdownId');
+                var now = (new Date()).getTime();
+
+                var distance = countDownDate - now;
+
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                countdown.html(days + "d " + hours + "h " + minutes + "m " + seconds + "s ");
+
+                if (distance < 0) {
+                    var finished = new Date(moment("@Model.EndTime").valueOf());
+
+                    if (new Date() >= finished) {
+                        clearInterval(x);
+                        badgeCountdown.html('<i class="far fa-star mr-1"></i>Čeka ocenu klijenta');
+                    } else {
+                        if (!$('strong.badge i.far.fa-play').length)
+                            badgeCountdown.html('<i class="far fa-play mr-1"></i>Seansa počela');
+                    }
+                }
+            }, 1000);
+        });
+</script>)
+

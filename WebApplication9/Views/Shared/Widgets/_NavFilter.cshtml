@@ -1,0 +1,57 @@
+﻿@model WebApplication9.WidgetViewModels.NavFilterWithClearWidgetViewModel
+
+<div class="row">
+    <div class="col-12">
+        <div class="card @Model.Classes">
+            <div class="card-body p-0">
+                <nav id="nav-filter" class="navbar navbar-expand-xl navbar-toggleable-xl navbar-light">
+                    <div class="container">
+                        <span class="nav-item text-decoration-none text-secondary mr-3">Pretraga<span class="sr-only">(current)</span></span>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#search-widget" aria-controls="navbarSupportedContent"
+                                aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div id="search-widget" class="navbar-collapse mt-1 mt-md-0 collapse d-xl-inline-flex flex-xl-row-reverse">
+                            <ul class="navbar-nav flex-grow-1">
+                                @foreach (var dropdown in Model.Filters)
+                                {
+                                    <li class="nav-item" role="button">
+                                        <div class="dropdown">
+                                            <span class="nav-link text-dark dropdown-toggle noselect"
+                                               id="@dropdown.Id"
+                                               data-toggle="dropdown"
+                                               aria-expanded="@dropdown.AriaExpanded">
+                                                <i class="@dropdown.FontAwesomeIcon @dropdown.IconBootstrapColorClass fa-fw mr-1"></i>@dropdown.MainFilterText
+                                            </span>
+                                            <div class="dropdown-menu position-absolute" id="@dropdown.DropdownId" aria-labelledby="@dropdown.AriaLabelledby">
+                                                <a class="dropdown-item"
+                                                   href='@Url.Action(Model.ClearFilterAction, Model.ClearFilterController, new { Area = Model.ClearFilterArea, filter = "", predicate = "" })'>
+                                                    Ukloni filter
+                                                </a>
+                                                <div class="dropdown-divider"></div>
+                                                @foreach (var link in dropdown.Links)
+                                                {
+                                                    <a class="dropdown-item @link.BootstrapTextColor"
+                                                       data-predicate="@link.Predicate"
+                                                       href='@Url.Action(link.Action, link.Controller, new { Area = link.Area, filter = link.Filter, predicate = link.Predicate })'>
+                                                        @link.Text
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                                <li class="nav-item" id="@Model.ClearFilterId">
+                                    <a class="nav-link text-danger"
+                                       href='@Url.Action(Model.ClearFilterAction, Model.ClearFilterController, new { Area = Model.ClearFilterArea, filter = "", predicate = "" })'>
+                                        <i class="far fa-minus fa-fw mr-1"></i>Ukloni filter
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

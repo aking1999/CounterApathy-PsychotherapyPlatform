@@ -1,0 +1,197 @@
+﻿@model List<WebApplication9.Areas.Admin.ViewModels.AdminWebCreditLogViewModel>
+@using Framework.Helpers.ExtensionMethods
+@{
+    ViewData.SetTitle("Transakcije klijenata");
+    ViewData.SetMetaDescription("Zapisi o dopuni i potrošnji Veb kredita klijenata.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@await Html.PartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("far fa-exchange-alt fa-sm",
+        "text-primary",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+@*@await Html.PartialAsync("~/Views/Shared/Widgets/_NavFilter.cshtml",
+    new WebApplication9.WidgetViewModels.NavFilterWithClearWidgetViewModel("Admin",
+        "Dashboard",
+        "Applications",
+        new List<WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel>()
+        {
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("bydate", false, "far fa-calendar", "text-success", "Datum", "date-dropdown", "bydate", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>()
+            {
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Admin", "Dashboard", "WebCreditLogs", "", "opadajući", "Opadajući"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Admin", "Dashboard", "WebCreditLogs", "", "rastući", "Rastući")
+            }),
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("bypaymenttype", false, "far fa-calendar", "text-primary", "Način plaćanja", "paymenttype-dropdown", "bypaymenttype", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>()
+            {
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Admin", "Dashboard", "WebCreditLogs", "", "prihvaćeno", ""),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("", "Admin", "Dashboard", "WebCreditLogs", "", "na-čekanju", "Rastući")
+            })
+        }))*@
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header border-bottom-0">
+                    <div class="row align-items-center justify-content-between">
+                        <div class="col-4 col-sm-auto d-flex align-items-center pr-0">
+                            <h5 class="text-secondary fs-0 mb-0 text-nowrap">Transakcije</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="falcon-data-table table-responsive pb-3">
+                        <table class="table table-borderless table-sm mb-0 table-striped table-dashboard fs--1 data-table">
+                            <thead class="bg-200 text-900">
+                                <tr>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center">ID TRX</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center">Pošiljalac</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center pr-lg-3 pr-xl-4"></th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center pr-2">Primalac</th>
+                                    @*<th class="align-middle sort border-top-0 border-bottom-0 text-center">Imejl</th>*@
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center" style="min-width: 150px;">Klijent platio putem</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center">Iznos</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center text-nowrap">Ukupno na nalogu</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center" style="padding-right:1.25rem !important;">Datum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    string badgeClass = string.Empty;
+                                    string icon = string.Empty;
+                                }
+                                @foreach (var log in Model)
+                                {
+                                    if (log.Amount > 0)
+                                    {
+                                        badgeClass = "badge-soft-success";
+                                        icon = "fa-plus";
+                                    }
+                                    else if (log.Amount < 0)
+                                    {
+                                        badgeClass = "badge-soft-danger";
+                                        icon = "fa-minus";
+                                    }
+                                    else
+                                    {
+                                        badgeClass = "badge-soft-secondary";
+                                        icon = "fa-ban";
+                                    }
+                                    <tr class="text-center">
+                                        <td class="py-2 align-middle">
+                                            @log.WebCreditLogId
+                                        </td>
+                                        <td class="py-2 pr-lg-2 pr-xl-0 align-middle text-left">
+                                            @if (!log.TransactionIsMissing)
+                                            {
+                                                @if (log.SenderIsUser)
+                                                {
+                                                    <div class="media d-flex align-items-center">
+                                                        <div class="avatar avatar-xl mr-2">
+                                                            <img class="rounded-circle"
+                                                                 src="@log.SenderPhoto"
+                                                                 alt="pošiljalac" />
+                                                        </div>
+                                                        <div class="media-body">
+                                                            <h5 class="text-secondary mb-0 fs--1 text-nowrap">@log.UserFullName</h5>
+                                                            <h5 class="text-secondary mb-0" style="font-size:0.7rem!important;">@log.UserId</h5>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <img src="@log.SenderPhoto"
+                                                         alt="pošiljalac" />
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-soft-danger">Nedostaje</span>
+                                            }
+                                        </td>
+                                        <td class="py-2 pl-lg-2 pl-xl-0 pr-3 align-middle">
+                                            <i class="far fa-long-arrow-alt-right fa-lg align-middle ml-md-2 ml-lg-0"></i>
+                                        </td>
+                                        <td class="py-2 align-middle text-left">
+                                            @if (!log.TransactionIsMissing)
+                                            {
+                                                @if (log.ReceiverIsUser)
+                                                {
+                                                    <div class="media d-flex align-items-center">
+                                                        <div class="avatar avatar-xl mr-2">
+                                                            <img class="rounded-circle"
+                                                                 src="@log.ReceiverPhoto"
+                                                                 alt="primalac" />
+                                                        </div>
+                                                        <div class="media-body">
+                                                            <h5 class="text-secondary mb-0 fs--1 text-nowrap">@log.UserFullName</h5>
+                                                            <h5 class="text-secondary fs--2 mb-0">@log.UserId</h5>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <img src="@log.ReceiverPhoto"
+                                                         alt="primalac" />
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-soft-danger">Nedostaje</span>
+                                            }
+                                        </td>
+                                        <td class="py-2 align-middle">
+                                            @if (!log.SenderIsUser)
+                                            {
+                                                <img src="~/images/content-images/@log.PaymentTypeLogo"
+                                                 height="20"
+                                                 alt="način plaćanja" />
+                                            }
+                                            else
+                                            {
+                                                <img src="~/images/content-images/@log.PaymentTypeLogo"
+                                                 alt="način plaćanja" />
+                                            }
+                                        </td>
+                                        <td class="py-2 align-middle">
+                                            @if (!string.IsNullOrWhiteSpace(log.CurrencyCode))
+                                            {
+                                                <span class="badge @badgeClass rounded-pill">
+                                                    <i class="fas @icon mr-1"></i>@Math.Abs(log.Amount) RSD
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas @icon mr-1"></i>@Math.Abs(log.Amount) <span class='badge badge-soft-danger ml-1'>Greška</span>
+                                            }
+                                        </td>
+                                        <td class="py-2 align-middle">
+                                            @log.CurrentAmount
+                                            @(!string.IsNullOrWhiteSpace(log.CurrencyCode) ?
+                                                Html.Raw(log.CurrencyCode) : Html.Raw("<span class='badge badge-soft-danger ml-1'>Greška</span>"))
+                                        </td>
+                                        <td class="py-2 align-middle text-nowrap">
+                                            @log.ExecutionDateTime
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-12 text-center px-4 text-secondary">
+            Trenutno nema nijedne klijentske transakcije ili ste izabrali kriterijum pretrage koju nijedna transakcija ne ispunjava.
+            <br />
+            Sve transakcije klijenata biće prikazani ovde.
+        </div>
+    }
+</div>
+

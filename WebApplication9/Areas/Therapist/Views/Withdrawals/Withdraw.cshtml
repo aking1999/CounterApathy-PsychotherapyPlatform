@@ -1,0 +1,248 @@
+﻿@model WebApplication9.Areas.Therapist.ViewModels.WithdrawViewModel
+@using Framework.Helpers.ExtensionMethods
+
+@{ 
+    ViewData.SetTitle("Isplata sredstava");
+    ViewData.SetMetaDescription("Isplata na bankovni račun ili putem PayPala.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var badge = "<span class='badge badge-soft-danger badge-pill ml-1'><i class='fas fa-times mr-1'></i> Nije povezan</span>";
+    var disabled = "disabled";
+    var height = "h-100";
+    var marginBottom = "mb-4";
+
+    if (Model.HasSetupStripeAccount)
+    {
+        badge = "<span class='badge badge-soft-success text-success badge-pill ml-1'><i class='fas fa-check mr-1'></i> Povezan</span>";
+        disabled = string.Empty;
+        height = string.Empty;
+        marginBottom = "mb-0";
+    }
+}
+
+@section StyleSheets {
+    @if (Model.HasSetupStripeAccount)
+    {
+        <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+    }
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("far fa-arrow-to-bottom fa-sm",
+        "text-success",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription(),
+        "col-12",
+        "Imate pitanja? " +
+        $"Kontaktirajte <a href='{Url.Action("Support", "Account", new { Area = "Therapist" })}' target='_blank'>podršku za terapeute</a>."))
+
+<form id="withdrawal-form" autocomplete="off">
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-12 col-lg-8 mb-3">
+            <div class="card @height">
+                <div class="card-header border-bottom-0">
+                    <h5 class="mb-0 text-secondary">Podaci o isplati</h5>
+                </div>
+                <div class="card-body">
+                    <div class="custom-control custom-radio">
+                        <input class="custom-control-input" data-target="#credit-cards-tab" type="radio" name="billing" id="credit-card" checked />
+                        <label class="custom-control-label" for="credit-card">
+                            <span class="d-flex align-items-center">
+                                <span class="fs-1 text-nowrap text-center">
+                                    Bankovni račun
+                                </span>
+                                <i class="far fa-university text-700 fa-lg ml-1 fa-fw"></i>
+                                @Html.Raw(badge)
+                            </span>
+                        </label>
+                    </div>
+                    <p class="fs--1 mb-4 mt-1">
+                        Bezbedan transfer sredstava na Vaš <b class="text-purple">Stripe</b> nalog,
+                        odakle se automatski prosleđuju na Vaš dinarski bankovni račun i ležu
+                        u roku od 1-14 radnih dana.
+                    </p>
+                    <div class="custom-control custom-radio">
+                        <input class="custom-control-input" type="radio" name="billing" id="paypal" disabled />
+                        <label class="custom-control-label" for="paypal">
+                            <img class="pull-right"
+                                 src="/images/content-images/paypal.svg"
+                                 height="20"
+                                 alt="paypal logo">
+                            <span class="badge badge-soft-secondary badge-pill ml-2">Uskoro</span>
+                        </label>
+                    </div>
+                    <p class="fs--1 @marginBottom mt-1">
+                        Isplata preko PayPala
+                    </p>
+                    <div class="tab-content">
+                        <div id="credit-cards-tab" class="tab-pane fade show active">
+                            @if (!Model.HasSetupStripeAccount)
+                            {
+                                <div class="border-dotted-bottom-4 my-4"></div>
+                                <div class="row ml-0">
+                                    <div class="col-12 px-0">
+                                        <div class="row">
+                                            <div class="media">
+                                                <img src="~/images/content-images/stripe.svg" class="avatar" style="width: 6.125rem" alt="stripe logo" />
+                                                <div class="media-body pl-2">
+                                                    <h6 class="d-flex align-items-center text-1000 fs-1 mb-0 pb-1" style="height: 3rem">
+                                                        Povežite bankovni račun preko stripe-a
+                                                    </h6>
+                                                    Povežite terapeutski nalog sa dinarskim bankovnim računom
+                                                    (pomoću <b class="text-purple">Stripe</b> procesora za plaćanje)
+                                                    kako biste primali isplate (u dinarima)
+                                                    sa platforme.
+                                                    <div class="mt-3">
+                                                        <div class="row">
+                                                            <div class="col-12 col-md-6">
+                                                                <div class="media align-items-center pb-1 mb-3">
+                                                                    <i class="fad fa-check-circle fa-fw mr-2 no-tick" style="color:#635BFF"></i>
+                                                                    <div class="media-body">
+                                                                        <h6 class="mb-0">Automatska isplata sredstava</h6>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="media align-items-center pb-1 mb-3">
+                                                                    <i class="fad fa-check-circle fa-fw mr-2 no-tick" style="color:#635BFF"></i>
+                                                                    <div class="media-body">
+                                                                        <h6 class="mb-0">Dodavanje dinarskih instrukcija za isplate</h6>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="media align-items-center pb-1 mb-3">
+                                                                    <i class="fad fa-check-circle fa-fw mr-2 no-tick" style="color:#635BFF"></i>
+                                                                    <div class="media-body">
+                                                                        <h6 class="mb-0">Isplata u dinarima</h6>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="media align-items-center pb-1 mb-3">
+                                                                    <i class="fad fa-check-circle fa-fw mr-2 no-tick" style="color:#635BFF"></i>
+                                                                    <div class="media-body">
+                                                                        <h6 class="mb-0">Isplata na dinarski bankovni račun</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-md-6">
+                                                                <img src="~/images/content-images/cards-payment-grey.png"
+                                                                    class="w-75 w-md-100 h-100 h-md-75"
+                                                                    alt="kreditne kartice" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 pl-0 pr-2 d-flex justify-content-center align-items-center mt-3">
+                                        <button id="setup-payment-gateway"
+                                                type="button"
+                                                class="btn btn-purple px-2 rounded-pill mb-md-auto mt-md-1">
+                                            <span id="setup-payment-gateway-text">&nbsp;Povežite bankovni račun&nbsp;</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-header border-bottom-0">
+                    <h5 class="mb-0 text-secondary">Plaćanje</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between fs--1 mb-1">
+                        <p class="mb-0">Međuzbir</p><span>RSD @Model.SubtotalAmount</span>
+                    </div>
+                    <div class="d-flex justify-content-between fs--1 mb-1">
+                        <p class="mb-0">Dodatak zbog provizije (+ @Model.StripeConnectTransferFeePercentage %)</p><span>RSD @Model.StripeConnectTransferFeePercentageAmount</span>
+                    </div>
+                    <hr />
+                    <h5 class="d-flex justify-content-between text-success mb-3"><span>Ukupno</span><span>RSD @Model.TotalAmount</span></h5>
+                    @*<p class="fs--1 text-600">
+                            Kada pošaljete zahtev za povlačenje sredstava na račun,
+                            <strong>naš predstavnik će Vas kontaktirani putem imejla i/ili telefonskog poziva radi potvrde zahteva o isplati.</strong>
+                            Kada potvrdite zahtev, sredstva će biti poslata na Vaš račun u naredna tri radna dana.
+                        </p>*@
+                    @*<p class="fs--1 text-600 mr-1">
+                        <span class="d-block"><i class="fal fa-envelope text-info fa-fw mr-2 no-tick"></i>@Model.Email</span>
+                        <span class="d-block"><i class="fal fa-phone text-success fa-fw mr-2 no-tick"></i>@Model.PhoneNumber</span>
+                    </p>*@
+                    <button data-toggle="popover"
+                            data-placement="bottom"
+                            data-content="Povežite dinarski bankovni račun sa nalogom kako biste primali isplate sa platforme."
+                            id="btn-submit"
+                            class="btn btn-primary btn-block"
+                            type="button"
+                            @disabled>
+                        <span id="submit-text">
+                            <i class="fas fa-lock mr-2"></i>@*Pošalji zahtev za isplatu*@Isplati sredstva
+                        </span>
+                    </button>
+                    <div class="text-center mt-2">
+                        <small class="d-inline-block">
+                            Nastavkom, slažete se sa našim
+                            <a href="@Url.Action("TherapistsTerms", "Home")" target="_blank">uslovima za terapeute</a> i
+                            <a href="@Url.Action("Privacy", "Home")" target="_blank">politikom privatnosti</a>.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.HasSetupStripeAccount)
+{
+    <div id="withdrawal-successful-modal"
+         data-toggle="modal"
+         class="modal fade p-0"
+         tabindex="-1"
+         role="dialog"
+         data-keyboard="false"
+         data-backdrop="static"
+         aria-labelledby="ModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title text-center mx-auto">Slanje sredstava u toku</h5>
+                </div>
+                <div id="withdrawal-successful-modal-body" class="modal-body pb-4 text-center">
+                    <svg class="mb-n3" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; background: rgb(241, 242, 243); display: block;" width="8rem" height="8rem" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                        <defs><clipPath id="ldio-0v5rp1pyeoi-cp"><rect x="0" y="0" width="100" height="82.235"></rect></clipPath></defs>
+                        @*<path stroke="#dcdcdc" stroke-width="1" fill="#dcdcdc" d="M85.529 75.177H14.471c-2.469 0-4.471 2.002-4.471 4.471h80C90 77.179 87.998 75.177 85.529 75.177z"></path>*@
+                        <g clip-path="url(#ldio-0v5rp1pyeoi-cp)">
+                            <g>
+                                <animateTransform attributeName="transform" type="translate" repeatCount="indefinite" dur="1.7142857142857142s" values="0 0;0 150" keyTimes="0;1"></animateTransform>
+                                <g transform="translate(0 -75)">
+                                    <path fill="#00d27a" d="M50 25c-13.785 0-25 11.215-25 25s11.215 25 25 25s25-11.216 25-25S63.784 25 50 25z M50 70.845 c-11.494 0-20.844-9.351-20.844-20.845S38.506 29.155 50 29.155S70.845 38.506 70.845 50S61.493 70.845 50 70.845z"></path>
+                                    <path fill="#dbfff0" d="M50 29.155c-11.494 0-20.844 9.351-20.844 20.844S38.506 70.845 50 70.845S70.845 61.493 70.845 50S61.493 29.155 50 29.155 z"></path>
+                                    <path fill="#00d27a" d="M48.11 62.796v-1.64c-1.535-0.068-3.041-0.358-4.281-0.765c-1.029-0.337-1.611-1.421-1.342-2.469 l0.043-0.167c0.297-1.158 1.521-1.781 2.653-1.395c1.152 0.392 2.465 0.662 3.855 0.662c2.032 0 3.421-0.783 3.421-2.21 c0-1.354-1.14-2.21-3.778-3.101c-3.814-1.283-6.416-3.066-6.416-6.523c0-3.137 2.211-5.596 6.025-6.345v-1.639 c0-0.965 0.782-1.746 1.746-1.746h0c0.965 0 1.746 0.782 1.746 1.746v1.39c1.275 0.057 2.327 0.226 3.21 0.459 c1.107 0.291 1.782 1.404 1.498 2.513v0c-0.287 1.118-1.44 1.803-2.546 1.473c-0.843-0.251-1.887-0.453-3.16-0.453 c-2.317 0-3.066 0.998-3.066 1.997c0 1.176 1.247 1.924 4.277 3.065c4.241 1.498 5.953 3.458 5.953 6.666 c0 3.173-2.246 5.882-6.345 6.594v1.89c0 0.965-0.782 1.746-1.746 1.746h-0.001C48.892 64.543 48.11 63.761 48.11 62.796z"></path>
+                                </g>
+                            </g>
+                        </g>
+                    </svg>
+                    <div class="text-center mt-n3">
+                        <i class="fas fa-university text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.PartialSectionScripts(@<script>const withdrawUrl = '@Url.Action("WithdrawEarnings", "Withdrawals", new { Area = "Therapist" })'</script>)
+    @Html.PartialSectionScripts(@<script src="~/sweet-alert2/sweetalert2.all.min.js"></script>)
+    @Html.PartialSectionScripts(@<script src="~/js/therapist/withdraw.js"></script>)
+}
+else
+{
+    @Html.PartialSectionScripts(@<script> const stripeAccountSetupUrl = '@Url.Action("PaymentGatewaySetup", "Withdrawals", new { Area = "Therapist" })'; </script>)
+    @Html.PartialSectionScripts(@<script src="~/js/therapist/setup-payment-gateway.js"></script>)
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/FAQs/Therapist/_EarningsWithdrawalsFAQ.cshtml")
+
+@section Scripts {
+    <script src="~/js/accordion-setup.js"></script>
+}

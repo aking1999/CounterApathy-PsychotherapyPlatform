@@ -1,0 +1,266 @@
+﻿@using Framework.Helpers.ExtensionMethods
+@using Framework.Providers
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+    var userRole = await User.GetRoleAsync();
+    var paddingBottom = userRole == UserRoles.Admin ? "pb-3" : "pb-0";
+    var supportUrl = string.Empty;
+    if (userRole == UserRoles.None || userRole == UserRoles.Client)
+    {
+        supportUrl = Url.Action("CustomerSupport", "Home");
+    }
+    else if (userRole == UserRoles.Therapist)
+    {
+        supportUrl = Url.Action("Support", "Account", new { Area = "Therapist" });
+    }
+}
+
+<div class="card pt-1 mb-3">
+    <div class="card-header pb-0">
+        <h4 class="text-center mb-0 text-primary">Česta pitanja o zakazivanju seansi sa psihoterapeutima</h4>
+    </div>
+    <div class="card-body @paddingBottom">
+        <div class="accordion">
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Mogu li da vidim sve ocene psihoterapeuta pre zakazivanja seanse?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Na <a asp-controller="Therapists" asp-action="PsychotherapistsExperiences" target="_blank">stranici sa iskustvima sa psihoterapije</a>
+                            možete pročitati iskustva dosadašnjih klijenata.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Da li je moja privatnost zaštićena?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                <strong>Vaša privatnost je sve vreme zaštićena.</strong>
+                                <br />
+                                Kada zakažete seansu, platforma garantuje da ni u kom trenutku neće Vaše lične podatke prikazati javno.
+                                Terapeutu sa kojim zakazujete seansu biće prikazani samo ime (ili alijas), prezime (ili alijas), telefon i imejl.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Da li mogu da zakažem seansu anonimno bez naloga ?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p class="mb-0">
+                                Seansu možete zakazati bez naloga, unosom svog imena (ili alijasa), prezimena (ili alijasa), telefona i imejla.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako funkcionišu online seanse?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                Online seanse se odvijaju preko Google Meet aplikacije.
+                                <br />
+                                Kada zakažete Google Meet seansu stiže Vam imejl sa potvrdom o zakazivanju.
+                                <br />
+                                Zatim, sledeći imejl sa linkom za pristup seansi biće Vam poslat
+                                <strong>najkasnije 4 sata pre početka seanse</strong>.
+                            </p>
+                            Za pristup seansi putem računara, pročitajte <a asp-area="" asp-controller="Guides" asp-action="JoinGoogleMeetByComputer" target="_blank">uputstvo za pristup putem računara</a>.
+                            <br />
+                            Za pristup seansi putem mobilnog telefona, pročitajte <a asp-area="" asp-controller="Guides" asp-action="JoinGoogleMeetByPhone" target="_blank">uputstvo za pristup putem mobilnog telefona</a>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako funkcionišu lične seanse?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Kada zakažete ličnu seansu stiže Vam imejl sa potvrdom o zakazivanju.
+                            <br />
+                            Zatim, na dan održavanja seanse, <strong>5 minuta pre samog početka</strong>,
+                            budite na adresi terapeuta.
+                            <br />
+                            Adresa terapeuta biće prikazana u toku zakazivanja.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Da li se cena seanse razlikuje u zavisnosti od toga da li je seansa lično ili online?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Cena je ista za ličnu i online seansu i nju terapeut sam određuje.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Koje načine plaćanja prihvatate?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p class="mb-0">
+                                Prihvatamo sledeće načine plaćanja: Visa, Mastercard, Maestro, AmericanExpress, Discover, JCB, China UnionPay,
+                                Google Pay, Apple Pay, PayPal, Payoneer, Link, Binance Pay, USDC i USDT.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako mogu da zakažem i platim seansu?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Seansu možete zakazati i platiti u 3 koraka koji su objašnjeni na
+                            <a asp-controller="Guides" asp-action="BookingRoadmap" target="_blank">stranici za lako zakazivanje seansi</a>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Da li mogu otkazati ili promeniti termin zakazane seanse?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Iako cenimo fleksibilnost,
+                            u skladu sa <a asp-controller="Home" asp-action="TermsOfService" target="_blank">našim uslovima korišćenja</a>,
+                            zakazanu seansu nije moguće odložiti, promeniti joj termin, zameniti
+                            je za drugu seansu niti je otkazati i dobiti novac nazad.
+                            Izvinjavamo se za bilo koju neprijatnost koju ovo može izazvati i zahvaljujemo Vam se na razumevanju.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Šta da radim ukoliko je došlo do tehničkih problema u toku održavanja online seanse?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                U slučaju da dođe do tehničkih problema u tolikoj meri da nije moguće nastaviti seansu,
+                                obavestite terapeuta usmeno, putem imejla ili pozivom na mobilni telefon u toku trajanja seanse.
+                                Nakon toga, neophodno je da se ulogujete na svoj nalog i
+                                obavestite <a href="@supportUrl" target="_blank">korisničku podršku</a>
+                                o ovom problemu. Ubrzo nakon toga, pun iznos seanse će biti vraćen na Vaš nalog u obliku Veb kredita.
+                            </p>
+                            <p class="mb-0">
+                                <span class="fa-stack">
+                                    <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                    <i class="far fa-star fa-stack-1x text-warning"></i>
+                                </span>
+                                Ukoliko ste zakazali seansu bez kreiranja naloga, neophodno je da kreirate nalog i
+                                obavestite <a href="@supportUrl" target="_blank">korisničku podršku</a>.
+                                Nakon toga, pun iznos seanse će biti vraćen na Vaš nalog u obliku Veb kredita kojim možete zakazati drugu seansu.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (userRole == UserRoles.None || userRole == UserRoles.Client)
+    {
+        <div class="card-footer text-center">
+            <small>
+                <i class="far fa-info-circle text-info mr-2"></i>Imate dodatna pitanja? Pogledajte
+                <a asp-controller="Guides" asp-action="All">uputstva</a>,
+                <a asp-controller="Home" asp-action="TermsOfService">uslove korišćenja</a> ili
+                <a href="@supportUrl">kontaktirajte podršku</a>.
+            </small>
+        </div>
+    }
+    else if (userRole == UserRoles.Therapist)
+    {
+        <div class="card-footer text-center">
+            <small>
+                <i class="far fa-info-circle text-info mr-2"></i>Imate dodatna pitanja? Pogledajte
+                <a asp-controller="Guides" asp-action="All">uputstva</a>,
+                <a asp-controller="Home" asp-action="TermsOfService">uslove korišćenja</a> ili
+                <a href="@supportUrl">kontaktirajte podršku</a>.
+            </small>
+        </div>
+    }
+</div>

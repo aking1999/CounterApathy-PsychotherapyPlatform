@@ -1,0 +1,45 @@
+﻿@using Framework.Helpers.ExtensionMethods
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    ViewData.SetTitle("Greška prilikom plaćanja");
+    ViewData.SetMetaDescription("Plaćanje neuspešno, Veb kredit nije dodat na nalog.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center text-center">
+    <div class="col-sm-10 col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body px-4 pt-4 pb-0 px-sm-5 pt-sm-5">
+                <h2 class="display-1 text-300 fs-error mb-4"><i class="fas fa-times-circle text-danger"></i></h2>
+                <h4 class="mb-3">Došlo je do greške prilikom plaćanja, ali ne brinite :)</h4>
+                <p>Izveštaj o grešci je poslat našem timu developera kako bi se ona ubrzo otklonila.</p>
+                <hr />
+                Kliknite na dugme ispod kako biste ponovo pokušali da dodate Veb kredit.
+                <div class="row mt-3">
+                    <div class="col-12 col-md-6 d-flex align-items-stretch">
+                        <a asp-area="" asp-controller="Account" asp-action="AddWebCredit"
+                           class="btn btn-primary btn-block d-flex align-items-center justify-content-center">
+                            <i class="far fa-redo-alt fa-sm mr-2"></i>Pokušajte ponovo
+                        </a>
+                    </div>
+                    <div class="col-12 col-md-6 d-flex align-items-stretch mt-2 mt-md-0">
+                        <a asp-area="" asp-controller="Home" asp-action="Index"
+                           class="btn btn-outline-primary btn-block d-flex align-items-center justify-content-center">
+                            <i class="far fa-home mr-2"></i>Početna
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-footer px-4 pb-4 px-sm-5 pb-sm-5">
+                <small>
+                    <i class="fal fa-info-circle text-info mr-2"></i><a asp-controller="Home" asp-action="CustomerSupport" target="_blank">Kontaktirajte naš tim za korisničku podršku</a> ukoliko imate pitanja,
+                    ideje ili povratne informacije u
+                    vezi sa našim uslugama ovde na @($"{Configuration.GetSection("Application:AppName")?.Value}.com").
+                    Rado bismo pomogli u svemu što Vam je potrebno!
+                </small>
+            </div>
+        </div>
+    </div>
+</div>

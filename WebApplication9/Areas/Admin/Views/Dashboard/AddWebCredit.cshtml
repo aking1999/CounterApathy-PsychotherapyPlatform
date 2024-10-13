@@ -1,0 +1,381 @@
+﻿@model DataTransferObjects.ViewModels.Admin.AdminAddWebCreditPaymentTypesViewModel
+@using Framework.Helpers.ExtensionMethods
+@{
+    ViewData.SetTitle("Dodavanje Veb kredita");
+    ViewData.SetMetaDescription("Dodajte Veb kredita klijentima.");
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/search-box/search-box.css" />
+    <link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("far fa-usd-circle fa-sm",
+        "text-success",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription(),
+        "col-12"))
+
+<div class="row">
+    @if (Model != null && Model.Clients != null && Model.Clients.Any())
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header border-bottom-0">
+                    <div class="row align-items-center justify-content-between">
+                        <div class="col-4 col-sm-auto d-flex align-items-center pr-0">
+                            <h5 class="text-secondary fs-0 mb-0 text-nowrap">Klijenti</h5>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <input type="text" class="search form-control form-control-sm" placeholder="Pretražite klijente..." />
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="falcon-data-table table-responsive pb-3">
+                        <table class="table table-borderless table-sm mb-0 table-striped table-dashboard fs--1 data-table results">
+                            <thead class="text-900">
+                                <tr>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center">ID</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center pr-2">Ime</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center">Imejl</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center text-nowrap">Veb kredit (RSD)</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center" style="padding-right:1.25rem !important;">Akcija</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-danger bg-soft-danger text-center no-result">
+                                    <td colspan="6"><i class="far fa-times mr-2"></i>Nema rezultata.</td>
+                                </tr>
+                                @foreach (var client in Model.Clients)
+                                {
+                                    <tr class="text-center">
+                                        <td class="py-2 align-middle">
+                                            @client.UserId
+                                        </td>
+                                        <td class="py-2 align-middle white-space-nowrap">
+                                            <div class="media d-flex align-items-center text-left">
+                                                <div class="avatar avatar-xl mr-2">
+                                                    <img id="profile-photo-@client.UserId"
+                                                 class="rounded-circle"
+                                                 src="@client.ProfilePhoto"
+                                                 alt="profilna slika klijenta @client.FullName" />
+                                                </div>
+                                                <div class="media-body">
+                                                    <h5 id="full-name-@client.UserId" class="text-secondary mb-0 fs--1 pr-2">@client.FullName</h5>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-2 align-middle">
+                                            <a href="mailto:@client.Email">@client.Email</a>
+                                        </td>
+                                        <td id="web-credit-amount-@client.UserId" class="py-2 align-middle text-success">
+                                            @client.WebCredit
+                                        </td>
+                                        <td class="py-2 align-middle white-space-nowrap" style="padding-right:1.25rem !important;">
+                                            <button data-user-id="@client.UserId"
+                                            class="btn-show-web-credit-modal btn btn-sm btn-success">
+                                                <i class="far fa-plus mr-2"></i>Dodaj
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-12 text-center px-4 text-secondary">
+            Trenutno nema nijednog klijenta.
+            <br />
+            Svi klijenti biće prikazani ovde.
+        </div>
+    }
+</div>
+
+<div id="web-credit-modal"
+     data-backdrop="static"
+     data-keyboard="false"
+     data-toggle="modal"
+     class="modal fade p-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title text-center mx-auto">Dodajte Veb kredit</h5>
+                <button id="dismiss-modal" type="button" class="close m-0 p-0" data-dismiss="modal" aria-label="Zatvori">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="web-credit-form" autocomplete="off">
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.UserId)
+                <div class="modal-body">
+                    <div class="avatar avatar-4xl d-block mx-auto mb-3">
+                        <img id="modal-profile-photo"
+                             class="d-inline-block rounded-circle" />
+                    </div>
+                    <h5 id="modal-full-name" class="text-center mb-3 text-1000"></h5>
+                    <h4 class="text-center pb-1">
+                        <span>
+                            <span id="modal-web-credit-amount"
+                                  class="fs-0 badge badge-soft-success"
+                                  data-countup='{"endValue":}'>
+                            </span>
+                        </span>
+                    </h4>
+                    <div id="amount-added-holder" class="text-center text-success"></div>
+                    <div id="inputs-holder" class="mt-3">
+                        <div class="media">
+                            <div class="media-body">
+                                <h6 class="mb-0"><label asp-for="Chosen_PaymentTypeId"></label></h6>
+                                <select asp-for="Chosen_PaymentTypeId"
+                                        class="selectpicker form-control"
+                                        title="Način uplate"
+                                        data-size="5"
+                                        style="border: 2px solid #d8e2ef !important">
+                                    @if (Model.ToChooseFrom_PaymentTypes != null && Model.ToChooseFrom_PaymentTypes.Any())
+                                    {
+                                        foreach (var payment in Model.ToChooseFrom_PaymentTypes)
+                                        {
+                                            var concat = Framework.Helpers.Helper.GetObjectIconAndNameAndColor(payment.Text);
+
+                                            <option value="@payment.Value" data-icon="<img src='@concat[0]' style='margin-bottom:0.125rem !important' alt='@concat[1] logo' height='20' />" data-content="<img src='@concat[0]' style='margin-bottom:0.125rem !important' alt='@concat[1] logo' height='20' />">
+                                                @concat[1]
+                                            </option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="" disabled>
+                                            Kontakt metode nedostupne.
+                                            Kontaktirajte korisničku podršku.
+                                        </option>
+                                    }
+                                </select>
+                                <span>
+                                    <span asp-validation-for="Chosen_PaymentTypeId" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group mt-4">
+                            <h6 class="mb-0"><label asp-for="Amount"></label></h6>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">RSD</span>
+                                </div>
+                                <input asp-for="Amount"
+                                       class="form-control"/>
+                            </div>
+                            <span asp-validation-for="Amount" class="invalid-feedback"></span>
+                        </div>
+                        <button id="btn-submit" class="btn btn-block btn-success mt-4" type="button">
+                            <span>Dodaj</span>
+                        </button>
+                    </div>
+                    
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/search-box/search-box.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/multiselect/bootstrap-select.min.js"></script>
+    <script src="~/js/countUp.umd.js"></script>
+    <script>
+        $(document).ready(function () {
+            let webCreditModal = $('#web-credit-modal');
+            let btnDismissModal = $('#dismiss-modal');
+            const userIdInput = $('#UserId');
+            const inputsHolder = $('#inputs-holder');
+            let paymentTypes = $('#Chosen_PaymentTypeId');
+            let amount = $('#Amount');
+            const btnSubmit = $('#btn-submit');
+            let submitText = btnSubmit.find('span');
+            const submitTextUnchanged = submitText.html();
+            let webCreditForm = $('#web-credit-form');
+
+            $('.btn-show-web-credit-modal').click(function () {
+                const userId = $(this).attr('data-user-id');
+                const profilePhotoPath = $(`#profile-photo-${userId}`);
+                const fullName = $(`#full-name-${userId}`);
+                const webCreditAmount = parseFloat($(`#web-credit-amount-${userId}`).text());
+
+                userIdInput.val(userId);
+                $('#modal-profile-photo').attr('src', profilePhotoPath.attr('src'));
+                $('#modal-profile-photo').attr('alt', profilePhotoPath.attr('alt'));
+                $('#modal-full-name').text(fullName.text());
+                $('#modal-web-credit-amount').text(`${webCreditAmount} RSD`)
+
+                webCreditModal.modal();
+            })
+
+            btnSubmit.click(function () {
+                DisableInputs();
+                
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                });
+
+                setTimeout(function () {
+                    if (FormIsValid()) {
+                        let formData = new FormData(webCreditForm.get(0));
+                        formData.append('addWebCredit.UserId', userIdInput.val());
+                        formData.append('addWebCredit.Chosen_PaymentTypeId', paymentTypes.val());
+                        formData.append('addWebCredit.Amount', amount.val());
+
+                        $.ajax({
+                            url: '@Url.Action("AddWebCredit", "Dashboard", new { Area = "Admin" })',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            headers: {
+                                'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                            },
+                            success: function (response) {
+                                if (response.success === true) {
+                                    submitText.fadeOut('fast', function () {
+                                        $(this).html('<i class="fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                inputsHolder.fadeOut('slow', function () {
+                                                    $('#amount-added-holder').fadeIn(100).html('<i class="far fa-plus mr-1"></i>' + response.amountAdded);
+                                                    $('#modal-web-credit-amount')
+                                                        .attr('data-countup', JSON.stringify({ 'startVal': response.amountBeforeAdding, 'endValue': response.totalAmount, "suffix": ' ' + response.currencyCode, "separator": '' }))
+
+                                                    $(`#web-credit-amount-${userIdInput.val()}`).text(response.totalAmount);
+
+                                                    document.querySelectorAll('[data-countup]').forEach((node) => {
+                                                        const { endValue, ...options } = JSON.parse($(node).attr('data-countup'));
+                                                        const c = new countUp.CountUp(node, endValue, {
+                                                            duration: 4,
+                                                            ...options
+                                                        });
+                                                        if (!c.error) {
+                                                            c.start();
+                                                        } else {
+                                                            throw new Error('CountUp error');
+                                                        }
+                                                    });
+
+                                                    setTimeout(function () {
+                                                        $('#amount-added-holder').fadeOut('fast', function () {
+                                                            ResetInputs();
+                                                            EnableInputs();
+                                                            submitText.html(submitTextUnchanged).fadeIn('slow');
+                                                            inputsHolder.fadeIn('fast');
+                                                        })
+                                                    }, 4100);
+                                                });
+                                            }, 600);
+                                        })
+                                    })
+                                } else {
+                                    if (response.redirectUrl) window.location.href = response.redirectUrl;
+                                    else HandleError(response.title, response.body, response.severity);
+                                }
+                            },
+                            error: function () {
+                                HandleError('Došlo je do greške', 'Molimo pokušajte ponovo ili kontaktirajte korisničku podršku.', 'error');
+                            }
+                        })
+                    } else HandleError('Popunite sva obavezna polja', '', 'info');
+                }, 1200)
+            })
+
+            function PaymentTypesDropdownHighlighter() {
+                let paymentParents = paymentTypes.closest('div');
+
+                if (paymentTypes.hasClass('is-valid')) {
+                    paymentParents.removeClass('is-invalid');
+                    paymentParents.addClass('is-valid');
+                } else if (paymentTypes.hasClass('is-invalid')) {
+                    paymentParents.removeClass('is-valid');
+                    paymentParents.addClass('is-invalid');
+                }
+            }
+
+            paymentTypes.change(function () {
+                let atLeastOneSelected = false;
+                $('#Chosen_PaymentTypeId > option').each(function () {
+                    if ($(this).is(':selected'))
+                        atLeastOneSelected = true;
+                });
+
+                if (atLeastOneSelected) {
+                    paymentTypes.closest('div').removeClass('is-invalid');
+                    paymentTypes.closest('div').addClass('is-valid');
+                } else {
+                    paymentTypes.closest('div').removeClass('is-valid');
+                    paymentTypes.closest('div').addClass('is-invalid');
+                }
+            })
+
+            function ElementIsValid(element) {
+                return webCreditForm.validate().element($(element));
+            }
+
+            function FormIsValid() {
+                const paymentTypesValid = ElementIsValid(paymentTypes);
+                const amountValid = ElementIsValid(amount);
+
+                PaymentTypesDropdownHighlighter();
+
+                return (paymentTypesValid && amountValid);
+            }
+
+            function ResetInputs() {
+                paymentTypes.selectpicker('val', '');;
+                paymentTypes.closest('div').removeClass('is-invalid');
+                paymentTypes.closest('div').removeClass('is-valid');
+
+                amount.val(0);
+                amount.removeClass('is-invalid');
+                amount.removeClass('is-valid');
+            }
+
+            function EnableInputs() {
+                btnSubmit.prop('disabled', false);
+                btnDismissModal.prop('disabled', false);
+                amount.prop('readonly', false);
+            }
+
+            function DisableInputs() {
+                btnSubmit.prop('disabled', true);
+                btnDismissModal.prop('disabled', true);
+                amount.prop('readonly', true);
+            }
+
+            function HandleError(title, body, severity) {
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                    toastr[severity](body, title);
+                })
+                    .promise()
+                    .done(function () {
+                        setTimeout(function () {
+                            submitText.fadeOut('fast', function () {
+                                $(this).html(submitTextUnchanged).fadeIn('slow');
+                                EnableInputs();
+                            });
+                        }, 1300)
+                    })
+            }
+        });
+    </script>
+}
+
+

@@ -1,0 +1,90 @@
+﻿@model WebApplication9.ViewModels.TherapistConsultationsViewModel
+@inject Framework.Interfaces.IDateTimeHelper DateHelper
+
+<link id="swal-styles-@Model.TherapistId" rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<div id="free-consultations-modal-@Model.TherapistId"
+     data-backdrop="static"
+     data-keyboard="false"
+     data-toggle="modal"
+     class="modal theme-modal fade p-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true"
+     style="overflow-y: auto !important">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content border">
+            <div class="modal-header border-bottom-0 mb-n2 pb-0">
+                <h5 class="modal-title text-center mx-auto">Izaberite termin za besplatne konsultacije</h5>
+            </div>
+            <form autocomplete="off">
+                @Html.AntiForgeryToken()
+                <div class="modal-body mx-md-2 py-0">
+                    <div class="row">
+                        <div class="col-12">
+                            @if (Model != null && Model.DayOfWeekNameConsultations.Any())
+                            {
+                @foreach (var freeConsultationsDate in Model.DayOfWeekNameConsultations)
+                {
+@if (freeConsultationsDate.Consultations.Any())
+{
+<h5 class="text-secondary font-weight-normal fs-0 mt-4 pb-1">
+    @freeConsultationsDate.DayOfWeekName, <span style="font-size:0.88rem !important;">@freeConsultationsDate.DayOfWeekDateTime</span>
+</h5>
+                        @foreach (var freeConsultation in freeConsultationsDate.Consultations)
+                        {
+<button data-free-consultation-id="@freeConsultation.Id"
+        data-consultation-date="@freeConsultationsDate.DayOfWeekDateTime"
+        data-consultation-start-time="@DateHelper.TimeStringFromDateTime(freeConsultation.StartDateTime)"
+        type="button"
+        style="opacity: 1 !important;"
+        class="btn-book-free-consultation btn btn-sm btn-soft-primary mt-2 mr-1">
+    <span class="btn-book-free-consultation-text">
+        @DateHelper.TimeStringFromDateTime(freeConsultation.StartDateTime) - @DateHelper.TimeStringFromDateTime(freeConsultation.EndDateTime)
+    </span>
+</button>}
+                                                <div class=" border-dotted-bottom-4 mt-4"></div>}
+} }
+                            else
+                            {
+                <p class="text-secondary text-center mt-3 mb-0">Ovaj psihoterapeut trenutno nema slobodne termine besplatnih konsultacija.</p>}
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer border-top-0">
+                <button id="btn-close-modal" type="button" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Zatvori</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="script-@Model.TherapistId">
+    $(document).ready(function () {
+        const therapistId = '@Model.TherapistId';
+        let freeConsultationModal = $(`#free-consultations-modal-${therapistId}`);
+
+        freeConsultationModal.modal();
+
+        freeConsultationModal.on('hidden.bs.modal', function () {
+            freeConsultationModal.remove();
+            $(`#script-${therapistId}`).remove();
+        })
+
+        $('#btn-close-modal').click(function () {
+            setTimeout(function () {
+                $(`#swal-styles-${therapistId}`).remove();
+                $(`#swal-script-${therapistId}`).remove();
+            }, 100)
+        })
+
+        $('.btn-book-free-consultation').click(function () {
+            Swal.fire({
+                title: 'Trenutno samo klijenti mogu zakazivati konsultacije sa psihoterapeutima',
+                text: 'Ulogujte se koristeći nalog klijenta da biste mogli zakazati konsultacije.',
+                icon: 'info'
+            })
+        })
+    });
+</script>
+<script id="swal-script-@Model.TherapistId" async src="~/sweet-alert2/sweetalert2.all.min.js"></script>

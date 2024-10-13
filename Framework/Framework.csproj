@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Emails\EmailTemplates\BookedSessionTemplate\**" />
+    <Compile Remove="Emails\EmailTemplates\EmailConfirmationTemplate\**" />
+    <Compile Remove="Emails\EmailTemplates\PasswordChangedTemplate\**" />
+    <Compile Remove="Emails\EmailTemplates\PasswordResetTemplate\**" />
+    <Compile Remove="Emails\EmailTemplates\SessionInviteLinkTemplate\**" />
+    <Compile Remove="Emails\EmailTemplates\SignInSuccessfulTemplate\**" />
+    <Compile Remove="Emails\EmailTemplates\TherapistApplicationStatusTemplate\**" />
+    <Compile Remove="Emails\EmailTemplates\WebCreditAddedTemplate\**" />
+    <Compile Remove="Emails\EmailTemplates\WithdrawalRequestAcceptedTemplate\**" />
+    <Compile Remove="Emails\EmailTemplates\WithdrawalRequestSentTemplate\**" />
+    <EmbeddedResource Remove="Emails\EmailTemplates\BookedSessionTemplate\**" />
+    <EmbeddedResource Remove="Emails\EmailTemplates\EmailConfirmationTemplate\**" />
+    <EmbeddedResource Remove="Emails\EmailTemplates\PasswordChangedTemplate\**" />
+    <EmbeddedResource Remove="Emails\EmailTemplates\PasswordResetTemplate\**" />
+    <EmbeddedResource Remove="Emails\EmailTemplates\SessionInviteLinkTemplate\**" />
+    <EmbeddedResource Remove="Emails\EmailTemplates\SignInSuccessfulTemplate\**" />
+    <EmbeddedResource Remove="Emails\EmailTemplates\TherapistApplicationStatusTemplate\**" />
+    <EmbeddedResource Remove="Emails\EmailTemplates\WebCreditAddedTemplate\**" />
+    <EmbeddedResource Remove="Emails\EmailTemplates\WithdrawalRequestAcceptedTemplate\**" />
+    <EmbeddedResource Remove="Emails\EmailTemplates\WithdrawalRequestSentTemplate\**" />
+    <None Remove="Emails\EmailTemplates\BookedSessionTemplate\**" />
+    <None Remove="Emails\EmailTemplates\EmailConfirmationTemplate\**" />
+    <None Remove="Emails\EmailTemplates\PasswordChangedTemplate\**" />
+    <None Remove="Emails\EmailTemplates\PasswordResetTemplate\**" />
+    <None Remove="Emails\EmailTemplates\SessionInviteLinkTemplate\**" />
+    <None Remove="Emails\EmailTemplates\SignInSuccessfulTemplate\**" />
+    <None Remove="Emails\EmailTemplates\TherapistApplicationStatusTemplate\**" />
+    <None Remove="Emails\EmailTemplates\WebCreditAddedTemplate\**" />
+    <None Remove="Emails\EmailTemplates\WithdrawalRequestAcceptedTemplate\**" />
+    <None Remove="Emails\EmailTemplates\WithdrawalRequestSentTemplate\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="3.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
+    <PackageReference Include="MimeKit" Version="3.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="UAParser" Version="3.1.47" />
+	<FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Database\Database.csproj" />
+  </ItemGroup>
+
+</Project>

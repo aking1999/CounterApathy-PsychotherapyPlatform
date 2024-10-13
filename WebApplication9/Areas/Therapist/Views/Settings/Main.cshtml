@@ -1,0 +1,200 @@
+﻿@{
+    ViewData["Title"] = "Main";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+        <h5 class="mb-0">Security Settings</h5>
+        <p>These settings help you keep your account secure.</p>
+        <div class="list-group mb-5 shadow">
+            <div class="list-group-item">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <strong class="mb-2">Receive Important Emails&nbsp;&nbsp;<i class="far fa-envelope"></i></strong>
+                        <p class="text-muted mb-0">
+                            Receive Emails about Important Notifications that you get (Recommended).
+                        </p>
+                    </div>
+                    <div class="col-auto">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="customSwitch0" checked>
+                            <label class="custom-control-label" for="customSwitch0"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group-item">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <strong class="mb-2">Vacation Mode&nbsp;&nbsp;<i class="far fa-umbrella-beach"></i></strong>
+                        <p class="text-muted mb-0">
+                            While Enabled, Users will be able to see your Profile, but not Book your Sessions.
+                        </p>
+                    </div>
+                    <div class="col-auto">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="customSwitch1">
+                            <label class="custom-control-label" for="customSwitch1"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group-item">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <strong class="mb-2">Invisible Mode&nbsp;&nbsp;<i class="far fa-user-secret"></i></strong>
+                        <p class="text-muted mb-0">
+                            While Enabled, Users won't be able to see your Profile anywhere on the Site.
+                        </p>
+                    </div>
+                    <div class="col-auto">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="customSwitch2">
+                            <label class="custom-control-label" for="customSwitch2"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group-item">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <strong class="mb-2">Dark Mode&nbsp;&nbsp;<i id="dark-mode-icon" class="far fa-moon-stars"></i></strong>
+                        <p class="text-muted mb-0">
+                            Choose between Light and Dark Mode.
+                        </p>
+                    </div>
+                    <div class="col-auto">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="customSwitch3">
+                            <label class="custom-control-label" for="customSwitch3"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group-item">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <strong class="mb-2">2FA Authentication</strong>
+                        <span id="2fa-badge" class="badge badge-success">Enabled</span>
+                        <p class="text-muted mb-0">
+                            Maecenas sed diam eget risus varius blandit.
+                        </p>
+                    </div>
+                    <div class="col-auto">
+                        <button id="2fa-btn" class="btn btn-primary btn-sm">Disable</button>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group-item">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <strong class="mb-2">Activate Pin Code</strong>
+                        <p class="text-muted mb-0">
+                            Donec id elit non mi porta gravida at eget metus.
+                        </p>
+                    </div>
+                    <div class="col-auto">
+                        <div class="custom-control custom-switch">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="customSwitch4">
+                                <label class="custom-control-label" for="customSwitch4"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group-item">
+                <a asp-area="Therapist" asp-controller="Settings" asp-action="Blocked" style="color: inherit;" class="text-decoration-none">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <strong class="mb-2">Blocked From Booking Your Sessions&nbsp;&nbsp;<i class="far fa-user-lock"></i></strong>
+                            <p class="text-muted mb-0">
+                                Add Users that can't Book your Sessions. Blocked Users can still see your Sessions.
+                            </p>
+                        </div>
+                        <div class="col-auto">
+                            <i class="far fa-angle-right"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <h5 class="mb-0">Recent Activity</h5>
+        <p>Last activities with your account.</p>
+        <table class="table border bg-white">
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Location</th>
+                    <th>IP</th>
+                    <th>Time</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="col">
+                        <i class="fe fe-globe fe-12 text-muted mr-2"></i>Chrome -
+                        Windows 10
+                    </th>
+                    <td>Paris, France</td>
+                    <td>192.168.1.10</td>
+                    <td>Apr 24, 2019</td>
+                    <td>
+                        <a hreff="#" class="text-muted"><i class="fe fe-x"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="col">
+                        <i class="fe fe-smartphone fe-12 text-muted mr-2"></i>App -
+                        Mac OS
+                    </th>
+                    <td>Newyork, USA</td>
+                    <td>10.0.0.10</td>
+                    <td>Apr 24, 2019</td>
+                    <td>
+                        <a hreff="#" class="text-muted"><i class="fe fe-x"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="col">
+                        <i class="fe fe-globe fe-12 text-muted mr-2"></i>Chrome -
+                        iOS
+                    </th>
+                    <td>London, UK</td>
+                    <td>255.255.255.0</td>
+                    <td>Apr 24, 2019</td>
+                    <td>
+                        <a hreff="#" class="text-muted"><i class="fe fe-x"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#2fa-btn').click(function () {
+            if ($(this).is(":contains('Disable')"))
+                $(this).html("Enable");
+            else $(this).html("Disable");
+
+            if ($('#2fa-badge').is(":contains('Enabled')"))
+                $('#2fa-badge').html("Disabled");
+            else $('#2fa-badge').html("Enabled");
+
+            $('#2fa-badge').toggleClass("badge-success");
+            $('#2fa-badge').toggleClass("badge-danger");
+        })
+
+        $("#customSwitch3").change(function () {
+            if ($(this).is(":checked")) {
+                alert('yes')
+            }
+            else alert('no')
+        });
+    })
+</script>
+

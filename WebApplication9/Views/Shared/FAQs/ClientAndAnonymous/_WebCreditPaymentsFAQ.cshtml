@@ -1,0 +1,231 @@
+﻿@using Framework.Helpers.ExtensionMethods
+@using Framework.Providers
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+    var userRole = await User.GetRoleAsync();
+    var paddingBottom = userRole == UserRoles.Admin ? "pb-3" : "pb-0";
+    var supportUrl = string.Empty;
+    if (userRole == UserRoles.None || userRole == UserRoles.Client)
+    {
+        supportUrl = Url.Action("CustomerSupport", "Home");
+    }
+    else if (userRole == UserRoles.Therapist)
+    {
+        supportUrl = Url.Action("Support", "Account", new { Area = "Therapist" });
+    }
+}
+
+<div class="card pt-1 mb-3">
+    <div class="card-header pb-0">
+        <h4 class="text-center mb-0 text-primary">Česta pitanja o dopuni i upotrebi Veb kredita na nalogu</h4>
+    </div>
+    <div class="card-body @paddingBottom">
+        <div class="accordion">
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Čemu služi Veb kredit na @appName platformi?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                Veb kredit služi za plaćanje usluga
+                                (npr. <a asp-controller="Guides" asp-action="BookingRoadmap" target="_blank">zakazivanje seansi</a>) na @appName platformi.
+                            </p>
+                            <p>
+                                Za dopunu Veb kredita na nalogu, klikniet <a asp-controller="Account" asp-action="AddWebCredit" target="_blank">ovde</a>.
+                            </p>
+                            <span class="fa-stack">
+                                <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                <i class="far fa-star fa-stack-1x text-warning"></i>
+                            </span>
+                            1 RSD = 1 Veb kredit
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako da proverim koliko imam Veb kredita na svom nalogu?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Ulogujte se na nalog i idite na <a asp-controller="Account" asp-action="Profile">svoju profilnu stranicu</a>.
+                            Trenutna količina Veb kredita piše ispod stavke "Veb kredit".
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Kako mogu da dopunim Veb kredit na svom nalogu?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Da biste dopunili Veb kredit na svom nalogu:
+                            <ol>
+                                <li><a asp-controller="Authorization" asp-action="SignIn" target="_blank">Ulogujte se</a>.</li>
+                                <li>
+                                    Idite na <a asp-controller="Account" asp-action="AddWebCredit" target="_blank">stanicu za dopunu Veb kredita</a>
+                                    i putem bilo koje opcije, dopunite kredit na svom nalogu.
+                                </li>
+                            </ol>
+                            <p>
+                                <span class="fa-stack">
+                                    <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                    <i class="far fa-star fa-stack-1x text-warning"></i>
+                                </span>
+                                1 RSD = 1 Veb kredit
+                            </p>
+                            <p class="mb-0">
+                                <span class="fa-stack">
+                                    <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                    <i class="far fa-star fa-stack-1x text-warning"></i>
+                                </span>
+                                Nepotrošeni Veb kredit ostaje na <a asp-controller="Account" asp-action="Profile" target="_blank">Vašem nalogu</a>
+                                i možete ga iskoristiti za zakazivanje narednih seansi.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Šta se dešava sa nepotrošenim Veb kreditom koji mi je ostao na nalogu?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            <p>
+                                Nepotrošeni Veb kredit ostaje na Vašem nalogu sve do narednog puta kad odlučite da zakažete seansu.
+                            </p>
+                            <p class="mb-0">
+                                <span class="fa-stack">
+                                    <i class="fa fa-circle fa-stack-2x" style="color: #ffffd6 !important;"></i>
+                                    <i class="far fa-star fa-stack-1x text-warning"></i>
+                                </span>
+                                Nema vremenskog roka za koji morate potrošiti Veb kredit.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Da li mogu dopuniti Veb kredit na nalogu bez da moram zakazati seansu?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Veb kredit možete dopunjavati na nalog u bilo kojoj količini, čuvati i trošiti kada Vama odgovara, bez vremenskog ograničenja.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none border-bottom accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Nakon uplate dopune za Veb kredit, koliko dugo traje da on bude dodat na moj nalog?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Nakon uplate dopune, sistem momentalno dodaje Veb kredit na Vaš nalog, u uplaćenom iznosu.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-none accordion-item">
+                <div class="card-header py-0">
+                    <button class="btn btn-link text-decoration-none btn-block media py-2 px-0 text-left" type="button" data-toggle="collapse">
+                        <span class="fas fa-caret-right accordion-icon mr-3" data-fa-transform="shrink-2"></span>
+                        <span class="font-weight-medium text-sans-serif text-900">
+                            Da li je moguća isplata nepotrošenog Veb kredita?
+                        </span>
+                    </button>
+                </div>
+                <div class="collapse">
+                    <div class="card-body pt-2">
+                        <div class="pl-4">
+                            Iako cenimo fleksibilnost,
+                            u skladu sa <a asp-controller="Home" asp-action="TermsOfService" target="_blank">našim uslovima korišćenja</a>,
+                            isplata nepotrošenog Veb kredita nije moguća.
+                            Izvinjavamo se za bilo koju neprijatnost koju ovo može izazvati i
+                            zahvaljujemo Vam se na razumevanju.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (userRole == UserRoles.None || userRole == UserRoles.Client)
+    {
+        <div class="card-footer text-center">
+            <small>
+                <i class="far fa-info-circle text-info mr-2"></i>Imate dodatna pitanja? Pogledajte
+                <a asp-controller="Guides" asp-action="All">uputstva</a>,
+                <a asp-controller="Home" asp-action="TermsOfService">uslove korišćenja</a> ili
+                <a href="@supportUrl">kontaktirajte podršku</a>.
+            </small>
+        </div>
+    }
+    else if (userRole == UserRoles.Therapist)
+    {
+        <div class="card-footer text-center">
+            <small>
+                <i class="far fa-info-circle text-info mr-2"></i>Imate dodatna pitanja? Pogledajte
+                <a asp-controller="Guides" asp-action="All">uputstva</a>,
+                <a asp-controller="Home" asp-action="TermsOfService">uslove korišćenja</a> ili
+                <a href="@supportUrl">kontaktirajte podršku</a>.
+            </small>
+        </div>
+    }
+</div>
+
+
+@*
+    How do I add web credit to my account?
+    Can I pay for web credit with a credit card?
+    Is there a minimum amount required to add web credit to my account?
+    Can I get a refund for unused web credit on my account?
+    Can I use web credit to book sessions with multiple psychotherapists?
+    How long does it take for web credit to be added to my account after payment?
+    How do I check my current web credit balance?
+    Are there any fees associated with adding web credit to my account?
+    Can I add web credit to someone else's account?
+    How do I cancel a web credit payment?
+        da li mogu dodati veb kredit na nalog bez zakazivanja seanse, cisto da stoji
+*@

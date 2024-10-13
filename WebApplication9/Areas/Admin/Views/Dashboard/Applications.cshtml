@@ -1,0 +1,138 @@
+﻿@model List<WebApplication9.Areas.Admin.ViewModels.ApplicationsViewModel>
+@using Framework.Helpers.ExtensionMethods
+@{
+    ViewData.SetTitle("Aplikacije za terapeute");
+    ViewData.SetMetaDescription("Upravljajte zahtevima za terapeutske naloge.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("far fa-paste fa-sm",
+        "text-info",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavFilter.cshtml",
+    new WebApplication9.WidgetViewModels.NavFilterWithClearWidgetViewModel("Admin",
+        "Dashboard",
+        "Applications",
+        new List<WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel>()
+        {
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("bystatus", false, "far fa-analytics", "text-danger", "Status", "status-dropdown", "bystatus", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>()
+            {
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-success", "Admin", "Dashboard", "Applications", "", "prihvaćeno", "Prihvaćeno"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-warning", "Admin", "Dashboard", "Applications", "", "na-čekanju", "Na čekanju"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-danger", "Admin", "Dashboard", "Applications", "", "odbijeno", "Odbijeno")
+            })
+        }))
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header border-bottom-0">
+                    <div class="row align-items-center justify-content-between">
+                        <div class="col-4 col-sm-auto d-flex align-items-center pr-0">
+                            <h5 class="text-secondary fs-0 mb-0 text-nowrap">Aplikacije</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="falcon-data-table table-responsive pb-3">
+                        <table class="table table-borderless table-sm mb-0 table-striped table-dashboard fs--1 data-table">
+                            <thead class="text-900">
+                                <tr>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center">ID APK</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center pr-2">Ime</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center">Imejl</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center" style="min-width: 150px;">Datum aplikacije</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center">Status</th>
+                                    <th class="align-middle sort border-top-0 border-bottom-0 text-center" style="padding-right:1.25rem !important;">Akcija</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{ 
+                                    string badgeClass = string.Empty;
+                                    string badgeText = string.Empty;
+                                    string icon = string.Empty;
+                                }
+                                @foreach (var app in Model)
+                                {
+                                    if (app.Accepted == 0)
+                                    {
+                                        badgeClass = "badge-soft-warning";
+                                        badgeText = "Na čekanju";
+                                        icon = "fa-stream";
+                                    }
+                                    else if (app.Accepted == 1)
+                                    {
+                                        badgeClass = "badge-soft-success";
+                                        badgeText = "Prihvaćeno";
+                                        icon = "fa-check";
+                                    }
+                                    else if (app.Accepted == -1)
+                                    {
+                                        badgeClass = "badge-soft-danger";
+                                        badgeText = "Odbijeno";
+                                        icon = "fa-times";
+                                    }
+                                    else
+                                    {
+                                        badgeClass = "badge-soft-secondary";
+                                        badgeText = "Nedefinisano";
+                                        icon = "fa-ban";
+                                    }
+                                    <tr class="text-center">
+                                        <td class="py-2 align-middle">
+                                            @app.ApplicationId
+                                        </td>
+                                        <td class="py-2 align-middle white-space-nowrap">
+                                            <a href="@Url.Action("ApplicationDetails", "Dashboard", new { Area = "Admin", userId = app.UserId })"
+                                               target="_blank">
+                                                <div class="media d-flex align-items-center text-left">
+                                                    <div class="avatar avatar-xl mr-2">
+                                                        <img class="rounded-circle"
+                                                             src="@app.ProfilePhoto"
+                                                             alt="profilna slika korisnika @app.FirstName @app.LastName" />
+                                                    </div>
+                                                    <div class="media-body">
+                                                        <h5 class="text-secondary mb-0 fs--1 pr-2">@app.FirstName @app.LastName</h5>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td class="py-2 align-middle">
+                                            <a href="mailto:@app.Email">@app.Email</a>
+                                        </td>
+                                        <td class="py-2 align-middle">
+                                            @app.ApplicationDate
+                                        </td>
+                                        <td class="py-2 align-middle">
+                                            <span class="badge @badgeClass"><i class="fas @icon fa-fw mr-1"></i>@badgeText</span>
+                                        </td>
+                                        <td class="py-2 align-middle white-space-nowrap" style="padding-right:1.25rem !important;">
+                                            <a href="@Url.Action("ApplicationDetails", "Dashboard", new { Area = "Admin", userId = app.UserId })"
+                                               target="_blank"
+                                               class="btn btn-sm btn-info">
+                                                Detalji
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-12 text-center px-4 text-secondary">
+            Trenutno nema nijedna aplikacija ili ste izabrali kriterijum pretrage koju nijedna aplikacija ne ispunjava.
+            <br />
+            Svi Vaši zahtevi za isplatu sredstava biće prikazani ovde.
+        </div>
+    }
+</div>

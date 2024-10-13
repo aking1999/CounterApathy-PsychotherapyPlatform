@@ -1,0 +1,1016 @@
+﻿@model WebApplication9.ViewModels.TherapistApplicationsViewModel
+@using Framework.Helpers
+@using Framework.Helpers.ExtensionMethods
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+    ViewData.SetTitle("Apliciranje za nalog psihoterapeuta");
+    ViewData.SetMetaDescription("Licencirani ste psihoterapeut koji traži nove klijente? " +
+        $"Pridružite se {appName} platformi i započnite izgradnju svoje prakse. Aplicirajte već sada.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+    <link rel="stylesheet" href="~/country-codes-phone-input/intlTelInput.min.css" />
+    <link rel="stylesheet" href="~/country-codes-phone-input/demo.css" />
+    <link rel="stylesheet" href="~/year-picker/yearpicker.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+    <style>
+        .custom-file-input:lang(sr-RS) ~ .custom-file-label::after {
+            content: "Pretraži" !important;
+        }
+
+        .custom-file-input:lang(en) ~ .custom-file-label::after {
+            content: "Browse" !important;
+        }
+    </style>
+    <script async src="~/multiselect/bootstrap-select.min.js"></script>
+    <script async src="~/country-codes-phone-input/intlTelInput.min.js"></script>
+    <script async id="wwwroot-utils" src="~/country-codes-phone-input/utils.js"></script>
+    <script async src="~/year-picker/moment.min.js"></script>
+    <script async src="~/year-picker/yearpicker.js"></script>
+    <script async src="~/sweet-alert2/sweetalert2.min.js"></script>
+    <script async src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-paste fa-sm",
+        "text-info",
+        ViewData.GetTitle(),
+        "Popunite aplikacionu formu i pridružite se našoj mreži kvalifikovanih i licenciranih psihoterapeuta",
+        "col-12",
+        $"Imate pitanje ili problem? " +
+        $"<a href='{Url.Action("CustomerSupport", "Home")}' target='_blank'>Kontaktirajte nas</a>."))
+
+@await Html.TryPartialAsync("~/Views/Shared/Onboardings/BenefitsOfWorkingWithUs/_BenefitsForPsychotherapists.cshtml")
+<form id="apply-form" enctype="multipart/form-data" autocomplete="off">
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-12 col-lg-4 mb-3 mb-lg-0">
+            <div class="card h-100">
+                <div class="card-body no-tick">
+                    <div class="account-settings">
+                        <div class="user-profile pb-0">
+                            <div class="user-avatar">
+                                <div class="img-holder avatar">
+                                    <img id="output"
+                                         class="d-inline-block"
+                                         src="@User.GetDafaultProfilePhotoPath()"
+                                         alt="profilna slika klijenta @Model.FirstName @Model.LastName" />
+                                </div>
+                            </div>
+                            <h5 class="font-weight-normal text-secondary mb-3"><span id="firstname">@Model.FirstName</span> <span id="lastname">@Model.LastName</span></h5>
+                            <h5 class="fs-0 font-weight-normal text-500">Psihoterapeut</h5>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fal fa-camera fa-fw"></i></span>
+                            </div>
+                            <div class="custom-file">
+                                <input asp-for="ProfilePhoto" class="custom-file-input">
+                                <label asp-for="ProfilePhoto" class="custom-file-label">Profilna slika</label>
+                            </div>
+                        </div>
+                        <span>
+                            <span id="validation-ProfilePhoto" asp-validation-for="ProfilePhoto" class="invalid-feedback"></span>
+                            <br />
+                        </span>
+                        <p class="text-secondary text-center">Dimenzije slike bi idealno trebalo da budu iste, na primer 400x400.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-8">
+            <div class="card mb-3">
+                <div class="card-header border-bottom-0">
+                    <h5 class="mb-0 text-primary fs-1">Lični podaci</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="FirstName"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="FirstName"
+                                           class="form-control" />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="FirstName" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="LastName"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="LastName"
+                                           class="form-control" />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="LastName" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="Email"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-envelope fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="Email"
+                                           class="form-control" readonly />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="PhoneNumber"></label>
+                                <div class="input-group">
+                                    <input asp-for="PhoneNumber"
+                                           class="form-control" />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="PhoneNumber" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="YearOfBirth"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-calendar fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="YearOfBirth"
+                                           class="form-control"
+                                           inputmode="numeric"
+                                           oninput="this.value = this.value.replace(/\D+/g, '')"
+                                           readonly />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="YearOfBirth" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="Chosen_GenderId"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-venus-mars fa-fw"></i></span>
+                                    </div>
+                                    <select asp-for="Chosen_GenderId"
+                                            class="selectpicker form-control"
+                                            title="Pol">
+                                        @if (Model.ToChooseFrom_Genders != null && Model.ToChooseFrom_Genders.Any())
+                                        {
+                                            foreach (var gender in Model.ToChooseFrom_Genders)
+                                            {
+                                                var concat = Helper.GetObjectIconAndNameAndColor(gender.Text);
+
+                                                <option value="@gender.Value" data-content="<i class='@concat[0] @concat[2] fa-fw mr-2 fa-lg align-middle'></i>@concat[1]">
+                                                    @concat[1]
+                                                </option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="" disabled>
+                                                Pol nedostupan.
+                                                Kontaktirajte korisničku podršku.
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                <span>
+                                    <span asp-validation-for="Chosen_GenderId" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header border-bottom-0">
+                    <h5 class="mb-0 text-primary fs-1">Adresa</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="Street"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-road fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="Street"
+                                           class="form-control" />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="Street" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="HouseNumber"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-home fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="HouseNumber"
+                                           class="form-control" />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="HouseNumber" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="City"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-city fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="City"
+                                           class="form-control" />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="City" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="PostalCode"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-mailbox fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="PostalCode"
+                                           class="form-control"
+                                           inputmode="numeric"
+                                           oninput="this.value = this.value.replace(/\D+/g, '')" />
+                                </div>
+                                <span>
+                                    <span asp-validation-for="PostalCode" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="Country"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-globe-europe fa-fw"></i></span>
+                                    </div>
+                                    <input asp-for="Country"
+                                           class="form-control" value="Srbija" readonly />
+                                </div>
+                                <span>
+                                    @*Ovde nek stoji span validacije iako ne prihvatam nista osim Hard kodovanog Serbia, nek stoji zbog razmaka na divu*@
+                                    <span asp-validation-for="Country" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header border-bottom-0">
+                    <h5 class="mb-0 text-primary fs-1">Edukacija i veštine</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="mb-2 text-primary">Supervizija</h6>
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input class="custom-control-input mr-1" asp-for="UnderSupervision">
+                                    <label class="custom-control-label" asp-for="UnderSupervision">
+                                        Čekiranjem, naglašavate da ste trenutno pod supervizijom.
+                                    </label>
+                                    <br />
+                                    <span>
+                                        <span asp-validation-for="UnderSupervision" class="invalid-feedback"></span>
+                                        <br />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h6 class="mb-2 text-primary">
+                                Pravni oblik (opciono)
+                                <a href="javascript://"
+                                   class="form-group ml-2 no-tick"
+                                   data-toggle="popover"
+                                   data-placement="bottom"
+                                   data-content="Udruženje, d.o.o. ili preduzetnik.">
+                                    <i class="fas fa-question-circle text-info fs-0"></i>
+                                </a>
+                            </h6>
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input class="custom-control-input mr-1" asp-for="LegalEntity">
+                                    <label class="custom-control-label" asp-for="LegalEntity">
+                                        Čekiranjem, naglašavate da ste pravno lice.
+                                    </label>
+                                    <br />
+                                    <span>
+                                        <span asp-validation-for="LegalEntity" class="invalid-feedback"></span>
+                                        <br />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="University"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-university fa-fw"></i></span>
+                                    </div>
+                                    <textarea asp-for="University"
+                                              rows="4"
+                                              class="form-control">
+                                    </textarea>
+                                </div>
+                                <span>
+                                    <span asp-validation-for="University" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="PastCompanies"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-briefcase fa-fw"></i></span>
+                                    </div>
+                                    <textarea asp-for="PastCompanies"
+                                              rows="4"
+                                              class="form-control">
+                                    </textarea>
+                                </div>
+                                <span>
+                                    <span asp-validation-for="PastCompanies" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="Chosen_PsychotherapyTechniquesIds"></label>
+                                <a href="javascript://"
+                                   class="form-group ml-2 no-tick"
+                                   data-toggle="popover"
+                                   data-placement="bottom"
+                                   title="Nema određene psihoterapijske tehnike?"
+                                   data-content="Ukoliko nema određene psihoterapijske tehnike, kontaktirajte <a href='@Url.Action("CustomerSupport", "Home", new { Area = "" })' target='_blank'>korisničku podršku</a> pre apliciranja."
+                                   data-html="true">
+                                    <i class="fas fa-question-circle text-info"></i>
+                                </a>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-magic fa-fw"></i></span>
+                                    </div>
+                                    <select asp-for="Chosen_PsychotherapyTechniquesIds"
+                                            data-dropup-auto="false"
+                                            class="selectpicker form-control"
+                                            multiple data-live-search="true"
+                                            title="Psihoterapijske tehnike"
+                                            data-selected-text-format="count"
+                                            data-size="4">
+                                        @if (Model.ToChooseFrom_PsychotherapyTechniques != null && Model.ToChooseFrom_PsychotherapyTechniques.Any())
+                                        {
+                                            foreach (var technique in Model.ToChooseFrom_PsychotherapyTechniques)
+                                            {
+                                                var concat = Helper.GetObjectIconAndNameAndColor(technique.Text);
+
+                                                <option value="@technique.Value" data-content="<i class='@concat[0] fa-fw mr-2 fa-lg align-middle' style='color:@concat[2];'></i>@concat[1]">
+                                                    @concat[1]
+                                                </option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="" disabled>
+                                                @* Overflow y happening, content goes off screen, fix later *@
+                                                Tehnike nedostupne.
+                                                @*<br />*@
+                                                Kontaktirajte korisničku podršku.
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                <span>
+                                    <span asp-validation-for="Chosen_PsychotherapyTechniquesIds" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="Chosen_SpecialtiesIds"></label>
+                                <a href="javascript://"
+                                   class="form-group ml-2 no-tick"
+                                   data-toggle="popover"
+                                   data-placement="bottom"
+                                   title="Nema odredjene specijalnosti?"
+                                   data-content="Ukoliko nema određene specijalnosti, kontaktirajte <a href='@Url.Action("CustomerSupport", "Home", new { Area = "" })' target='_blank'>korisničku podršku</a> pre apliciranja."
+                                   data-html="true">
+                                    <i class="fas fa-question-circle text-info"></i>
+                                </a>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-book fa-fw"></i></span>
+                                    </div>
+                                    <select asp-for="Chosen_SpecialtiesIds"
+                                            data-dropup-auto="false"
+                                            class="selectpicker form-control"
+                                            multiple data-live-search="true"
+                                            title="Specijalnosti"
+                                            data-selected-text-format="count"
+                                            data-size="4">
+                                        @if (Model.ToChooseFrom_Specialties != null && Model.ToChooseFrom_Specialties.Any())
+                                        {
+                                            foreach (var specialty in Model.ToChooseFrom_Specialties)
+                                            {
+                                                var iconAndNameAndColor = Helper.GetObjectIconAndNameAndColor(specialty.Text);
+                                                var icon = iconAndNameAndColor[0];
+                                                var name = iconAndNameAndColor[1];
+                                                var color = iconAndNameAndColor[2];
+
+                                                <option value="@specialty.Value" data-content="<i class='@icon fa-fw mr-2 fa-lg align-middle' style='color:@color;'></i>@name">
+                                                    @name
+                                                </option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="" disabled>
+                                                @* Overflow y happening, content goes off screen, fix later *@
+                                                Specijalnosti nedostupne.
+                                                @*<br />*@
+                                                Kontaktirajte korisničku podršku.
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                <span>
+                                    <span asp-validation-for="Chosen_SpecialtiesIds" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-0">
+                <div class="card-header border-bottom-0">
+                    <h5 class="mb-0 text-primary fs-1">Uslovi rada</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="mb-2 text-primary">Uslovi korišćenja</h6>
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input mr-1" asp-for="TermsOfService" required>
+                                    <label class="custom-control-label" asp-for="TermsOfService">
+                                        Čekiranjem, slažete se sa našim
+                                        <a asp-area="" asp-controller="Home" asp-action="TermsOfService" target="_blank">uslovima korišćenja</a>.
+                                    </label>
+                                    <br />
+                                    <span>
+                                        <span asp-validation-for="TermsOfService" class="invalid-feedback"></span>
+                                        <br />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h6 class="mb-2 text-primary">Politika privatnosti</h6>
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input mr-1" asp-for="PrivacyPolicy" required>
+                                    <label class="custom-control-label" asp-for="PrivacyPolicy">
+                                        Čekiranjem, slažete se sa našom
+                                        <a asp-area="" asp-controller="Home" asp-action="Privacy" target="_blank">politikom privatnosti</a>.
+                                    </label>
+                                    <br />
+                                    <span>
+                                        <span asp-validation-for="PrivacyPolicy" class="invalid-feedback"></span>
+                                        <br />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h6 class="mb-2 text-primary">Uslovi korišćenja za psihoterapeute</h6>
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input mr-1" asp-for="TherapistTermsOfService" required>
+                                    <label class="custom-control-label" asp-for="TherapistTermsOfService">
+                                        Čekiranjem, slažete se sa našim
+                                        <a asp-area="" asp-controller="Home" asp-action="TherapistsTerms" target="_blank">uslovima korišćenja za psihoterapeute</a>.
+                                    </label>
+                                    <br />
+                                    <span>
+                                        <span asp-validation-for="TherapistTermsOfService" class="invalid-feedback"></span>
+                                        <br />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="text-right">
+                                <button type="button"
+                                        id="btn-cancel"
+                                        class="btn btn-sm btn-falcon-secondary">
+                                    Odustani
+                                </button>
+                                <button type="button"
+                                        id="btn-submit"
+                                        class="btn btn-sm btn-primary">
+                                    <span id="btn-submit-text">&nbsp;Apliciraj&nbsp;</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            window.history.pushState({}, '', '@Url.Action("Apply", "Account", new { Area = "" })');
+
+            if (!localStorage.getItem("BenefitsOfWorkingPsychotherapistsModalVisited")) {
+                setTimeout(function () {
+                    $('#benefits-of-working-psychotherapists-modal').modal('show');
+                }, 1200);
+
+                localStorage.setItem("BenefitsOfWorkingPsychotherapistsModalVisited", "true");
+            }
+
+            const fileExtension = ['jpeg', 'jpg', 'png'];
+            let submit = $('#btn-submit');
+            let submitText = $('#btn-submit-text');
+            let submitTextUnchanged = submitText.html();
+            let cancel = $('#btn-cancel');
+            let applyForm = $('#apply-form');
+            let inputImage = $("#ProfilePhoto");
+            let defaultUserImage = $('#output').attr('src');
+            let profilePhotoAlt = $('#output').attr('alt');
+            let firstName = $('#FirstName');
+            let lastName = $('#LastName');
+            let phoneNumber = $('#PhoneNumber');
+            let yearOfBirth = $('#YearOfBirth');
+            let currentYear = new Date().getFullYear();
+            let gender = $('#Chosen_GenderId');
+            let street = $('#Street');
+            let houseNumber = $('#HouseNumber');
+            let city = $('#City');
+            let postalCode = $('#PostalCode');
+            let underSupervision = $('#UnderSupervision');
+            let legalEntity = $('#LegalEntity');
+            let university = $('#University');
+            let pastCompanies = $('#PastCompanies');
+            let techniques = $('#Chosen_PsychotherapyTechniquesIds');
+            let specialties = $('#Chosen_SpecialtiesIds');
+            let termsOfService = $('#TermsOfService');
+            let privacyPolicy = $('#PrivacyPolicy');
+            let therapistTermsOfService = $('#TherapistTermsOfService');
+
+            termsOfService.rules('add', {
+                required: true,
+                messages: {
+                    required: "Polje je obavezno."
+                }
+            });
+
+            privacyPolicy.rules('add', {
+                required: true,
+                messages: {
+                    required: "Polje je obavezno."
+                }
+            });
+
+            therapistTermsOfService.rules('add', {
+                required: true,
+                messages: {
+                    required: "Polje je obavezno."
+                }
+            });
+
+            function GenderDropdownHighlighter() {
+                let genderParent = gender.closest('div');
+
+                if (gender.hasClass('is-valid')) {
+                    genderParent.removeClass('is-invalid');
+                    genderParent.addClass('is-valid');
+                } else if (gender.hasClass('is-invalid')) {
+                    genderParent.removeClass('is-valid');
+                    genderParent.addClass('is-invalid');
+                }
+            }
+
+            function TechniquesDropdownHighlighter() {
+                let techsParent = techniques.closest('div');
+
+                if (techniques.hasClass('is-valid')) {
+                    techsParent.removeClass('is-invalid');
+                    techsParent.addClass('is-valid');
+                } else if (techniques.hasClass('is-invalid')) {
+                    techsParent.removeClass('is-valid');
+                    techsParent.addClass('is-invalid');
+                }
+            }
+
+            function SpecialtiesDropdownHighlighter() {
+                let specsParent = specialties.closest('div');
+
+                if (specialties.hasClass('is-valid')) {
+                    specsParent.removeClass('is-invalid');
+                    specsParent.addClass('is-valid');
+                } else if (specialties.hasClass('is-invalid')) {
+                    specsParent.removeClass('is-valid');
+                    specsParent.addClass('is-invalid');
+                }
+            }
+
+            gender.change(function () {
+                let atLeastOneSelected = false;
+                $('#Chosen_GenderId > option').each(function () {
+                    if ($(this).is(':selected'))
+                        atLeastOneSelected = true;
+                });
+
+                if (atLeastOneSelected) {
+                    gender.closest('div').removeClass('is-invalid');
+                    gender.closest('div').addClass('is-valid');
+                } else {
+                    gender.closest('div').removeClass('is-valid');
+                    gender.closest('div').addClass('is-invalid');
+                }
+            });
+
+            techniques.change(function () {
+                let atLeastOneSelected = false;
+                $('#Chosen_PsychotherapyTechniquesIds > option').each(function () {
+                    if ($(this).is(':selected'))
+                        atLeastOneSelected = true;
+                });
+
+                if (atLeastOneSelected) {
+                    techniques.closest('div').removeClass('is-invalid');
+                    techniques.closest('div').addClass('is-valid');
+                } else {
+                    techniques.closest('div').removeClass('is-valid');
+                    techniques.closest('div').addClass('is-invalid');
+                }
+            });
+
+            specialties.change(function () {
+                let atLeastOneSelected = false;
+                $('#Chosen_SpecialtiesIds > option').each(function () {
+                    if ($(this).is(':selected'))
+                        atLeastOneSelected = true;
+                });
+
+                if (atLeastOneSelected) {
+                    specialties.closest('div').removeClass('is-invalid');
+                    specialties.closest('div').addClass('is-valid');
+                } else {
+                    specialties.closest('div').removeClass('is-valid');
+                    specialties.closest('div').addClass('is-invalid');
+                }
+            });
+
+            window.intlTelInput(document.querySelector("#PhoneNumber"), {
+                formatOnDisplay: true,
+                separateDialCode: true,
+                initialCountry: "rs",
+                nationalMode: false,
+                placeholderNumberType: "MOBILE",
+                onlyCountries: ["rs"],
+                utilsScript: document.getElementById("wwwroot-utils").href
+            });
+
+            yearOfBirth.yearpicker({
+                year: currentYear - 23,
+                startYear: currentYear - 90,
+                endYear: currentYear - 23
+            });
+
+            $('#output').click(function () {
+                inputImage.click();
+            });
+
+            cancel.click(function () {
+                window.location.href = '@Url.Action("TherapistApplications", "Home", new { Area = "" })'
+            })
+
+            submit.click(function () {
+                DisableInputs();
+                let width = $(this).width();
+                let height = $(this).height();
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                    submit.width(width);
+                    submit.height(height);
+                });
+
+                setTimeout(function () {
+                    if (FormIsValid()) {
+                        let formData = new FormData(applyForm.get(0));
+                        formData.append('appVm.ProfilePhoto', inputImage.get(0).files[0]);
+                        formData.append('appVm.FirstName', firstName.val());
+                        formData.append('appVm.LastName', lastName.val());
+                        formData.append('appVm.PhoneNumber', phoneNumber.val());
+                        formData.append('appVm.YearOfBirth', yearOfBirth.val());
+                        formData.append('appVm.Chosen_GenderId', gender.val());
+                        formData.append('appVm.Street', street.val());
+                        formData.append('appVm.HouseNumber', houseNumber.val());
+                        formData.append('appVm.City', city.val());
+                        formData.append('appVm.PostalCode', postalCode.val());
+                        formData.append('appVm.UnderSupervision', underSupervision.is(':checked'));
+                        formData.append('appVm.LegalEntity', legalEntity.is(':checked'));
+                        formData.append('appVm.University', university.val());
+                        formData.append('appVm.PastCompanies', pastCompanies.val());
+                        formData.append('appVm.Chosen_PsychotherapyTechniquesIds', techniques.val());
+                        formData.append('appVm.Chosen_SpecialtiesIds', specialties.val());
+                        formData.append('appVm.TermsOfService', termsOfService.val());
+                        formData.append('appVm.PrivacyPolicy', privacyPolicy.val());
+                        formData.append('appVm.TherapistTermsOfService', therapistTermsOfService.val());
+
+                        $.ajax({
+                            url: '@Url.Action("Apply", "Account", new { Area = "" })',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            headers: {
+                                'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                            },
+                            success: function (response) {
+                                if (response.success === true) {
+                                    submitText.fadeOut('fast', function () {
+                                        $(this).html('<i class="ca-lightgreen fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                Swal.fire({
+                                                    title: response.title,
+                                                    text: response.body,
+                                                    icon: response.severity,
+                                                    confirmButtonColor: '#00d27a',
+                                                    confirmButtonText: 'U redu'
+                                                }).then(() => {
+                                                    window.location.href = response.redirectUrl;
+                                                });
+                                            }, 600);
+                                        });
+                                    });
+                                } else {
+                                    if (response.redirectUrl) window.location.href = response.redirectUrl;
+                                    else HandleError(response.title, response.body, response.severity);
+                                }
+                            },
+                            error: function () {
+                                HandleError('Došlo je do greške', 'Molimo pokušajte ponovo ili kontaktirajte korisničku podršku.', 'error');
+                            }
+                        });
+                    } else HandleError('Popunite sva obavezna polja', '', 'info');
+                }, 1200)
+            });
+
+            inputImage.on('change', function (event) {
+                if (!this.files.length) {
+                    inputImage.removeClass('is-valid');
+                    inputImage.addClass('is-invalid');
+                    inputImage.siblings(".custom-file-label").removeClass("selected").html('<i class="far fa-times text-danger mr-2"></i>Izaberite sliku.');
+                    $('#validation-ProfilePhoto')
+                        .removeAttr('data-valmsg-replace', 'true');
+
+                    $('.img-holder').fadeOut('fast', function () {
+                        $(this).html('<i class="text-primary fas fa-spinner fa-spin no-tick" style="margin-top:42% !important;"></i>')
+                            .fadeIn(800, function () {
+                                $(this).fadeOut(800, function () {
+                                    $(this).html(`<img class="d-inline-block" src="${defaultUserImage}" alt="${profilePhotoAlt}" id="output" />`);
+                                    var image = document.getElementById("output");
+
+                                    $(this).fadeIn('slow');
+                                    inputImage.prop('readonly', false);
+
+                                    //click listener must also be included here
+                                    $(image).click(function () {
+                                        inputImage.click();
+                                    });
+                                });
+                            });
+                    });
+
+                }
+                else {
+                    if (!FileExtensionValid(inputImage)) {
+                        inputImage.removeClass('is-valid');
+                        inputImage.addClass('is-invalid');
+
+                        $('#validation-ProfilePhoto')
+                            .removeAttr('data-valmsg-replace')
+                            .html("Dozvoljeni formati: jpeg, jpg, png.");
+
+                        inputImage.siblings(".custom-file-label").removeClass("selected").html('<i class="far fa-times text-danger mr-2"></i>Format nedozvoljen.');
+
+                        $('.img-holder').fadeOut('fast', function () {
+                            $(this).html('<i class="text-primary fas fa-spinner fa-spin no-tick" style="margin-top:42% !important;"></i>')
+                                .fadeIn(800, function () {
+                                    $(this).fadeOut(800, function () {
+                                        $(this).html(`<img class="d-inline-block" src="${defaultUserImage}" alt="${profilePhotoAlt}" id="output" />`);
+                                        var image = document.getElementById("output");
+
+                                        $(this).fadeIn('slow');
+                                        inputImage.prop('readonly', false);
+
+                                        //click listener must also be included here
+                                        $(image).click(function () {
+                                            inputImage.click();
+                                        });
+                                    });
+                                });
+                        });
+                    }
+                    else if (inputImage.val().split("\\").pop().length) {
+                        inputImage.prop('readonly', true);
+                        inputImage.removeClass('is-invalid');
+                        inputImage.addClass('is-valid');
+                        $('#validation-ProfilePhoto').html('');
+
+                        $('.img-holder').fadeOut('fast', function () {
+                            $(this).html('<i class="text-primary fas fa-spinner fa-spin no-tick" style="margin-top:42% !important;"></i>')
+                                .fadeIn(800, function () {
+                                    $(this).fadeOut(800, function () {
+                                        $(this).html(`<img class="d-inline-block" src="" alt="${profilePhotoAlt}" id="output" />`);
+                                        var image = document.getElementById("output");
+                                        image.src = URL.createObjectURL(event.target.files[0]);
+
+                                        $(this).fadeIn('slow');
+                                        inputImage.prop('readonly', false);
+
+                                        //click listener must also be included here
+                                        $(image).click(function () {
+                                            inputImage.click();
+                                        });
+                                    });
+                                });
+                        });
+
+                        inputImage.siblings(".custom-file-label").addClass("selected").html('<i class="far fa-check text-success mr-2"></i>Slika izabrana');
+                    }
+                }
+            });
+
+            function FileExtensionValid(inputImage) {
+                let fileName = $(inputImage).val().split("\\").pop();
+                if (fileName.length && ($.inArray($(inputImage).val().split('.').pop().toLowerCase(), fileExtension) == -1))
+                    return false;
+
+                return true;
+            }
+
+            firstName.on('input', function () {
+                if (!firstName.val()) {
+                    $('#firstname').html(firstName.attr('placeholder'));
+                } else {
+                    $('#firstname').html(firstName.val());
+                }
+            });
+
+            lastName.on('input', function () {
+                if (!lastName.val()) {
+                    $('#lastname').html(lastName.attr('placeholder'));
+                } else {
+                    $('#lastname').html(lastName.val());
+                }
+            });
+
+            function ElementIsValid(element) {
+                return applyForm.validate().element($(element));
+            }
+
+            function FormIsValid() {
+                const fileExtensionValid = FileExtensionValid(inputImage);
+                const inputImageValid = ElementIsValid(inputImage);
+                const firstNameValid = ElementIsValid(firstName);
+                const lastNameValid = ElementIsValid(lastName);
+                const phoneNumberValid = ElementIsValid(phoneNumber);
+                const yearOfBirthValid = ElementIsValid(yearOfBirth);
+                const genderValid = ElementIsValid(gender);
+                const streetValid = ElementIsValid(street);
+                const houseNumberValid = ElementIsValid(houseNumber);
+                const cityValid = ElementIsValid(city);
+                const postalCodeValid = ElementIsValid(postalCode);
+                const underSupervisionValid = ElementIsValid(underSupervision);
+                const legalEntityIsValid = ElementIsValid(legalEntity);
+                const universityValid = ElementIsValid(university);
+                const techniquesValid = ElementIsValid(techniques);
+                const specialtiesValid = ElementIsValid(specialties);
+                const pastCompaniesValid = ElementIsValid(pastCompanies);
+                const termsOfServiceValid = ElementIsValid(termsOfService);
+                const privacyPolicyValid = ElementIsValid(privacyPolicy);
+                const therapistTermsOfServiceValid = ElementIsValid(therapistTermsOfService);
+
+                GenderDropdownHighlighter();
+                TechniquesDropdownHighlighter();
+                SpecialtiesDropdownHighlighter();
+
+                return (fileExtensionValid && inputImageValid && firstNameValid &&
+                    lastNameValid && phoneNumberValid &&
+                    yearOfBirthValid && genderValid &&
+                    streetValid && houseNumberValid &&
+                    cityValid && postalCodeValid &&
+                    underSupervisionValid && legalEntityIsValid && universityValid &&
+                    pastCompaniesValid && techniquesValid &&
+                    specialtiesValid && termsOfServiceValid &&
+                    privacyPolicyValid && therapistTermsOfServiceValid);
+            }
+
+            function EnableInputs() {
+                submit.prop('disabled', false);
+                cancel.prop('disabled', false);
+                firstName.prop('readonly', false);
+                lastName.prop('readonly', false);
+                phoneNumber.prop('readonly', false);
+                yearOfBirth.prop('readonly', false);
+                street.prop('readonly', false);
+                houseNumber.prop('readonly', false);
+                city.prop('readonly', false);
+                postalCode.prop('readonly', false);
+                university.prop('readonly', false);
+                pastCompanies.prop('readonly', false);
+            }
+
+            function DisableInputs() {
+                submit.prop('disabled', true);
+                cancel.prop('disabled', true);
+                firstName.prop('readonly', true);
+                lastName.prop('readonly', true);
+                phoneNumber.prop('readonly', true);
+                yearOfBirth.prop('readonly', true);
+                street.prop('readonly', true);
+                houseNumber.prop('readonly', true);
+                city.prop('readonly', true);
+                postalCode.prop('readonly', true);
+                university.prop('readonly', true);
+                pastCompanies.prop('readonly', true);
+
+            @*//Dropdpwns
+                $('button[data-id="Chosen_SpecialtiesIds]"').prop('disabled', true);
+                $('button[data-id="Chosen_SpecialtiesIds]"').prop('disabled', true);*@
+            }
+
+            function HandleError(title, body, severity) {
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                    toastr[severity](body, title);
+                })
+                    .promise()
+                    .done(function () {
+                        setTimeout(function () {
+                            submitText.fadeOut('fast', function () {
+                                $(this).html(submitTextUnchanged).fadeIn('slow');
+                                EnableInputs();
+                            });
+                        }, 1300)
+                    })
+            }
+        });
+    </script>
+}

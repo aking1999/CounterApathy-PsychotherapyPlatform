@@ -1,0 +1,175 @@
+﻿@model List<DataTransferObjects.ViewModels.Therapist.BookedSessionViewModel>
+@using Framework.Helpers.ExtensionMethods
+@inject Framework.Interfaces.IDateTimeHelper DateHelper
+@{
+    ViewData.SetTitle("Zakazane seanse");
+    ViewData.SetMetaDescription("Vaše seanse koje su klijenti zakazali.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/star-rating/star-rating.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("fal fa-calendar-check fa-sm",
+        "text-success",
+        ViewData.GetTitle(),
+        ViewData.GetMetaDescription()))
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavFilter.cshtml",
+    new WebApplication9.WidgetViewModels.NavFilterWithClearWidgetViewModel("Therapist",
+        "Sessions",
+        "BookedSessions",
+        new List<WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel>()
+        {
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("bydate", false, "far fa-calendar", "text-success", "Datum", "date-dropdown", "bydate", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>()
+            {
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Sessions", "BookedSessions", "datum", "danas", "Danas"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Sessions", "BookedSessions", "datum", "ova-nedelja", "Ova nedelja"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Sessions", "BookedSessions", "datum", "ovaj-mesec", "Ovaj mesec"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-secondary", "Therapist", "Sessions", "BookedSessions", "datum", "ova-godina", "Ova godina")
+            }),
+            new WebApplication9.WidgetViewModels.NavFilterDropdownWidgetViewModel("bystatus", false, "far fa-analytics", "text-danger", "Status", "status-dropdown", "bystatus", new List<WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel>()
+            {
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-warning", "Therapist", "Sessions", "BookedSessions", "status", "na-čekanju", "Na čekanju"),
+                new WebApplication9.WidgetViewModels.NavFilterDropdownLinkWidgetViewModel("text-success", "Therapist", "Sessions", "BookedSessions", "status", "završeno", "Završeno")
+            })
+        }))
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var bookedSession in Model)
+        {
+            <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 pb-3">
+                <div class="card card-border-top-info h-100 card-span">
+                    <div class="card-header border-0 d-flex align-items-center">
+                        <div class="avatar avatar-3xl">
+                            <img src="@bookedSession.ProfilePhoto"
+                                 class="rounded-circle"
+                                 alt="Klijent @bookedSession.ClientFirstName @bookedSession.ClientLastName"
+                                 style="min-width: 3.5rem !important;" />
+                        </div>
+                        <h5 class="text-secondary fs-0 mr-auto mb-0 pl-3">
+                            @bookedSession.ClientFirstName @bookedSession.ClientLastName
+                        </h5>
+                        <div class="justify-content-end ml-auto">
+                            <span id="status-@bookedSession.BookingId" class="badge badge-soft-warning">
+                                <i class="fas fa-stream mr-1"></i>Na čekanju
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <ul class="list list-unstyled">
+                                    <li>
+                                        <i class="fal fa-users fa-fw text-info mr-2"></i>@bookedSession.TherapistFirstName @bookedSession.TherapistLastName
+                                    </li>
+                                    @if (bookedSession.EndTime.Day > bookedSession.StartTime.Day)
+                                    {
+                                        <li>
+                                            <i class="fal fa-calendar fa-fw text-success mr-2"></i>@DateHelper.DateTimeStringFromDateTime(bookedSession.StartTime)h &minus; @DateHelper.DateTimeStringFromDateTime(bookedSession.EndTime)h
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li><i class="fal fa-calendar fa-fw text-success mr-2"></i>@DateHelper.DateStringFromDateTime(bookedSession.StartTime)</li>
+                                        <li><i class="fal fa-clock fa-fw text-success mr-2"></i>@DateHelper.TimeStringFromDateTime(bookedSession.StartTime)h &minus; @DateHelper.TimeStringFromDateTime(bookedSession.EndTime)h</li>
+                                    }
+                                </ul>
+                            </div>
+                            <div class="col-sm-6">
+                                <ul class="list list-unstyled text-right">
+                                    @{
+                                        var sessionTypeText = string.Empty;
+                                        var sessionTypeIcon = string.Empty;
+
+                                        if (bookedSession.Type == 0)
+                                        {
+                                            sessionTypeText = "Individualna seansa";
+                                            sessionTypeIcon = "fa-user";
+                                        }
+                                        else
+                                        {
+                                            sessionTypeText = "Grupna seansa";
+                                            sessionTypeIcon = "fa-user-friends";
+                                        }
+                                    }
+                                    <li><i class="fal @sessionTypeIcon mr-2" style="color: #0000FF"></i>@sessionTypeText</li>
+                                    <li>Metoda:<i class="@bookedSession.ContactMethod.Icon ml-2 mr-1" style="color: @bookedSession.ContactMethod.Color"></i>@bookedSession.ContactMethod.Name</li>
+                                    <li>RSD @bookedSession.Price</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <div class="d-inline-block">
+                            @if (bookedSession.HasRating)
+                            {
+                                @await Html.TryPartialAsync("~/Views/Shared/_RenderStars.cshtml", bookedSession.StarsRating);
+                            }
+                            else
+                            {
+                                @await Html.TryPartialAsync("~/Views/Shared/_RenderCountdown.cshtml", new WebApplication9.PartialViewModels.CountdownPartialViewModel()
+                                {
+                                    CountdownId = bookedSession.BookingId,
+                                    StartTime = DateHelper.ConvertDateTimeToDateTimeStringISO(bookedSession.StartTime),
+                                    EndTime = DateHelper.ConvertDateTimeToDateTimeStringISO(bookedSession.EndTime)
+                                })
+                            }
+
+                            @await Html.TryPartialAsync("~/Views/Shared/_RenderSessionStatus.cshtml", new WebApplication9.PartialViewModels.CountdownPartialViewModel()
+                            {
+                                CountdownId = bookedSession.BookingId,
+                                StartTime = DateHelper.ConvertDateTimeToDateTimeStringISO(bookedSession.StartTime),
+                                EndTime = DateHelper.ConvertDateTimeToDateTimeStringISO(bookedSession.EndTime)
+                            })
+                        </div>
+                        <div>
+                            <a href='@Url.Action("Details", "Sessions", new { Area = "Therapist", bookingId = bookedSession.BookingId })'
+                               class="btn btn-mini btn-info"
+                               data-toggle="tooltip"
+                               data-placement="bottom"
+                               title="Detalji seanse"
+                               target="_blank">
+                                <i class="far fa-eye m-0"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center px-4 mb-3 text-secondary">
+            Trenutno nijedan klijent nije zakazao seansu sa Vama ili ste izabrali kriterijum pretrage koji nijedna zakazana seansa ne ispunjava.
+            <br />
+            <strong>Sve Vaše seanse koje klijenti zakažu biće prikazane ovde.</strong>
+            <br />
+            Kliknite na dugme ispod kako biste pregledali sve svoje trenutne dodate seanse.
+        </div>
+        <div class="col-12 text-center mb-3">
+            <a href='@Url.Action("All", "Sessions", new { Area = "Therapist" })'
+               class="btn btn-sm btn-success text-decoration-none">
+                <i class="far fa-calendar mr-2"></i>Pregledajte seanse
+            </a>
+        </div>
+    }
+</div>
+
+@await Html.TryPartialAsync("~/Views/Shared/FAQs/Therapist/_EarningsWithdrawalsFAQ.cshtml")
+
+@section Scripts {
+    <script src="~/year-picker/moment.min.js"></script>
+    <script src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#container-main main').removeClass('pb-3');
+        })
+    </script>
+    <script async src="~/js/accordion-setup.js"></script>
+}

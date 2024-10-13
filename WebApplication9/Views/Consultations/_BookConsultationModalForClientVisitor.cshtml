@@ -1,0 +1,235 @@
+﻿@model WebApplication9.ViewModels.TherapistConsultationsViewModel
+@inject Framework.Interfaces.IDateTimeHelper DateHelper
+
+<link id="swal-styles-@Model.TherapistId" rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+<div id="free-consultations-modal-@Model.TherapistId"
+     data-backdrop="static"
+     data-keyboard="false"
+     data-toggle="modal"
+     class="modal theme-modal fade p-0"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ModalLabel"
+     aria-hidden="true"
+     style="overflow-y: auto !important">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content border">
+            <div class="modal-header border-bottom-0 mb-n2 pb-0">
+                <h5 class="modal-title text-center mx-auto">Izaberite termin za besplatne konsultacije</h5>
+            </div>
+            <form autocomplete="off">
+                @Html.AntiForgeryToken()
+                <div class="modal-body mx-md-2 py-0">
+                    <div class="row">
+                        <div class="col-12">
+                            @if (Model != null && Model.DayOfWeekNameConsultations.Any())
+                            {
+                                @foreach (var freeConsultationsDate in Model.DayOfWeekNameConsultations)
+                                {
+                                    @if (freeConsultationsDate.Consultations.Any())
+                                    {
+                                        <h5 class="text-secondary font-weight-normal fs-0 mt-4 pb-1">
+                                            @freeConsultationsDate.DayOfWeekName, <span style="font-size:0.88rem !important;">@freeConsultationsDate.DayOfWeekDateTime</span>
+                                        </h5>
+                                        @foreach(var freeConsultation in freeConsultationsDate.Consultations)
+                                        { 
+                                            <button data-free-consultation-id="@freeConsultation.Id"
+                                                    data-consultation-date="@freeConsultationsDate.DayOfWeekDateTime"
+                                                    data-consultation-start-time="@DateHelper.TimeStringFromDateTime(freeConsultation.StartDateTime)"
+                                                    type="button"
+                                                    style="opacity: 1 !important;"
+                                                    class="btn-book-free-consultation btn btn-sm btn-soft-primary mt-2 mr-1">
+                                                <span class="btn-book-free-consultation-text">
+                                                    @DateHelper.TimeStringFromDateTime(freeConsultation.StartDateTime) - @DateHelper.TimeStringFromDateTime(freeConsultation.EndDateTime)
+                                                </span>
+                                            </button>   
+                                        }
+                                        <div class=" border-dotted-bottom-4 mt-4"></div>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <p class="text-secondary text-center mt-3 mb-0">Ovaj psihoterapeut trenutno nema slobodne termine besplatnih konsultacija.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer border-top-0">
+                <button id="btn-close-modal" type="button" class="btn btn-sm btn-falcon-secondary" data-dismiss="modal">Zatvori</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="script-@Model.TherapistId">
+    $(document).ready(function () {
+        const therapistId = '@Model.TherapistId';
+        let freeConsultationModal = $(`#free-consultations-modal-${therapistId}`);
+        const bookConsultationButtons = $('.btn-book-free-consultation');
+        const btnCloseModal = $('#btn-close-modal');
+
+        freeConsultationModal.modal();
+
+        freeConsultationModal.on('hidden.bs.modal', function () {
+            freeConsultationModal.remove();
+            $(`#script-${therapistId}`).remove();
+        })
+
+        btnCloseModal.click(function () {
+            setTimeout(function () {
+                $(`#swal-styles-${therapistId}`).remove();
+                $(`#swal-script-${therapistId}`).remove();
+            }, 100)
+        })
+
+        bookConsultationButtons.click(function () {
+            const targetButton = $(this);
+            const targetButtonText = targetButton.find('.btn-book-free-consultation-text');
+            const targetButtonTextUnchanged = targetButtonText.html();
+
+            Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-sm btn-info mr-2",
+                    cancelButton: "btn btn-sm btn-falcon-secondary"
+                },
+                buttonsStyling: false
+            }).fire({
+                title: `Želite li zakazati besplatne konsultacije ` +
+                       `za datum ${targetButton.attr('data-consultation-date')}, u ${targetButton.attr('data-consultation-start-time')}h?`,
+                html: '<div class="alert alert-primary mb-0 text-dark-primary" role="alert">' +
+                      'Google Meet link za pristup konsultacijama biće poslat na Vaš imejl najkasnije 4 sata do početka.' +
+                      '</div>',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: "Zakaži",
+                cancelButtonText: "Odustajem",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    DisableFreeConsultationInputs();
+                    let width = targetButton.width();
+                    let height = targetButton.height();
+                    targetButtonText.fadeOut('fast', function () {
+                        $(this).html('<i class="fas fa-spinner text-primary fa-spin no-tick"></i>').fadeIn('slow');
+                        targetButton.width(width);
+                        targetButton.height(height);
+                    });
+
+                    setTimeout(function () {
+                        $.ajax({
+                            url: '@Url.Action("BookConsultation", "Consultations", new { Area = "" })',
+                            type: 'POST',
+                            data: { therapistId: therapistId, consultationId: targetButton.attr('data-free-consultation-id') },
+                            headers: {
+                                'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                            },
+                            success: function (response) {
+                                if (response.success === true) {
+                                    targetButtonText.fadeOut('fast', function () {
+                                        $(this).html('<i class="text-success fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                freeConsultationModal.modal('hide');
+                                                Swal.fire({
+                                                    title: response.title,
+                                                    text: response.body,
+                                                    icon: response.severity,
+                                                    confirmButtonColor: '#27bcfd',
+                                                    confirmButtonText: 'U redu'
+                                                }).then(() => {
+                                                    setTimeout(function () {
+                                                        $(`#swal-styles-${therapistId}`).remove();
+                                                        $(`#swal-script-${therapistId}`).remove();
+                                                    }, 200)
+                                                });
+                                            }, 600);
+                                        });
+                                    });
+                                } else {
+                                    if (response.consultationAlreadyBooked === true) {
+                                        targetButtonText.fadeOut('fast', function () {
+                                            $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                                            Swal.mixin({
+                                                customClass: {
+                                                    confirmButton: "btn btn-sm btn-success mr-2",
+                                                    cancelButton: "btn btn-sm btn-falcon-secondary"
+                                                },
+                                                buttonsStyling: false
+                                            }).fire({
+                                                title: response.title,
+                                                text: response.body,
+                                                icon: response.severity,
+                                                showCancelButton: true,
+                                                confirmButtonText: 'Zakažite seansu',
+                                                cancelButtonText: 'Odustajem'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    sessionStorage.setItem('showCalendarTab', 'true');
+                                                    window.location.href = response.therapistProfileUrl;
+                                                }
+                                            });
+                                        })
+                                            .promise()
+                                            .done(function () {
+                                                setTimeout(function () {
+                                                    targetButtonText.fadeOut('fast', function () {
+                                                        $(this).html(targetButtonTextUnchanged).fadeIn('slow');
+                                                        EnableFreeConsultationInputs();
+                                                    });
+                                                }, 1300)
+                                            })
+                                    } else if (response.redirectUrl) window.location.href = response.redirectUrl;
+                                    else {
+                                        targetButtonText.fadeOut('fast', function () {
+                                            $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                                            Swal.fire({
+                                                title: response.title,
+                                                text: response.body,
+                                                icon: response.severity
+                                            });
+                                        })
+                                            .promise()
+                                            .done(function () {
+                                                setTimeout(function () {
+                                                    targetButtonText.fadeOut('fast', function () {
+                                                        $(this).html(targetButtonTextUnchanged).fadeIn('slow');
+                                                        EnableFreeConsultationInputs();
+                                                    });
+                                                }, 1300)
+                                            })
+                                    }
+                                }
+                            },
+                            error: function () {
+                                targetButtonText.fadeOut('fast', function () {
+                                    $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                                    toastr['error']('Molimo osvežite stranicu i pokušajte ponovo ili kontaktirajte korisničku podršku.', 'Došlo je do greške');
+                                })
+                                    .promise()
+                                    .done(function () {
+                                        setTimeout(function () {
+                                            targetButtonText.fadeOut('fast', function () {
+                                                $(this).html(targetButtonTextUnchanged).fadeIn('slow');
+                                                EnableFreeConsultationInputs();
+                                            });
+                                        }, 1300)
+                                    })
+                            }
+                        })
+                    }, 1200);
+                }
+            });
+        })
+
+        function EnableFreeConsultationInputs() {
+            bookConsultationButtons.prop('disabled', false);
+            btnCloseModal.prop('disabled', false);
+        }
+
+        function DisableFreeConsultationInputs() {
+            bookConsultationButtons.prop('disabled', true);
+            btnCloseModal.prop('disabled', true);
+        }
+    });
+</script>
+<script id="swal-script-@Model.TherapistId" async src="~/sweet-alert2/sweetalert2.all.min.js"></script>

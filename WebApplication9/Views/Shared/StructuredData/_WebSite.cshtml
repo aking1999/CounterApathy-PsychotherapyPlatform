@@ -1,0 +1,12 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<script type="application/ld+json">
+    {
+      "@@context" : "https://schema.org",
+      "@@type" : "WebSite",
+      "name" : "@Configuration.GetSection("Application:AppName")?.Value",
+      "alternateName" : "@Configuration.GetSection("Application:AppNameSrb")?.Value",
+      "url" : "@Configuration.GetSection("Application:AppDomain")?.Value"
+    }
+</script>

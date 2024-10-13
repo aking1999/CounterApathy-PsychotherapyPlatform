@@ -1,0 +1,136 @@
+﻿@model WebApplication9.SharedPartialViewModels.OtpVerificationPartialViewModel
+@using Framework.Helpers.ExtensionMethods
+
+<link rel="stylesheet" href="~/css/otp-verification.css" />
+<form id="otp-form" class="row justify-content-center form-group" autocomplete="off">
+    <input asp-for="Digit1" class="form-control rounded text-center p-2" value="" maxlength="1" autofocus />
+    <input asp-for="Digit2" class="form-control rounded text-center p-2" value="" maxlength="1" readonly />
+    <input asp-for="Digit3" class="form-control rounded text-center p-2 mr-3" value="" maxlength="1" readonly />
+    <input asp-for="Digit4" class="form-control rounded text-center p-2" value="" maxlength="1" readonly />
+    <input asp-for="Digit5" class="form-control rounded text-center p-2" value="" maxlength="1" readonly />
+    <input asp-for="Digit6" class="form-control rounded text-center p-2" value="" maxlength="1" readonly />
+</form>
+<div id="spinner-holder"><i class="fas fa-check-circle text-success"></i></div>
+<button type="button" id="send-verification-code-again" class="btn btn-link text-decoration-none"><span id="send-verification-code-again-text">Ponovo pošalji kod</span></button>
+
+<script>
+    $(document).ready(function () {
+        const regex = /^[0-9]$/;
+        const inputs = document.querySelectorAll("#otp-form input");
+
+        inputs.forEach((input, index) => {
+            input.dataset.index = index;
+            input.addEventListener("keyup", HandleOtp);
+            input.addEventListener("paste", HandleOnPasteOtp);
+        });
+
+        $('#otp-form').click(function () {
+            const digit1 = inputs[0];
+            const digit2 = inputs[1];
+            const digit3 = inputs[2];
+            const digit4 = inputs[3];
+            const digit5 = inputs[4];
+            const digit6 = inputs[5];
+
+            if (!digit1.value.match(regex))
+                digit1.focus();
+            else if (!digit2.value.match(regex))
+                digit2.focus();
+            else if (!digit3.value.match(regex))
+                digit3.focus();
+            else if (!digit4.value.match(regex))
+                digit4.focus();
+            else if (!digit5.value.match(regex))
+                digit5.focus();
+            else if (!digit6.value.match(regex))
+                digit6.focus();
+        });
+
+        function HandleOtp(e) {
+            const input = e.target;
+            let value = input.value;
+
+            let isValidInput = value.match(regex);
+            input.value = "";
+            input.value = isValidInput ? value[0] : "";
+
+            let fieldIndex = input.dataset.index;
+            if (fieldIndex < inputs.length - 1 && isValidInput) {
+                input.setAttribute('readonly', true);
+                input.nextElementSibling.removeAttribute('readonly');
+                input.nextElementSibling.focus();
+            } else if (fieldIndex == inputs.length - 1) {
+                input.setAttribute('readonly', true);
+            }
+
+            if (e.key === "Backspace" && fieldIndex > 0) {
+                input.setAttribute('readonly', true);
+                input.previousElementSibling.removeAttribute('readonly');
+                input.previousElementSibling.focus();
+
+                if (!input.value) input.previousElementSibling.value = '';
+            }
+
+            let allEntered = true;
+            inputs.forEach((input) => {
+                if (!input.value.match(regex))
+                    allEntered = false;
+            });
+
+            if (allEntered && isValidInput) {
+                Submit();
+            }
+        }
+
+        function HandleOnPasteOtp(e) {
+            const data = e.clipboardData.getData("text");
+            const value = data.split("");
+            if (value.length === inputs.length) {
+                inputs.forEach((input, index) => (input.value = value[index]));
+                Submit();
+            }
+        }
+
+        function Submit() {
+            if (OtpFormIsValid()) {
+                inputs.forEach((input) => {
+                    input.disabled = true;
+                    input.classList.add("disabled");
+                });
+
+                // 👉 Call API below
+            }
+            else {
+                setTimeout(function () {
+                    Reset();
+                }, 3000)
+            }
+        }
+
+        function Reset() {
+            inputs.forEach((input) => {
+                input.value = '';
+                input.classList.remove('is-valid');
+                input.classList.remove('is-invalid');
+                input.classList.remove('disabled');
+                input.disabled = false;
+            });
+
+            inputs[0].removeAttribute('readonly');
+            inputs[0].focus();
+        }
+
+        function OtpElementIsValid(element) {
+            return $('#otp-form').validate().element(element);
+        }
+
+        function OtpFormIsValid() {
+            let allValid = true;
+            inputs.forEach((input) => {
+                if (!OtpElementIsValid($(input)))
+                    allValid = false;
+            });
+            return allValid;
+        }
+    });
+</script>

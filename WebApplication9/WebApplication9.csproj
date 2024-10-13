@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<UserSecretsId>aspnet-WebApplication9-CD97A436-0199-4C6D-952C-486F3E2510CE</UserSecretsId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <Optimize>false</Optimize>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Views\Shared\Guides\Therapist\**" />
+	  <Compile Remove="wwwroot\images\user-images\**" />
+	  <Content Remove="Views\Shared\Guides\Therapist\**" />
+	  <Content Remove="wwwroot\images\user-images\**" />
+	  <EmbeddedResource Remove="Views\Shared\Guides\Therapist\**" />
+	  <EmbeddedResource Remove="wwwroot\images\user-images\**" />
+	  <None Remove="Views\Shared\Guides\Therapist\**" />
+	  <None Remove="wwwroot\images\user-images\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.10" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.10" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.10">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.10" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
+		<PackageReference Include="Otp.NET" Version="1.3.0" />
+		<PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
+		<PackageReference Include="Stripe.net" Version="41.21.0" />
+		<PackageReference Include="Winton.AspNetCore.Seo" Version="3.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\BackgroundTasks\BackgroundTasks.csproj" />
+		<ProjectReference Include="..\Database\Database.csproj" />
+		<ProjectReference Include="..\DataTransferObjects\DataTransferObjects.csproj" />
+		<ProjectReference Include="..\Framework\Framework.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="Views\Authorization\EmailConfirmed.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Logs\EmailLogs\" />
+	</ItemGroup>
+
+	<ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+
+</Project>

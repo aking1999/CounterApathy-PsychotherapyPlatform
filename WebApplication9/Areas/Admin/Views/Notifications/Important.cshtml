@@ -1,0 +1,66 @@
+﻿@using Framework.Helpers.ExtensionMethods;
+@using WebApplication9.SharedPartialViewModels;
+
+@{
+    ViewData["Title"] = "Important notifications";
+    Layout = "~/Views/Shared/_NotificationCenterLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/notification-center/notification-center.css" />
+<link rel="stylesheet" href="~/notification/notifications.css" />
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            @await Html.TryPartialAsync("~/Views/Shared/Menues/_SideMenu.cshtml",
+                new SideMenuPartialViewModel("fal fa-bells", "Notification center", "text-danger",
+                    new List<SideMenuItemPartialViewModel>()
+                    {
+                        new SideMenuItemPartialViewModel("", "Admin", "Notifications", "All", "fal fa-envelope-open text-info", "All notifications"),
+                        new SideMenuItemPartialViewModel("unread-notifications", "", "Admin", "Notifications", "Unread", "fal fa-envelope text-info", "Unread", true),
+                        new SideMenuItemPartialViewModel("active", "Admin", "Notifications", "Important", "fal fa-star text-warning", "Important")
+                    })
+                )
+            <div class="col-lg-9">
+                <div id="notification-center-content" class="notification-ui_dd-content">
+                    <aleksajecar2 id="notifications-holder" style="display: none;">
+                        <div class="card card-span mb-3">
+                            <div id="notification-list-main" class="notification-list">
+                                <div class="notification-list_icon">
+                                    <i id="notification-icon-main" class="fa-lg fa-fw no-tick"></i>
+                                </div>
+                                <div class="notification-list_detail">
+                                    <p id="notification-text-main" class="notification-text text-break"></p>
+                                    <p class="pt-3">
+                                        <small id="days-ago-main"></small>
+                                    </p>
+                                    <p id="paragraph-mark-read-main" class="mb-0">
+                                        <small id="small-mark-read-main">
+                                            <i id="important-main" class="important-star fal fa-star no-tick"></i>
+                                        </small>
+                                    </p>
+                                </div>
+                                <div class="notification-list_feature-icon">
+                                    <p>
+                                        <small>
+                                            <i id="check-icon-main" class="fa-fw"></i>
+                                            <span id="read-main"></span>
+                                        </small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </aleksajecar2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
+<script>
+    var url = '@await Url.GetNotificationsUrlBasedOnRole()';
+    var notificationHubUrl = '/@Framework.Notifications.NotificationHub.Url';
+</script>
+<script src="~/notification-center/notification-center-important-notifications.js"></script>
+

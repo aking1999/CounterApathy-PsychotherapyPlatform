@@ -1,0 +1,49 @@
+﻿@using Framework.Helpers.ExtensionMethods
+
+<link rel="stylesheet" href="~/notification/notifications.css" />
+
+<li id="a" class="nav-item dropdown notification-ui show">
+    <a class="nav-link dropdown-toggle notification-ui_icon" href="#" id="notif-navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <div id="main-notif" class="notification"></div>
+    </a> <!-- obrisah show odavde ispod-->
+    <div id="notif-dropdown-menu" class="dropdown-menu notification-ui_dd" aria-labelledby="navbarDropdown">
+        <div class="notification-ui_dd-header">
+            <h3 class="text-center">Notifikacije</h3>
+        </div>
+        <div id="notification-section-dropdown-content" class="notification-ui_dd-content">
+            <aleksajecar id="anchor-main" style="display: none;">
+                <div id="notification-list-main" class="notification-list">
+                    <div class="notification-list_icon">
+                        <i id="notification-icon-main" class="fa-lg fa-fw no-tick"></i>
+                    </div>
+                    <div class="notification-list_detail">
+                        <p id="notification-text-main" class="notification-text text-break"></p>
+                        <p class="pt-3">
+                            <small id="days-ago-main"></small>
+                        </p>
+                        <p id="paragraph-mark-read-main" class="mb-0">
+                            <small id="small-mark-read-main">
+                                <button id="mark-read-main" class="btn btn-mini btn-soft-primary border-0">
+                                    Označi kao pročitano
+                                </button>
+                            </small>
+                        </p>
+                    </div>
+                    <div class="notification-list_feature-icon">
+                        <p class="d-flex align-items-start">
+                            <small>
+                                <i id="check-icon-main"></i>
+                                <span id="read-main"></span>
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </aleksajecar>
+        </div>
+        <div class="notification-ui_dd-footer">
+            <a asp-area="@await User.GetAreaAsync()" asp-controller="Notifications" asp-action="All" class="btn btn-falcon-success btn-block">Pogledajte sve</a>
+        </div>
+    </div>
+</li>
+
+@await Html.TryPartialAsync("_InitializeNotifications") 

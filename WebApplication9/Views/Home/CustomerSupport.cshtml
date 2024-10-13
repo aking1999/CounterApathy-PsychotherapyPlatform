@@ -1,0 +1,389 @@
+﻿@model DataTransferObjects.ViewModels.Client.CustomerSupportViewModel
+@using Framework.Helpers
+@using Framework.Helpers.ExtensionMethods
+@using WebApplication9.SharedPartialViewModels;
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var appName = Configuration.GetSection("Application:AppName")?.Value;
+
+    ViewData.SetTitle("Korisnička podrška");
+    ViewData.SetMetaDescription("Kontaktirajte naš tim za korisničku podršku ukoliko imate pitanja, " +
+        $"ideje ili povratne informacije u vezi sa našim uslugama ovde na {appName}.com. " +
+        "Rado bismo pomogli u svemu što Vam je potrebno!");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/multiselect/bootstrap-select.min.css" />
+    <link rel="stylesheet" href="~/notification-center/notification-center.css" />
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+}
+
+<div class="row">
+    @await Html.TryPartialAsync("~/Views/Shared/Menues/_SideMenu.cshtml",
+        new SideMenuPartialViewModel("fal fa-info-circle", "Centar za pomoć", "text-info",
+            new List<SideMenuItemPartialViewModel>()
+            {
+                new SideMenuItemPartialViewModel("", null, "Home", "About", "fal fa-address-card fa-fw text-info", "O nama"),
+                new SideMenuItemPartialViewModel("", null, "Consultations", "Index", "fal fa-comments-alt fa-fw text-primary", "Besplatne konsultacije"),
+                new SideMenuItemPartialViewModel("", null, "Guides", "BookingRoadmap", "fal fa-calendar-check fa-fw text-success", "Lako zakažite seansu"),
+                new SideMenuItemPartialViewModel("", null, "Therapists", "PsychotherapistsExperiences", "fal fa-star fa-fw text-warning", "Iskustva sa psihoterapije"),
+                //new SideMenuItemPartialViewModel("", null, "Home", "EasySiteNavigation", "fal fa-map-marked fa-fw text-info", "Easy site navigation"),
+                new SideMenuItemPartialViewModel("", null, "Home", "FAQ", "fal fa-question fa-fw text-info", "Česta pitanja"),
+                new SideMenuItemPartialViewModel("", null, "Guides", "All", "fal fa-book-open fa-fw text-primary", "Uputstva"),
+                new SideMenuItemPartialViewModel("", null, "Home", "TermsOfService", "fal fa-scroll fa-fw text-primary", "Uslovi korišćenja"),
+                new SideMenuItemPartialViewModel("", null, "Home", "TherapistsTerms", "fal fa-scroll fa-fw text-primary", "Uslovi za terapeute"),
+                new SideMenuItemPartialViewModel("", null, "Home", "Privacy", "fal fa-shield fa-fw text-primary", "Politika privatnosti"),
+                new SideMenuItemPartialViewModel("active", null, "Home", "CustomerSupport", "fal fa-user-headset fa-fw text-pink", "Korisnička podrška")
+            })
+        )
+    <div class="col-lg-9">
+        <div class="row">
+            <div class="col-12 col-lg-7">
+                <div class="card h-100">
+                    <div class="card-header border-bottom-0">
+                        <h5 class="mb-0 text-secondary fs-1"><i class="fal fa-user-headset fa-fw text-pink mr-2 no-tick"></i>Korisnička podrška</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="ticket-form" autocomplete="off">
+                            @Html.AntiForgeryToken()
+                            <div class="form-group">
+                                <label asp-for="Chosen_TopicId"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-question fa-fw"></i></span>
+                                    </div>
+                                    <select asp-for="Chosen_TopicId"
+                                            data-dropup-auto="false"
+                                            class="selectpicker form-control"
+                                            data-live-search="true"
+                                            title="Izaberite temu"
+                                            data-size="4">
+                                        @if (Model.ToChooseFrom_Topics != null && Model.ToChooseFrom_Topics.Any())
+                                        {
+                                            foreach (var topic in Model.ToChooseFrom_Topics)
+                                            {
+                                                var concat = Helper.GetObjectIconAndNameAndColor(topic.Text);
+
+                                                <option value="@topic.Value" data-content="<i class='@concat[0] fa-fw mr-2' style='color:@concat[2];'></i>@concat[1]">
+                                                    @concat[1]
+                                                </option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="" disabled>Teme nisu dostupne.</option>
+                                        }
+                                    </select>
+                                </div>
+                                <span>
+                                    <span asp-validation-for="Chosen_TopicId" class="invalid-feedback"></span>
+                                    <br />
+                                </span>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-lg-6">
+                                    <div class="form-group">
+                                        <label asp-for="FirstName"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                                            </div>
+                                            <input asp-for="FirstName"
+                                                   class="form-control" />
+                                        </div>
+                                        <span>
+                                            <span asp-validation-for="FirstName" class="invalid-feedback"></span>
+                                            <br />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="form-group">
+                                        <label asp-for="LastName"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fal fa-user fa-fw"></i></span>
+                                            </div>
+                                            <input asp-for="LastName"
+                                                   class="form-control" />
+                                        </div>
+                                        <span>
+                                            <span asp-validation-for="LastName" class="invalid-feedback"></span>
+                                            <br />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label asp-for="Email"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fal fa-envelope fa-fw"></i></span>
+                                            </div>
+                                            <input asp-for="Email"
+                                                   class="form-control" />
+                                        </div>
+                                        <span>
+                                            <span asp-validation-for="Email" class="invalid-feedback"></span>
+                                            <br />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label asp-for="Text"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fal fa-bars fa-fw"></i></span>
+                                            </div>
+                                            <textarea asp-for="Text"
+                                                      rows="3"
+                                                      class="form-control">
+                                                    </textarea>
+                                        </div>
+                                        <span>
+                                            <span asp-validation-for="Text" class="invalid-feedback"></span>
+                                            <br />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="text-right">
+                                        <button type="button"
+                                                id="btn-submit"
+                                                class="btn btn-sm btn-primary">
+                                            <span id="btn-submit-text">&nbsp;Pošalji&nbsp;</span>
+                                        </button>
+                                    </div>
+                                    <div class="border-dotted-bottom-4 my-4"></div>
+                                    <div class="mt-3 notranslate">Support / podrška:</div>
+                                    <ul class="mb-0">
+                                        <li class="mt-3 notranslate"><a class="text-decoration-none" href="mailto:@($"support@{appName}.com")">@($"support@{appName}.com")</a></li>
+                                        <li class="mt-3 notranslate"><a class="text-decoration-none" href="mailto:@($"podrska@{appName}.com")">@($"podrska@{appName}.com")</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-5 mt-3 mt-lg-0">
+                <div class="card h-100">
+                    <div class="card-header border-bottom-0 pb-0">
+                        <h5 class="mb-0 text-secondary fs-1"><i class="fal fa-address-book fa-fw text-primary mr-2 no-tick"></i>Naši kontakt podaci</h5>
+                    </div>
+                    <div class="card-body notranslate">
+                        <img src="~/images/content-images/flags/offices.png" alt="kontakt imejlovi" />
+                        @*<div class="font-weight-bold"><img src="~/images/content-images/flags/us.svg" width="26" class="d-inline-block mr-2" />United States Office:</div>
+                        <div>@($"office@{appName}.com")</div>
+                        <div class="mt-3 font-weight-bold"><img src="~/images/content-images/flags/at.svg" width="26" class="d-inline-block mr-2" />Austria Office:</div>
+                        <div>@($"office.at@{appName}.com")</div>
+                        <div class="mt-3 font-weight-bold"><img src="~/images/content-images/flags/rs.svg" width="26" class="d-inline-block mr-2" />Serbia Office:</div>
+                        <div>@($"office.rs@{appName}.com")</div>
+                        <div class="mt-3 font-weight-bold"><img src="~/images/content-images/flags/hr.svg" width="26" class="d-inline-block mr-2" />Croatia Office:</div>
+                        <div>@($"office.hr@{appName}.com")</div>
+                        <div class="mt-3 font-weight-bold"><img src="~/images/content-images/flags/ba.svg" width="26" class="d-inline-block mr-2" />Bosnia Office:</div>
+                        <div>@($"office.ba@{appName}.com")</div>
+                        <div class="mt-3 font-weight-bold"><img src="~/images/content-images/flags/pl.svg" width="26" class="d-inline-block mr-2" />Poland Office:</div>
+                        <div>@($"office.pl@{appName}.com")</div>
+                        <div class="mt-3 font-weight-bold"><img src="~/images/content-images/flags/gb.svg" width="26" class="d-inline-block mr-2" />United Kingdom Office:</div>
+                        <div>@($"office.uk@{appName}.com")</div>
+                        <div class="mt-3 font-weight-bold"><img src="~/images/content-images/flags/de.svg" width="26" class="d-inline-block mr-2" />Germany Office:</div>
+                        <div>@($"office.de@{appName}.com")</div>
+                        <div class="mt-3 font-weight-bold"><img src="~/images/content-images/flags/fr.svg" width="26" class="d-inline-block mr-2" />France Office:</div>
+                        <div>@($"office.fr@{appName}.com")</div>
+                        <div class="mt-3 font-weight-bold"><img src="~/images/content-images/flags/it.svg" width="26" class="d-inline-block mr-2" />Italy Office:</div>
+                        <div>@($"office.it@{appName}.com")</div>
+                        <div class="mt-3 font-weight-bold"><img src="~/images/content-images/flags/hk.svg" width="26" class="d-inline-block mr-2" />Hong Kong Office:</div>
+                        <div>@($"office.hk@{appName}.com")</div>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script async src="~/multiselect/bootstrap-select.min.js"></script>
+    <script async src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <script async>
+            $(document).ready(function () {
+                $('#FirstName')
+                    .add('#LastName')
+                    .add('#Email')
+                    .prop('readonly', true);
+            })
+        </script>
+    }
+    <script async>
+        $(document).ready(function () {
+            let submit = $('#btn-submit');
+            let submitText = $('#btn-submit-text');
+            let submitTextUnchanged = submitText.html();
+            let ticketForm = $('#ticket-form');
+            let firstName = $('#FirstName');
+            let lastName = $('#LastName');
+            let email = $('#Email');
+            let text = $('#Text');
+            let topic = $('#Chosen_TopicId');
+            const requestAccountDeletionId = '@Framework.Providers.ClientSupportTicketTopicsProvider.RequestAccountDeletion.Id';
+            const signedIn = ('@User.Identity.IsAuthenticated' === 'True' || '@User.Identity.IsAuthenticated' === 'true');
+
+            if (signedIn && sessionStorage.getItem('requestedAccountDeletionHasWebCredit') === 'true') {
+                if ($(`#Chosen_TopicId option[value='${requestAccountDeletionId}']`).length)
+                    topic.val(`${requestAccountDeletionId}`).change();
+                sessionStorage.removeItem('requestedAccountDeletionHasWebCredit');
+            }
+
+            function TopicDropdownHighlighter() {
+                let topicParent = topic.closest('div');
+
+                if (topic.hasClass('is-valid')) {
+                    topicParent.removeClass('is-invalid');
+                    topicParent.addClass('is-valid');
+                } else if (topic.hasClass('is-invalid')) {
+                    topicParent.removeClass('is-valid');
+                    topicParent.addClass('is-invalid');
+                }
+            }
+
+            topic.change(function () {
+                let atLeastOneSelected = false;
+
+                $('#Chosen_TopicId > option').each(function () {
+                    if ($(this).is(':selected'))
+                        atLeastOneSelected = true;
+                });
+
+                if (atLeastOneSelected) {
+                    $(this).closest('div').removeClass('is-invalid');
+                    $(this).closest('div').addClass('is-valid');
+                } else {
+                    $(this).closest('div').removeClass('is-valid');
+                    $(this).closest('div').addClass('is-invalid');
+                }
+            })
+
+            submit.click(function () {
+                DisableInputs();
+                let width = submit.width();
+                let height = submit.height();
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin no-tick"></i>').fadeIn('slow');
+                    submit.width(width);
+                    submit.height(height);
+                })
+
+                setTimeout(function () {
+                    if (FormIsValid()) {
+                        let formData = new FormData(ticketForm.get(0));
+                        formData.append('support.FirstName', firstName.val());
+                        formData.append('support.LastName', lastName.val());
+                        formData.append('support.Email', email.val());
+                        formData.append('support.Text', text.val());
+                        formData.append('support.Chosen_TopicId', topic.val());
+
+                        $.ajax({
+                            url: '@Url.Action("CustomerSupport", "Home", new { Area = "" })',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            headers: {
+                                'RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    submitText.fadeOut('fast', function () {
+                                        $(this).html('<i class="ca-lightgreen fas fa-check no-tick"></i>').fadeIn('slow', function () {
+                                            setTimeout(function () {
+                                                Swal.fire({
+                                                    title: response.title,
+                                                    text: response.body,
+                                                    icon: response.severity,
+                                                    confirmButtonColor: '#00d27a',
+                                                    confirmButtonText: 'U redu'
+                                                }).then(() => {
+                                                    window.location.href = response.redirectUrl
+                                                });
+                                            }, 600)
+                                        })
+                                    })
+                                } else {
+                                    if (response.redirectUrl) window.location.href = response.redirectUrl;
+                                    else HandleError(response.title, response.body, response.severity);
+                                }
+                            },
+                            error: function (response) {
+                                HandleError('Došlo je do greške', 'Molimo osvežite stranicu i pokušajte ponovo.', 'error');
+                            }
+                        })
+                    } else HandleError('Popunite sva obavezna polja', '', 'info');
+                }, 1200)
+            })
+
+            function ElementIsValid(element) {
+                return ticketForm.validate().element($(element));
+            }
+
+            function FormIsValid() {
+                const firstNameValid = ElementIsValid(firstName);
+                const lastNameValid = ElementIsValid(lastName);
+                const emailValid = ElementIsValid(email);
+                const textValid = ElementIsValid(text);
+                const topicValid = ElementIsValid(topic);
+
+                TopicDropdownHighlighter();
+
+                return (firstNameValid && lastNameValid &&
+                    emailValid && textValid &&
+                    topicValid);
+            }
+
+            function EnableInputs() {
+                if (!signedIn) {
+                    firstName.prop('readonly', false);
+                    lastName.prop('readonly', false);
+                    email.prop('readonly', false);
+                }
+
+                submit.prop('disabled', false);
+                text.prop('readonly', false);
+            }
+
+            function DisableInputs() {
+                if (!signedIn) {
+                    firstName.prop('readonly', true);
+                    lastName.prop('readonly', true);
+                    email.prop('readonly', true);
+                }
+
+                submit.prop('disabled', true);
+                text.prop('readonly', true);
+            }
+
+            function HandleError(title, body, severity) {
+                submitText.fadeOut('fast', function () {
+                    $(this).html('<i class="text-danger fas fa-times no-tick"></i>').fadeIn('slow');
+                    toastr[severity](body, title);
+                })
+                .promise()
+                .done(function () {
+                    setTimeout(function () {
+                        submitText.fadeOut('fast', function () {
+                            $(this).html(submitTextUnchanged).fadeIn('slow');
+                            EnableInputs();
+                        });
+                    }, 1300)
+                });
+            }
+        });
+    </script>
+}

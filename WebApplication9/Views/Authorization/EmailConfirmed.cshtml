@@ -1,0 +1,92 @@
+﻿@model string
+@using Framework.Helpers.ExtensionMethods
+@{
+    ViewData.SetTitle("Imejl potvrđen");
+    ViewData.SetMetaDescription("Imejl uspešno potvrđen i sve funkcionalnosti su Vam otključane. Dobrodošli na CounterApathy platformu.");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/css/email-confirmed.css" />
+}
+
+<div class="row flex-center text-center">
+    <div class="col-sm-10 col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body p-4 p-sm-5">
+                <div class="card-ec no-tick" align="center">
+                    <div class="percent-ec">
+                        <svg class="svg-ec" id="svg-percentage">
+                            <circle class="circle-ec" cx="70" cy="70" r="70"></circle>
+                            <circle class="circle-ec" cx="70" cy="70" r="70"></circle>
+                        </svg>
+                        <div id="div-h2-percentage" class="num-ec">
+                            <h2 id="h2-percentage">
+                                <span class="span-ec" id="number-percentage">0</span><span id="percentage-sign">%</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <h2 class="mt-0 text-success" id="message-successful" style="visibility: hidden;">Imejl potvrđen</h2>@*Email confirmation successful*@
+                    <p class="text-secondary mb-0" id="redirect-message" style="visibility: hidden;">
+                        Preusmeravanje za <span id="number-of-seconds">3</span>s <i class="fas fa-spinner fa-spin no-tick"></i>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let i = 1;
+            let run;
+
+            function startProgressBar() {
+                if (i < 100) {
+                    i++;
+                    $("#number-percentage").html(i);
+                    $(".card-ec:nth-child(1) .svg-ec .circle-ec:nth-child(2)").animate(
+                        {
+                            "stroke-dashoffset": 440 - (440 * i) / 100,
+                        }, 3);
+                }
+                if (i >= 100) {
+                    clearInterval(run);
+                    $("#h2-percentage").add("#svg-percentage")
+                        .fadeOut(400)
+                        .promise()
+                        .done(function () {
+                            $(this)
+                                .html('<i class="far fa-check fa-lg text-success mb-3 no-tick"></i>')
+                                .fadeIn(800);
+                            $('#message-successful')
+                                .css('visibility', 'visible')
+                                .hide()
+                                .fadeIn(800);
+                            $('#redirect-message')
+                                .css('visibility', 'visible')
+                                .hide()
+                                .fadeIn(800)
+                                .promise()
+                                .done(function () {
+                                    let redirectSeconds = 2;
+                                    let redirectRunner = setInterval(function () {
+                                        if (redirectSeconds >= 0) {
+                                            $('#number-of-seconds').html(redirectSeconds);
+                                            redirectSeconds--;
+                                        } else {
+                                            clearInterval(redirectRunner);
+                                            window.location.href = '@Model';
+                                        }
+                                    }, 800)
+                                })
+                        });
+                }
+            }
+
+            run = setInterval(startProgressBar, 30);
+        });
+    </script>
+}
+

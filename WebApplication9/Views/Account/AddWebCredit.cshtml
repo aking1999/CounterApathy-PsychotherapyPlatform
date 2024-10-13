@@ -1,0 +1,196 @@
+﻿@model DataTransferObjects.ViewModels.Client.AddWebCreditViewModel
+@using Framework.Helpers.ExtensionMethods
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{ 
+    ViewData.SetTitle("Dodavanje Veb kredita");
+    ViewData.SetMetaDescription("Dopunite Veb kredit kako biste zakazali seansu sa izabranim psihoterapeutom. " +
+        "Mogući načini dopune: Kreditne kartice ili PayPal");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var _paypalSettings = Configuration.GetSection("PayPalSettings").Get<WebApplication9.Controllers.PayPalController.PayPalSettings>();
+}
+
+@section StyleSheets {
+    <link rel="stylesheet" href="~/css/multi-step-form.css" />
+    <style>
+        .progress-bar-ms .step .bullet:before, .progress-bar-ms .step .bullet:after {
+            position: absolute;
+            content: "";
+            bottom: 9.5px;
+            right: -155px !important;
+            height: 2px;
+            width: 151px !important;
+            background: var(--border);
+        }
+
+        @@media(max-width: 474px) {
+            .progress-bar-ms .step .bullet:before,
+            .progress-bar-ms .step .bullet:after {
+                right: -107px !important;
+                width: 103px !important;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="~/sweet-alert2/sweetalert2.min.css" />
+}
+
+@await Html.TryPartialAsync("~/Views/Shared/Widgets/_NavCard.cshtml",
+    new WebApplication9.WidgetViewModels.NavCardWidgetViewModel("far fa-usd-circle fa-sm",
+        "text-success",
+        ViewData.GetTitle(),
+        "Veb kredit se koristi za plaćanja na platformi, 0% provizije.",
+        "col-12"))
+
+<div id="main" class="mb-3">
+    <div class="container-ms">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="progress-bar-ms">
+            <div class="step">
+                <p class="text-secondary">Načini dopune</p>
+                <div class="bullet">
+                    <span>1</span>
+                </div>
+                <div class="check fas fa-check"></div>
+            </div>
+            <div class="step">
+                <p class="text-secondary">Detalji</p>
+                <div class="bullet">
+                    <span>2</span>
+                </div>
+                <div class="check fas fa-check"></div>
+            </div>
+        </div>
+        <div class="form-outer">
+            <form id="add-web-credit-form" autocomplete="off">
+                @Html.AntiForgeryToken()
+                <div id="first-slide" class="page slide-page">
+                    <div id="first-slide-inner">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                            <h6 class="mb-3 text-primary text-center">Izaberite način dopune</h6>
+                        </div>
+                        <div class="mx-1">
+                            <button id="pay-with-cards" class="btn btn-falcon-secondary btn-block btn-lg mb-1" type="button" tabindex="-1">
+                                <span>
+                                    <img src="~/images/content-images/payment-cards.png" width="220" alt="kreditne i debitne kartice" />
+                                </span>
+                            </button>
+                            <button id="pay-with-paypal" class="btn btn-falcon-secondary btn-block btn-lg disabled" disabled type="button" tabindex="-1">
+                                <span>
+                                    @*<input type="radio" name="options" id="option2" style="position: absolute;clip:rect(0,0,0,0)">*@
+                                    <img src="~/images/content-images/paypal.svg" width="100" alt="paypal logo" />
+                                    <span class="badge badge-soft-secondary badge-pill fs--2">
+                                        Uskoro
+                                    </span>
+                                </span>
+                            </button>
+                            <button id="pay-with-usdc" class="btn btn-falcon-secondary disabled btn-block btn-lg mb-1" type="button" tabindex="-1">
+                                <span>
+                                    <img src="~/images/content-images/usdc.svg" width="100" alt="usd coin logo" />
+                                    <span class="badge badge-soft-secondary badge-pill fs--2">
+                                        Uskoro
+                                    </span>
+                                </span>
+                            </button>
+                            <button id="pay-with-usdt" class="btn btn-falcon-secondary disabled btn-block btn-lg mb-1" type="button" tabindex="-1">
+                                <span>
+                                    <img src="~/images/content-images/usdt.svg" width="100" alt="usd tether logo" />
+                                    <span class="badge badge-soft-secondary badge-pill fs--2">
+                                        Uskoro
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="dynamic-slide"
+                     class="page"
+                     data-user-id="@Model.PostOfSerbia.Id"
+                     data-firstname="@Model.PostOfSerbia.FirstName"
+                     data-lastname="@Model.PostOfSerbia.LastName">
+                    <div id="cards-slide-inner" class="d-none">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                            <h6 class="mb-3 text-primary text-center">Unesite količinu koju biste dodali</h6>
+                        </div>
+                        <div class="form-group mb-0">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">RSD</span>
+                                </div>
+                                <input asp-for="Cards.Amount" class="amount form-control form-control-lg"
+                                       oninput="this.value = this.value.replace(/\D+/g, '')" value="" tabindex="-1" />
+                            </div>
+                            <span asp-validation-for="Cards.Amount" class="invalid-feedback"></span>
+                        </div>
+                        <p class="text-center my-3 pb-1">
+                            <small tabindex="-1">
+                                <i class="far fa-info-circle text-info mr-2"></i>Nastavkom, slažete se sa <a asp-controller="Home" asp-action="TermsOfService" target="_blank">uslovima korišćenja</a>.
+                            </small>
+                        </p>
+                        <button class="cards-next-1 next btn btn-primary btn-block btn-lg" type="button" tabindex="-1">
+                            <span id="cards-btnNext1Text">
+                                <i class="ca-lightgreen far fa-shield-check mr-2"></i>Zaštićena naplata
+                            </span>
+                        </button>
+                        <button class="cards-prev-1 prev border-0 text-secondary btn-block btn-lg" type="button" tabindex="-1">
+                            <span id="cards-btnPrev1Text">Prethodno</span>
+                        </button>
+                    </div>
+                    <div id="paypal-slide-inner" class="d-none">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                            <h6 class="mb-3 text-primary text-center">Unesite količinu koju biste dodali</h6>
+                        </div>
+                        <div class="form-group mb-0">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">RSD</span>
+                                </div>
+                                <input asp-for="PayPal.Amount" class="amount form-control form-control-lg"
+                                       oninput="this.value = this.value.replace(/\D+/g, '')" value="" tabindex="-1" />
+                                <div class="input-group-append" style="width: 30% !important;">
+                                    <span class="input-group-text w-100">~0.00<i class='fal fa-dollar-sign fa-sm text-success ml-1'></i></span>
+                                </div>
+                            </div>
+                            <span asp-validation-for="PayPal.Amount" class="invalid-feedback"></span>
+                        </div>
+                        <p class="text-center my-3 pb-1">
+                            <small tabindex="-1">
+                                <i class="far fa-info-circle text-info mr-2"></i>Nastavkom, slažete se sa <a asp-controller="Home" asp-action="TermsOfService" target="_blank">uslovima korišćenja</a>.
+                            </small>
+                        </p>
+                        <button class="paypal-next-1 next btn btn-primary btn-block btn-lg" type="button" tabindex="-1">
+                            <span id="paypal-btnNext1Text">
+                                <i class="ca-lightgreen far fa-shield-check mr-2"></i>Zaštićena naplata
+                            </span>
+                        </button>
+                        <button class="paypal-prev-1 prev border-0 text-secondary btn-block btn-lg" type="button" tabindex="-1">
+                            <span id="paypal-btnPrev1Text">Prethodno</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+@await Html.TryPartialAsync("~/Views/Shared/FAQs/ClientAndAnonymous/_WebCreditPaymentsFAQ.cshtml")
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const urls = {
+            cardsPayment: '@Url.Action("Pay", "Transactions")',
+            exchangeRate: '@Url.Action("GetUsdToRsdExchangeRate", "PayPal", new { Area = "" })',
+            executeOrder: '@Url.Action("ExecuteOrder", "PayPal", new { Area = "" })'
+        };
+        const paypalSettings = {
+            feePercentage: Number('@_paypalSettings.FeePercentage')
+        };
+    </script>
+    <script async src="https://js.stripe.com/v3/"></script>
+    <script async src="~/js/client/add-web-credit.js"></script>
+    <script async src="~/js/accordion-setup.js"></script>
+    <script async src="~/sweet-alert2/sweetalert2.all.min.js"></script>
+}
